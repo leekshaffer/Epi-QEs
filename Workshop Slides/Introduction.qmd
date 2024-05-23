@@ -1,0 +1,69 @@
+---
+title: "Introduction"
+author: "Lee Kennedy-Shaffer, PhD"
+date: "June 18, 2024"
+format: revealjs
+editor: visual
+---
+
+## How Will I Know?
+
+## About Me
+
+## Rise of Quasi-Experiments
+
+## QEs in Economics and Political Science
+
+## QEs in Epidemiology and Public Health
+
+## Considering the Role of Evidence
+
+## Workshop Plan: Part I
+
+::: {.fragment .fade-in-then-semi-out}
+[8:45--9:15]{style="color: purple"} Introduction to difference-in-differences
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[9:15--9:30]{style="color: purple"} Analysis 1: DID of cholera NPIs
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[9:30--10:00]{style="color: purple"} Advanced DID and staggered adoption
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[10:00--10:25]{style="color: purple"} Analysis 2: Advanced DID of COVID-19 vaccine mandates
+:::
+
+## Workshop Plan: Part II
+
+::: {.fragment .fade-in-then-semi-out}
+[10:30--11:00]{style="color: purple"} Introduction to synthetic control
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[11:00--11:30]{style="color: purple"} Analysis 3: SC of COVID-19 vaccine lottery
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[11:30--12:00]{style="color: purple"} Advanced SC methods
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[12:00--12:20]{style="color: purple"} Analysis 4: Advanced SC of PCVs
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+[12:20--12:30]{style="color: purple"} Conclusion
+:::
+
+## A Note on the Examples
+
+Infectious disease examples from published literature with available data
+
+## Let's Get To It!
+
+All materials: <https://github.com/leekshaffer/Epi-QEs/>
+
+QR code:

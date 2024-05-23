@@ -10,7 +10,7 @@ editor: visual
 
 # Staggered Adoption
 
-## Setting
+## Panel Data Setting
 
 ## Variety of 2x2s
 

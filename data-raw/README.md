@@ -1,6 +1,6 @@
 # Epi-QEs/Raw Data
 The sources of raw data for each of the workshop analyses are described below. In some cases, the raw data are available through this repository. In other cases, links are provided to the original repositories.
-The clean data files used in the analyses are all available in the Clean Data folder (https://github.com/leekshaffer/Epi-QEs/tree/main/data).
+The clean data files used in the analyses are all available in the [clean data folder](https://github.com/leekshaffer/Epi-QEs/tree/main/data).
 
 ## cholera
 Replication data for Coleman 2019 (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262234), Coleman 2024a (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3696028), and Coleman 2024b (https://doi.org/10.1016/j.socscimed.2024.116612), downloaded from https://github.com/tscoleman/SnowCholera on May 23, 2024.

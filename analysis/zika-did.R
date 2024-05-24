@@ -31,6 +31,16 @@ ggplot(data=zika_summ, mapping=aes(x=Year, y=LogBirths, color=State, linetype=St
                      minor_breaks=seq(10,12,by=.25)) +
   geom_vline(xintercept=2015, linetype="longdash", color="grey50")
 
+### Plot birth rate on log scale
+ggplot(data=zika_summ, mapping=aes(x=Year, y=LogRate, color=State, linetype=State)) +
+  geom_line() +
+  theme_bw() +
+  scale_y_continuous(name="Log Birth Rate (per 1000)",
+                     limits=c(2,3),
+                     breaks=seq(2,3,by=.2),
+                     minor_breaks=seq(2,3,by=.1)) +
+  geom_vline(xintercept=2015, linetype="longdash", color="grey50")
+
 ### Linear models
 zika_lm <- lm(Rate~trt+year+interaction, data=zika_full)
 summary(zika_lm)

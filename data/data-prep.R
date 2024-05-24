@@ -40,6 +40,7 @@ zika_full <- zika %>% dplyr::filter(!is.na(Pop)) %>% dplyr::add_row(zika_fix) %>
 zika_summ <- read_dta("data-raw/zika/Births_Fig2.dta") %>%
   mutate(State=factor(x=as.numeric(State), 
                       levels=c(26,43), labels=c("Pernambuco","Rio Grande do Sul")),
+         LogRate=log(Rate),
          LogBirths=log(LiveBirths))
 ### Save output in clean data folder:
 save(list=c("zika_full","zika_summ"), file="data/zika.Rda")

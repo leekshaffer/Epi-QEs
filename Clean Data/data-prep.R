@@ -85,3 +85,20 @@ save(list=c("lang_0624","lang_0912","lang_announce_dates"),
 ### Note that Fuller et al. identify a lottery in Missouri that Lang et al. do not use; 
 ### otherwise, the announce dates differ only by a few days in some cases
 
+
+## pcv data ##
+### Note that raw data files are not on the Epi-QEs github page, but are available at:
+### https://github.com/weinbergerlab/InterventionEvaluatR
+### Load and save data sets used in Bruhn et al.:
+load("Raw Data/pcv/data/pnas_brazil.rda")
+load("Raw Data/pcv/data/pnas_chile.rda")
+load("Raw Data/pcv/data/pnas_ecuador.rda")
+load("Raw Data/pcv/data/pnas_mexico.rda")
+load("Raw Data/pcv/data/pnas_us_ipd.rda")
+load("Raw Data/pcv/data/pnas_us_pneumonia.rda")
+load("Raw Data/pcv/data/ecuador_mortality.rda")
+save(list=c(paste0("pnas_",c("brazil","chile","ecuador","mexico","us_ipd","us_pneumonia")),
+            "ecuador_mortality"),
+     file="Clean Data/pcv.Rda")
+
+

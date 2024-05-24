@@ -49,39 +49,45 @@ save(list=c("zika_full","zika_summ"), file="data/zika.Rda")
 ## mandate data ##
 ### Read in dates, vaccine data, and population data
 Dates <- read_xlsx(path="data-raw/mandate/MandateDates.xlsx", sheet="Ballotpedia") %>%
-  dplyr::rename(Location=State) %>% mutate(Mandate_Start=as.Date(`Start Date`)) %>% 
+  mutate(Mandate_Start=as.Date(`Start Date`)) %>% 
   dplyr::select(-c(`Start Date`))
 Vax <- read_csv(file="data-raw/mandate/COVID-19_Vaccinations_in_the_United_States_Jurisdiction_20240508.csv") %>%
   mutate(DateT=mdy(Date))
-Pops <- read_xlsx(path="data-raw/mandate/Census_Pops.xlsx")
-### Territories/regions to exclude:
-Exclude_Locs <- c("AS","BP2","DC","DD2","FM","GU","IH2","LTC","MP","PR","PW","RP","US","VA2","VI")
-### Exclude territories and calculate population-adjusted rates:
+### Territories/regions to exclude (non-states and VA2 and WV-too many corrections):
+Exclude_Locs <- c("AS","BP2","DC","DD2","FM","GU","IH2","LTC","MP","PR","PW","RP","US","VA2","VI","WV")
+### Exclusions and pull key variables:
 Vax_rates <- Vax %>% dplyr::filter(!(Location %in% Exclude_Locs)) %>% 
-  left_join(Pops, by="Location") %>%
-  rename(SCY=Series_Complete_Yes,SCP=Series_Complete_Pop_Pct) %>%
-  dplyr::select(Location,Pop_Apr_2020,DateT,SCY,SCP) %>%
-  mutate(SCP2=SCY/Pop_Apr_2020*100,
-         SCY_100k=SCP2*1000) %>%
-  arrange(Location,desc(DateT))
-### Add 7-day prior values to data:
-Vax_wk_prior <- Vax_rates %>% mutate(WkPrior=DateT-7) %>% 
-  left_join(Vax_rates %>% rename(SCY_100k_wk=SCY_100k) %>%
-              dplyr::select(Location,DateT,SCY_100k_wk) %>% 
-              rename(WkPrior=DateT),
-            by=join_by(Location,WkPrior)) %>%
-  mutate(SCY_100k_diff=SCY_100k-SCY_100k_wk) %>%
-  arrange(Location,desc(DateT))
-### Get CDC MMWR weeks, Sunday--Saturday:
-WkB1 <- seq.Date(from=as.Date("2021/03/13"), to=as.Date("2023/05/13"), by=7)
-### Compute weekly vaccination rates:
-Vax_weekly <- Vax_wk_prior %>% dplyr::filter(DateT %in% WkB1) %>%
-  left_join(Dates, by="Location") %>%
-  mutate(mandate=if_else(is.na(Mandate_Start),0,
-                         if_else(Mandate_Start<=DateT,1,0)),
-         Wks_mandate=ifelse(mandate==0,0,ceiling((DateT-Mandate_Start+1)/7)),
-         LeadLag=ifelse(is.na(Mandate_Start),NA,ceiling((DateT-Mandate_Start+1)/7))) %>%
-  left_join(tibble(DateT=WkB1,WeekNum=seq(from=1,by=1,length.out=length(WkB1))))
+  rename(SCP=Series_Complete_18PlusPop_Pct,
+         D1P=Administered_Dose1_Recip_18PlusPop_Pct) %>%
+  mutate(Year=year(DateT),Month=month(DateT)) %>%
+  dplyr::select(Location,Year,Month,MMWR_week,DateT,SCP,D1P) %>%
+  rename(Date=DateT,State=Location) %>%
+  mutate(MMWR_year=if_else(MMWR_week==1 & Month==12,Year+1,
+                           if_else(MMWR_week > 50 & Month==1,Year-1,Year))) %>%
+  arrange(State,MMWR_year,MMWR_week,Date)
+### Summarize to Weekly Level
+Vax_wk_summ <- Vax_rates %>% group_by(State,MMWR_year,MMWR_week) %>%
+  summarize(Start_Date=min(Date), End_Date=max(Date),
+            SCP=max(SCP),D1P=max(D1P)) %>% ungroup()
+
+### Compute weekly vaccination rates and add in mandate date info:
+Vax_weekly <- Vax_wk_summ %>%
+  mutate(MMWR_week_prior=if_else(MMWR_week==1,if_else(MMWR_year==2021,53,52),MMWR_week-1),
+         MMWR_year_prior=if_else(MMWR_week==1,MMWR_year-1,MMWR_year)) %>%
+  left_join(Vax_wk_summ %>% dplyr::rename(MMWR_week_prior=MMWR_week,MMWR_year_prior=MMWR_year,
+                                          SCP_prior=SCP,D1P_prior=D1P) %>%
+              dplyr::select(-c(Start_Date,End_Date)),
+            by=join_by(State,MMWR_year_prior,MMWR_week_prior)) %>%
+  dplyr::select(-c(MMWR_year_prior,MMWR_week_prior)) %>%
+  dplyr::filter(MMWR_year > 2020) %>%
+  mutate(SCP_diff=SCP-SCP_prior,D1P_diff=D1P-D1P_prior) %>%
+  left_join(Dates, by="State") %>%
+  mutate(Yr_Wk=paste0(MMWR_year,"_",formatC(MMWR_week, width=2, flag="0")),
+         ever_mandate=!is.na(Mandate_Start),
+         mandate=if_else(!ever_mandate,FALSE,
+                         if_else(Mandate_Start<=End_Date,TRUE,FALSE)),
+         Wks_mandate=ifelse(mandate==0,0,ceiling((End_Date-Mandate_Start+1)/7)),
+         LeadLag=ifelse(is.na(Mandate_Start),NA,ceiling((End_Date-Mandate_Start+1)/7)))
 ### Save output in clean data folder:
 save(Vax_weekly, file="data/mandate.Rda")
 

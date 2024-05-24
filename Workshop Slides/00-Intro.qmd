@@ -66,4 +66,4 @@ Infectious disease examples from published literature with available data
 
 All materials: <https://github.com/leekshaffer/Epi-QEs/>
 
-QR code:
+[![](images/QR.png){fig-alt="QR code for above link" fig-align="center" width="4in"}](https://github.com/leekshaffer/Epi-QEs)

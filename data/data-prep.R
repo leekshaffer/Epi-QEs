@@ -1,5 +1,5 @@
 ### data-prep.R ###
-### Cleaning and preparing Raw Data for analyses ###
+### Cleaning and preparing data-raw for analyses ###
 ### Lee Kennedy-Shaffer ###
 ### May 24, 2024 ###
 
@@ -19,12 +19,28 @@ save(regdata, file="data/cholera.Rda")
 
 
 ## zika data ##
-### Read in zika_Table2.tab data and remove subjects (by Code) with any missing data (8 codes, 16 observations)
-zika <- read.table(file="data-raw/zika/zika_Table2.tab",
-                   header=TRUE, fill=TRUE)
-zika_full <- zika %>% dplyr::filter(!(Code %in% unique(zika %>% filter(is.na(Pop)) %>% pull(Code))))
-### Read in Births_Fig2.dta
-zika_summ <- read_dta("data-raw/zika/Births_Fig2.dta")
+### Read in zika_Table2.tab data
+zika <- read_table(file="data-raw/zika/zika_Table2.tab",
+                    col_names=TRUE)
+
+### Fix 9 observations that should have missing BirthSchool
+zika_fix <- zika %>% dplyr::filter(is.na(Pop)) %>% dplyr::select(-Pop) %>%
+  dplyr::rename(Pop=interaction,
+                interaction=year, 
+                year=trt, 
+                trt=Rate,
+                Rate=BirthSchool) %>%
+  mutate(BirthSchool=NA)
+### Merge these observations back in, and create factor variable for State and log-rate variable
+zika_full <- zika %>% dplyr::filter(!is.na(Pop)) %>% dplyr::add_row(zika_fix) %>%
+  mutate(State=factor(x=as.numeric(substr(as.character(Code),1,2)),
+                      levels=c(26,43), labels=c("Pernambuco","Rio Grande do Sul")),
+         LogRate=log(Rate))
+### Read in Births_Fig2.dta and create factor variable for State and log-births variable
+zika_summ <- read_dta("data-raw/zika/Births_Fig2.dta") %>%
+  mutate(State=factor(x=as.numeric(State), 
+                      levels=c(26,43), labels=c("Pernambuco","Rio Grande do Sul")),
+         LogBirths=log(LiveBirths))
 ### Save output in clean data folder:
 save(list=c("zika_full","zika_summ"), file="data/zika.Rda")
 

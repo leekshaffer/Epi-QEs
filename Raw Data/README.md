@@ -1,7 +1,7 @@
 # Epi-QEs/Raw Data
-Sources of raw data:
+The sources of raw data for each of the workshop analyses are described below. In some cases, the raw data are available through this repository. In other cases, links are provided to the original repositories.
 
--cholera: Replication data for Coleman 2019 (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262234), Coleman 2024a (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3696028), and Coleman 2024b (https://doi.org/10.1016/j.socscimed.2024.116612), downloaded from https://github.com/tscoleman/SnowCholera on May 23, 2024. Raw data files and .Rmd file to clean and compile these are included. The cleaning code was extracted by LKS from the .Rmd file.
+## cholera: Replication data for Coleman 2019 (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262234), Coleman 2024a (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3696028), and Coleman 2024b (https://doi.org/10.1016/j.socscimed.2024.116612), downloaded from https://github.com/tscoleman/SnowCholera on May 23, 2024. Raw data files and .Rmd file to clean and compile these are included. The cleaning code was extracted by LKS from the .Rmd file.
 
 -zika: Replication data for Taddeo et al. 2022 (https://doi.org/10.4310/21-SII704), downloaded from https://doi.org/10.7910/DVN/ENG0IY on May 23, 2024.
 -- zika_Table2.tab: Data on Brazil birth rate in two key states in 2014 and 2016.
@@ -14,7 +14,9 @@ Sources of raw data:
 --Census_Pops.xlsx: simplified xlsx file from NST-EST2023-POP.xlsx file, compiled by LKS.
 
 -lottery: Replication data for Fuller et al. 2022 (https://doi.org/10.1371/journal.pone.0274374) and Lang et al. 2023 (https://doi.org/10.1017/XPS.2021.32), downloaded from https://doi.org/10.7910/DVN/K1XX02 and https://doi.org/10.7910/DVN/QYXN9L, respectively, on May 24, 2024.
-The data and analysis files are not published by LKS to this repository, but available directly from the DataVerse sites.
-Clean versions required for the analyses are imported, re-named, and stored in the Clean Data folder of this repository.
+The raw data and cleaning files are not published by LKS to this repository, but available directly from the DataVerse sites, along with replication analysis code.
+Clean versions of the data required for the workshop analyses are imported, re-named, and stored in the Clean Data folder of this repository.
 
--pcv
+-pcv: Replication data for Bruhn et al. 2017 (https://doi.org/10.1073/pnas.1612833114), downloaded from https://github.com/weinbergerlab/InterventionEvaluatR on May 24, 2024.
+The raw data and cleaning files are not published by LKS to this reporsitory, but are available directly from the InterventionEvaluatR GitHub repository, along with replication analysis code.
+Clean versions of the data required for the workshop analyses are imported, re-named, and stored in the Clean Data folder of this repository.

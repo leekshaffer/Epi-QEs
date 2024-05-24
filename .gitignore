@@ -2,6 +2,15 @@
 .Rhistory
 .RData
 .Ruserdata
-Img/
+img/
 Raw Data/lottery/
+data-raw/lottery/
 Raw Data/pcv/
+data-raw/pcv/
+presentation/00-Intro_files
+presentation/01-DID_files
+presentation/02-Adv_DID_files
+presentation/03-SC_files
+presentation/04-Adv_SC_files
+presentation/05-Conclusion_files
+presentation/images

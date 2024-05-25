@@ -17,7 +17,7 @@ Files included:
 Based on Rains and Richards 2024 (https://doi.org/10.1073/pnas.2313610121). Note that the data used are not exactly those used in that paper, as LKS was unable to match the figures exactly using the below data sources.
 Files included:
 - mandate_did_test.csv: Replication data for Rains and Richards 2024 (https://doi.org/10.1073/pnas.2313610121), downloaded from https://osf.io/j3tqd/ on May 8, 2024. Note that this file is not used in the analysis by LKS but is available for comparison.
-- MandateDates.xlsx: Compiled by LKS from https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023 on May 8, 2024.
+- MandateDates.xlsx: Compiled by LKS from https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023 on May 8, 2024. Additional sources on data issues include (https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania).
 - NST-EST2023-POP.xlsx: Census population estimates by state, 2023, downloaded from https://www.census.gov/data/tables/time-series/demo/popest/2020s-national-total.html on May 8, 2024.
 - Census_Pops.xlsx: simplified xlsx file from NST-EST2023-POP.xlsx file, compiled by LKS.
 

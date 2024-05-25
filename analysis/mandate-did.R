@@ -11,6 +11,7 @@
 require(tidyverse)
 require(bacondecomp)
 require(did2s)
+require(DIDmultiplegt)
 
 ## load data:
 load("data/mandate.Rda")
@@ -129,4 +130,26 @@ ES <- event_study(data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
                   estimator="all")
 ES
 plot_event_study(ES)
+
+## dCdH
+dCdH <- did_multiplegt(df=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
+                         left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
+                                     dplyr::select(State,MMWR_week) %>%
+                                     rename(First_Week=MMWR_week),
+                                   by=join_by(State)) %>%
+                         left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
+                                     arrange(State) %>%
+                                     mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
+                                   by=join_by(State)),
+                       Y="SCP",
+                       G="StateID",
+                       T="MMWR_week",
+                       D="mandate",
+                       dynamic=10,
+                       brep=100,
+                       cluster="StateID")
+dCdH
+
+
+
 

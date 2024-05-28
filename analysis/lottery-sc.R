@@ -81,3 +81,6 @@ synth_ohio %>% plot_weights()
 synth_ohio %>% grab_balance_table()
 synth_ohio %>% plot_trends()
 synth_ohio %>% plot_differences()
+
+## Placebo Tests
+synth_ohio %>% plot_placebos()

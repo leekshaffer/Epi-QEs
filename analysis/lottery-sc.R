@@ -100,3 +100,41 @@ time_an <- function(time) {
   return(c(time_unit=time,estimate=Est,p.value=P.Val))
 }
 by_time_res <- as_tibble(t(sapply(X=times, FUN=time_an)))
+
+
+### Add some covariates to SC:
+synth_oh_2 <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
+  ## initialize SC object by specifying outcome, unit variable, time variable, 
+  ### and when/where intervention turns on:
+  synthetic_control(outcome=people_fully_vaccinated_per_hundred,
+                    unit=state,
+                    time=centered_week,
+                    i_unit="OH",
+                    i_time=0,
+                    generate_placebos=T) %>%
+  ## create predictors for SC model:
+  generate_predictor(time_window=-17:-14,lag17_14=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-13:-10,lag13_10=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-9:-6,lag9_6=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-5:-2,lag5_2=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-1,
+                     lag01=people_fully_vaccinated_per_hundred,
+                     cases=tot_cases_per_million,
+                     deaths=tot_death_per_million,
+                     vax_num=daily_vaccinations_per_million) %>%
+  generate_predictor(time_window=-5:-2,
+                     recent_cases=mean(new_case_per_million, na.rm=TRUE),
+                     recent_deaths=mean(new_death_per_million, na.rm=TRUE)) %>%
+  ## generate SC weights:
+  generate_weights(optimization_window=-17:-1,
+                   margin_ipop = .02,sigf_ipop = 7,bound_ipop = 6) %>%
+  ## run SC:
+  generate_control()
+
+## Weights, trends, results:
+synth_oh_2 %>% grab_unit_weights() %>% 
+  dplyr::filter(weight > 0.001) %>% dplyr::arrange(desc(weight))
+synth_oh_2 %>% grab_balance_table()
+synth_oh_2 %>% plot_trends()
+synth_oh_2 %>% plot_differences()
+synth_oh_2 %>% plot_placebos()

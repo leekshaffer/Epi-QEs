@@ -99,11 +99,34 @@ save(Vax_weekly, file="data/mandate.Rda")
 load("data-raw/lottery/synth_data_clean.RData")
 save(list=c("lotteries","state_vaccines","untreated_states"),
      file="data/lottery_fuller.Rda")
-### Load and save Lang data:
+### Load Lang data:
 lang_0624 <- readRDS("data-raw/lottery/weekly_data_2021-06-24.rds")
 lang_0912 <- readRDS("data-raw/lottery/weekly_data_2021-09-12.rds")
-lang_announce_dates <- read_csv("data-raw/lottery/lottery_announce_dates.csv")
-save(list=c("lang_0624","lang_0912","lang_announce_dates"),
+lang_ann_dates <- read_csv("data-raw/lottery/lottery_announce_dates.csv") %>%
+  mutate(state=str_trim(state),
+         lott_date=as.Date(lottery_announce_date, format="%m/%d/%y"),
+         lott_week=1+floor(as.numeric(lott_date-ymd("2021-01-04"))/7))
+### Add other states' lottery info to data sets:
+lang_0624 <- lang_0624 %>% left_join(lang_ann_dates %>% 
+                                       dplyr::select(state,lott_date,lott_week), 
+                                     by=join_by(state)) %>%
+  mutate(lottery=if_else(is.na(lott_date),FALSE,TRUE),
+         rel_week=ifelse(is.na(lott_date),NA,week-lott_week),
+         type=factor(if_else(state=="OH","Ohio",
+                             if_else(lottery,"Other Lottery State",
+                                     "Non-Lottery State")),
+                     levels=c("Ohio","Other Lottery State","Non-Lottery State")))
+lang_0912 <- lang_0912 %>% left_join(lang_ann_dates %>% 
+                                       dplyr::select(state,lott_date,lott_week), 
+                                     by=join_by(state)) %>%
+  mutate(lottery=if_else(is.na(lott_date),FALSE,TRUE),
+         rel_week=ifelse(is.na(lott_date),NA,week-lott_week),
+         type=factor(if_else(state=="OH","Ohio",
+                             if_else(lottery,"Other Lottery State",
+                                     "Non-Lottery State")),
+                     levels=c("Ohio","Other Lottery State","Non-Lottery State")))
+### Save data:
+save(list=c("lang_0624","lang_0912","lang_ann_dates"),
      file="data/lottery_lang.Rda")
 ### Note that Fuller et al. identify a lottery in Missouri that Lang et al. do not use; 
 ### otherwise, the announce dates differ only by a few days in some cases

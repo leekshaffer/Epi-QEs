@@ -76,3 +76,24 @@ synth_pcv <- synth_pcv %>%
 synth_pcv %>% plot_weights
 synth_pcv %>% plot_trends()
 synth_pcv %>% plot_differences()
+
+
+### Augmented SC:
+#### Prep data by adding "treated" Column:
+pcv_chile_02_as <- pcv_chile_02 %>% 
+  mutate(treated=if_else(target=="Pneumonia" & month_ctr >= 0,1,0))
+
+as_pcv <- augsynth(form=log_val~treated,
+                   unit=series,
+                   time=month_ctr,
+                   data=pcv_chile_02_as,
+                   progfunc="Ridge", scm=T, fixedeff=T)
+as_pcv_wts <- tibble(series=rownames(as_pcv$weights),
+                     weight=as_pcv$weights[,1]) %>%
+  arrange(desc(weight))
+as_pcv_wts
+plot(as_pcv)
+as_pcv_summ <- summary(as_pcv)
+as_pcv_summ
+as_pcv_summ$att
+

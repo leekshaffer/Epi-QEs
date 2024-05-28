@@ -146,7 +146,13 @@ pcv_chile <- pnas_chile %>% dplyr::select(!any_of(excl_cols)) %>%
                values_to="value") %>%
   mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
          month=interval(as.Date("2001-01-01"),date) %/% months(1) + 1,
-         month_ctr=interval(as.Date("2011-01-01"),date) %/% months(1))
+         month_ctr=interval(as.Date("2011-01-01"),date) %/% months(1),
+         age_group=factor(age_group,
+                          levels=c("92","8","3","4","5","6","7"),
+                          labels=c("<24m","80+y","2-4y","5-17y","18-39y","40-64y","65-79y")),
+         target=factor(series=="J12_18",
+                       levels=c(TRUE,FALSE),
+                       labels=c("Pneumonia","Control Series")))
 ### Save processed data:
 save("pcv_chile",
      file="data/pcv_chile.Rda")

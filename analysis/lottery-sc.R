@@ -84,3 +84,19 @@ synth_ohio %>% plot_differences()
 
 ## Placebo Tests
 synth_ohio %>% plot_placebos()
+synth_ohio %>% plot_placebos(prune=FALSE)
+synth_ohio %>% plot_mspe_ratio()
+synth_ohio %>% grab_significance() %>% dplyr::filter(unit_name=="OH")
+
+## More specific tests/estimates:
+SC_res <- synth_ohio %>% grab_synthetic_control(placebo=TRUE) %>%
+  mutate(diff=real_y-synth_y)
+
+times <- unique(SC_res %>% pull(time_unit))
+time_an <- function(time) {
+  SC_res_time <- SC_res %>% dplyr::filter(time_unit==time)
+  Est <- SC_res_time %>% dplyr::filter(.placebo==0) %>% pull(diff)
+  P.Val <- mean(abs(SC_res_time %>% pull(diff)) >= abs(Est))
+  return(c(time_unit=time,estimate=Est,p.value=P.Val))
+}
+by_time_res <- as_tibble(t(sapply(X=times, FUN=time_an)))

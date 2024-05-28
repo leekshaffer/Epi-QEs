@@ -135,16 +135,20 @@ save(list=c("lang_0624","lang_0912","lang_ann_dates"),
 ## pcv data ##
 ### Note that raw data files are not on the Epi-QEs github page, but are available at:
 ### https://github.com/weinbergerlab/InterventionEvaluatR
-### Load and save data sets used in Bruhn et al.:
-load("data-raw/pcv/data/pnas_brazil.rda")
+### Load Bruhn et al. Chile data:
 load("data-raw/pcv/data/pnas_chile.rda")
-load("data-raw/pcv/data/pnas_ecuador.rda")
-load("data-raw/pcv/data/pnas_mexico.rda")
-load("data-raw/pcv/data/pnas_us_ipd.rda")
-load("data-raw/pcv/data/pnas_us_pneumonia.rda")
-load("data-raw/pcv/data/ecuador_mortality.rda")
-save(list=c(paste0("pnas_",c("brazil","chile","ecuador","mexico","us_ipd","us_pneumonia")),
-            "ecuador_mortality"),
-     file="data/pcv.Rda")
+### Pre-processing of Chile data:
+excl_cols <- colnames(pnas_chile[,apply(pnas_chile,2,FUN=function(x) mean(is.na(x))==1)])
+pcv_chile <- pnas_chile %>% dplyr::select(!any_of(excl_cols)) %>%
+  mutate(date=as.Date(date)) %>%
+  pivot_longer(cols=!any_of(c("age_group","date","ach_noj")),
+               names_to="series",
+               values_to="value") %>%
+  mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
+         month=interval(as.Date("2001-01-01"),date) %/% months(1) + 1,
+         month_ctr=interval(as.Date("2011-01-01"),date) %/% months(1))
+### Save processed data:
+save("pcv_chile",
+     file="data/pcv_chile.Rda")
 
 

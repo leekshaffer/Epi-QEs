@@ -110,7 +110,8 @@ lang_ann_dates <- read_csv("data-raw/lottery/lottery_announce_dates.csv") %>%
 lang_0624 <- lang_0624 %>% left_join(lang_ann_dates %>% 
                                        dplyr::select(state,lott_date,lott_week), 
                                      by=join_by(state)) %>%
-  mutate(lottery=if_else(is.na(lott_date),FALSE,TRUE),
+  mutate(stateF=factor(state),
+         lottery=if_else(is.na(lott_date),FALSE,TRUE),
          rel_week=ifelse(is.na(lott_date),NA,week-lott_week),
          type=factor(if_else(state=="OH","Ohio",
                              if_else(lottery,"Other Lottery State",
@@ -126,7 +127,8 @@ lang_0624 <- lang_0624 %>% left_join(lang_ann_dates %>%
 lang_0912 <- lang_0912 %>% left_join(lang_ann_dates %>% 
                                        dplyr::select(state,lott_date,lott_week), 
                                      by=join_by(state)) %>%
-  mutate(lottery=if_else(is.na(lott_date),FALSE,TRUE),
+  mutate(stateF=factor(state),
+         lottery=if_else(is.na(lott_date),FALSE,TRUE),
          rel_week=ifelse(is.na(lott_date),NA,week-lott_week),
          type=factor(if_else(state=="OH","Ohio",
                              if_else(lottery,"Other Lottery State",
@@ -149,47 +151,49 @@ save(list=c("lang_0624","lang_0912","lang_ann_dates"),
 ## pcv data ##
 ### Note that raw data files are not on the Epi-QEs github page, but are available at:
 ### https://github.com/weinbergerlab/InterventionEvaluatR
-### Load Bruhn et al. Chile data:
-load("data-raw/pcv/data/pnas_chile.rda")
-### Pre-processing of Chile data:
-excl_cols <- colnames(pnas_chile[,apply(pnas_chile,2,FUN=function(x) mean(is.na(x))==1)])
-pcv_chile <- pnas_chile %>% dplyr::select(!any_of(excl_cols)) %>%
-  mutate(date=as.Date(date)) %>%
-  pivot_longer(cols=!any_of(c("age_group","date","ach_noj")),
-               names_to="series",
-               values_to="value") %>%
-  mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
-         month=interval(as.Date("2001-01-01"),date) %/% months(1) + 1,
-         month_ctr=interval(as.Date("2011-01-01"),date) %/% months(1),
-         age_group=factor(age_group,
-                          levels=c("92","8","3","4","5","6","7"),
-                          labels=c("<24m","80+y","2-4y","5-17y","18-39y","40-64y","65-79y")),
-         target=factor(series=="J12_18",
-                       levels=c(TRUE,FALSE),
-                       labels=c("Pneumonia","Control Series")))
-### Save processed data:
-save("pcv_chile",
-     file="data/pcv_chile.Rda")
-### Load Bruhn et al. Mexico data:
-load("data-raw/pcv/data/pnas_mexico.rda")
-### Pre-processing of Mexico data:
-pnas_mexico_01 <- pnas_mexico %>% dplyr::filter(age_group==9)
-excl_cols <- colnames(pnas_mexico_01[,apply(pnas_mexico_01,2,FUN=function(x) mean(is.na(x))==1)])
-pcv_mexico_01 <- pnas_mexico_01 %>% dplyr::select(!any_of(excl_cols)) %>%
-  mutate(date=as.Date(date)) %>%
-  pivot_longer(cols=!any_of(c("age_group","date","ach_noj")),
-               names_to="series",
-               values_to="value") %>%
-  mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
-         month=interval(as.Date("2000-01-01"),date) %/% months(1) + 1,
-         month_ctr=interval(as.Date("2006-01-01"),date) %/% months(1),
-         age_group=factor(age_group, levels=c(9),
-                          labels=c("<12 mo")),
-         target=factor(series=="J12_18",
-                       levels=c(TRUE,FALSE),
-                       labels=c("Pneumonia","Control Series")))
-### Save processed data:
-save("pcv_mexico_01",
-     file="data/pcv_mexico.Rda")
+### Load Bruhn et al. country data and start/end dates from supplement:
+countries <- tibble(country=c("brazil","chile","ecuador","mexico"),
+                    introduction=as.Date(c("2010-01-01","2011-01-01","2010-01-01","2006-01-01")),
+                    eval_start=as.Date(c("2012-01-01","2012-01-01","2012-01-01","2010-01-01")),
+                    eval_end=as.Date(c("2013-12-31","2012-12-31","2012-12-31","2011-12-31")))
+for (cy in countries$country) {
+  load(file=paste0("data-raw/pcv/data/pnas_",cy,".rda"))
+  pnas <- get(paste0("pnas_",cy))
+  start_date <- min(as.Date(pnas$date))
+  cy_vals <- countries %>% dplyr::filter(country==cy)
+  assign(x=paste0("key_dates_",cy),
+         value=cy_vals)
+  pcv <- pnas %>%
+    mutate(date=as.Date(date)) %>%
+    pivot_longer(cols=!any_of(c("age_group","date")),
+                 names_to="series",
+                 values_to="value") %>%
+    mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
+           month=interval(start_date,date) %/% months(1) + 1,
+           month_ctr=interval(cy_vals$introduction,date) %/% months(1),
+           age_group=factor(age_group,
+                            levels=c("0","1","2","3","4",
+                                     "5","6","7","8",
+                                     "9","92"),
+                            labels=c("<3m","3-12m","12-24m","2-4y","5-17y",
+                                     "18-39y","40-64y","65-79y","80+y",
+                                     "0-12m","0-24m")),
+           target=factor(series=="J12_18",
+                         levels=c(TRUE,FALSE),
+                         labels=c("Pneumonia","Control Series")),
+           seriesF=factor(series),
+           treated=if_else(target=="Pneumonia" & month_ctr >= 0,1,0),
+           pre_pd=if_else(month_ctr < 0,1,0),
+           eval_pd=if_else(date >= cy_vals$eval_start & 
+                             date <= cy_vals$eval_end,1,0))
+  assign(x=paste0("pcv_",cy),
+         value=pcv %>% left_join(pcv %>% group_by(age_group,series) %>%
+                                   dplyr::summarize(NA_rate=mean(is.na(value))),
+                                 by=join_by(age_group,series)) %>%
+           dplyr::filter(NA_rate != 1) %>% dplyr::select(-NA_rate) %>% ungroup())
+  save(list=c(paste0("pcv_",cy),
+              paste0("key_dates_",cy)),
+       file=paste0("data/pcv_",cy,".Rda"))
+}
 
 

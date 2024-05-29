@@ -12,8 +12,8 @@ require(tidysynth)
 
 ## Load data:
 load(file="data/lottery_lang.Rda")
-Ohio_ann <- lang_ann_dates %>% dplyr::filter(state=="OH") %>% pull(lott_date)
-Ohio_ann_week <- lang_ann_dates %>% dplyr::filter(state=="OH") %>% pull(lott_week)
+targ_ann <- lang_ann_dates %>% dplyr::filter(state %in% c("OH","NM","ME")) %>% 
+  dplyr::select(state,lott_date,lott_week)
 
 ## Plotting:
 ggplot(data=lang_0624,
@@ -138,3 +138,133 @@ synth_oh_2 %>% grab_balance_table()
 synth_oh_2 %>% plot_trends()
 synth_oh_2 %>% plot_differences()
 synth_oh_2 %>% plot_placebos()
+
+
+#### Advanced SC:
+### Plotting:
+ggplot(data=lang_0912,
+       mapping=aes(group=state,linetype=type2,color=type2,alpha=type2,
+                   x=last_day,y=people_fully_vaccinated_per_hundred)) +
+  scale_alpha_manual(name=NULL, breaks=c("Ohio","New Mexico","Maine",
+                                         "Other Lottery State","Non-Lottery State"),
+                     values=c(1,1,1,0.8,0.5)) +
+  geom_line() + theme_bw() +
+  geom_vline(data=lang_0624 %>% dplyr::filter(type2 %in% c("Ohio","New Mexico","Maine"),
+                                              rel_week==0),
+             mapping=aes(xintercept=lott_date, group=type2, color=type2),
+             linetype="dotted") +
+  labs(x="Day (2021)", y="Percent Fully Vaccinated",
+       linetype=NULL,color=NULL)
+
+## Ohio:
+OH_data <- lang_0912 %>% dplyr::filter(type2 %in% c("Ohio","Non-Lottery State")) %>%
+  mutate(treated=if_else(state=="OH" & rel_week >= 0,1,0))
+as_oh <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                  unit=state,
+                  time=week,
+                  data=OH_data,
+                  progfunc="none", scm=T)
+plot(as_oh)
+
+as_oh_ridge <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                        unit=state,
+                        time=week,
+                        data=OH_data,
+                        progfunc="ridge", scm=T)
+plot(as_oh_ridge)
+
+as_oh_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                     unit=state,
+                     time=week,
+                     data=OH_data,
+                     progfunc="none", scm=T, fixedeff=T)
+plot(as_oh_fe)
+
+as_oh_ridge_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                           unit=state,
+                           time=week,
+                           data=OH_data,
+                           progfunc="ridge", scm=T, fixedeff=T)
+plot(as_oh_ridge_fe)
+
+## New Mexico:
+NM_data <- lang_0912 %>% dplyr::filter(type2 %in% c("New Mexico","Non-Lottery State")) %>%
+  mutate(treated=if_else(state=="NM" & rel_week >= 0,1,0))
+as_nm <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                  unit=state,
+                  time=week,
+                  data=NM_data,
+                  progfunc="none", scm=T)
+plot(as_nm)
+
+as_nm_ridge <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                        unit=state,
+                        time=week,
+                        data=NM_data,
+                        progfunc="ridge", scm=T)
+plot(as_nm_ridge)
+
+as_nm_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                     unit=state,
+                     time=week,
+                     data=NM_data,
+                     progfunc="none", scm=T, fixedeff=T)
+plot(as_nm_fe)
+
+as_nm_ridge_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                           unit=state,
+                           time=week,
+                           data=NM_data,
+                           progfunc="ridge", scm=T, fixedeff=T)
+plot(as_nm_ridge_fe)
+
+
+## Maine:
+ME_data <- lang_0912 %>% dplyr::filter(type2 %in% c("Maine","Non-Lottery State")) %>%
+  mutate(treated=if_else(state=="ME" & rel_week >= 0,1,0))
+as_me <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                  unit=state,
+                  time=week,
+                  data=ME_data,
+                  progfunc="none", scm=T)
+plot(as_me)
+
+as_me_ridge <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                        unit=state,
+                        time=week,
+                        data=ME_data,
+                        progfunc="ridge", scm=T)
+plot(as_me_ridge)
+
+as_me_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                     unit=state,
+                     time=week,
+                     data=ME_data,
+                     progfunc="none", scm=T, fixedeff=T)
+plot(as_me_fe)
+
+as_me_ridge_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                           unit=state,
+                           time=week,
+                           data=ME_data,
+                           progfunc="ridge", scm=T, fixedeff=T)
+plot(as_me_ridge_fe)
+
+
+### Multi-state, multi-period:
+Mult_data <- lang_0912 %>% mutate(treated=if_else(!lottery,0,if_else(rel_week>=0,1,0)))
+as_mult <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
+                    unit=state,
+                    time=week,
+                    data=Mult_data)
+plot(as_mult)
+summary(as_mult)
+
+as_mult_2 <- augsynth(form=people_vaccinated_per_hundred~treated,
+                    unit=state,
+                    time=week,
+                    data=Mult_data)
+plot(as_mult_2)
+summary(as_mult_2)
+
+

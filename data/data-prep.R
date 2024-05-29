@@ -115,7 +115,14 @@ lang_0624 <- lang_0624 %>% left_join(lang_ann_dates %>%
          type=factor(if_else(state=="OH","Ohio",
                              if_else(lottery,"Other Lottery State",
                                      "Non-Lottery State")),
-                     levels=c("Ohio","Other Lottery State","Non-Lottery State")))
+                     levels=c("Ohio","Other Lottery State","Non-Lottery State")),
+         type2=factor(if_else(state=="OH","Ohio",
+                              if_else(state=="NM","New Mexico",
+                                      if_else(state=="ME","Maine",
+                                              if_else(lottery,"Other Lottery State",
+                                                      "Non-Lottery State")))),
+                      levels=c("Ohio","New Mexico","Maine",
+                               "Other Lottery State","Non-Lottery State")))
 lang_0912 <- lang_0912 %>% left_join(lang_ann_dates %>% 
                                        dplyr::select(state,lott_date,lott_week), 
                                      by=join_by(state)) %>%
@@ -124,7 +131,14 @@ lang_0912 <- lang_0912 %>% left_join(lang_ann_dates %>%
          type=factor(if_else(state=="OH","Ohio",
                              if_else(lottery,"Other Lottery State",
                                      "Non-Lottery State")),
-                     levels=c("Ohio","Other Lottery State","Non-Lottery State")))
+                     levels=c("Ohio","Other Lottery State","Non-Lottery State")),
+         type2=factor(if_else(state=="OH","Ohio",
+                              if_else(state=="NM","New Mexico",
+                                      if_else(state=="ME","Maine",
+                                              if_else(lottery,"Other Lottery State",
+                                                      "Non-Lottery State")))),
+                      levels=c("Ohio","New Mexico","Maine",
+                               "Other Lottery State","Non-Lottery State")))
 ### Save data:
 save(list=c("lang_0624","lang_0912","lang_ann_dates"),
      file="data/lottery_lang.Rda")
@@ -156,5 +170,26 @@ pcv_chile <- pnas_chile %>% dplyr::select(!any_of(excl_cols)) %>%
 ### Save processed data:
 save("pcv_chile",
      file="data/pcv_chile.Rda")
+### Load Bruhn et al. Mexico data:
+load("data-raw/pcv/data/pnas_mexico.rda")
+### Pre-processing of Mexico data:
+pnas_mexico_01 <- pnas_mexico %>% dplyr::filter(age_group==9)
+excl_cols <- colnames(pnas_mexico_01[,apply(pnas_mexico_01,2,FUN=function(x) mean(is.na(x))==1)])
+pcv_mexico_01 <- pnas_mexico_01 %>% dplyr::select(!any_of(excl_cols)) %>%
+  mutate(date=as.Date(date)) %>%
+  pivot_longer(cols=!any_of(c("age_group","date","ach_noj")),
+               names_to="series",
+               values_to="value") %>%
+  mutate(log_val=ifelse(is.na(value),NA,ifelse(value==0,log(0.5),log(value))),
+         month=interval(as.Date("2000-01-01"),date) %/% months(1) + 1,
+         month_ctr=interval(as.Date("2006-01-01"),date) %/% months(1),
+         age_group=factor(age_group, levels=c(9),
+                          labels=c("<12 mo")),
+         target=factor(series=="J12_18",
+                       levels=c(TRUE,FALSE),
+                       labels=c("Pneumonia","Control Series")))
+### Save processed data:
+save("pcv_mexico_01",
+     file="data/pcv_mexico.Rda")
 
 

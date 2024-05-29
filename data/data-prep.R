@@ -106,7 +106,7 @@ lang_ann_dates <- read_csv("data-raw/lottery/lottery_announce_dates.csv") %>%
   mutate(state=str_trim(state),
          lott_date=as.Date(lottery_announce_date, format="%m/%d/%y"),
          lott_week=1+floor(as.numeric(lott_date-ymd("2021-01-04"))/7))
-### Add other states' lottery info to data sets:
+### Add states' lottery info to data sets:
 lang_0624 <- lang_0624 %>% left_join(lang_ann_dates %>% 
                                        dplyr::select(state,lott_date,lott_week), 
                                      by=join_by(state)) %>%

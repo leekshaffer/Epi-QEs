@@ -8,15 +8,83 @@ editor: visual
 
 ## How Will I Know?
 
+![](images/intro/Whitney.jpg){fig-alt="Image of Whitney Houston's How Will I Know album cover" fig-align="center"}
+
 ## About Me
+
+::: columns
+::: {.column width="50%"}
+-   Assistant Professor at Vassar College/Yale School of Public Health
+
+-   Teach statistical modeling and study design
+
+-   Research focus on infectious disease study design and cluster-randomized trials
+:::
+
+::: {.column width="50%"}
+![](images/intro/Snow_Broad_Street_Pump.JPG){fig-alt="Image of presenter—32-year-old white man with dark hair—holding a water pump" fig-align="center"}
+:::
+:::
 
 ## Rise of Quasi-Experiments
 
+[![](images/intro/EconNobel1.png){fig-alt="Citation for Nobel Memorial Prize in Economic Sciences from 2021" fig-align="center"}](https://www.nobelprize.org/prizes/economic-sciences/2021/press-release/)
+
+[![](images/intro/EconNobel2.png){fig-alt="Text from the final paragraph of popular press release for Nobel Memorial Prize in Economic Sciences from 2021" fig-align="center" width="800"}](https://www.nobelprize.org/prizes/economic-sciences/2021/press-release/)
+
 ## QEs in Economics and Political Science
+
+::: columns
+::: {.column width="50%"}
+[![](images/intro/C+K.png){fig-alt="Title and abstract for Card and Krueger (1994)" fig-align="center"}](https://www.jstor.org/stable/2677856)
+:::
+
+::: {.column width="50%"}
+[![](images/intro/A+G.png){fig-alt="Title and abstract for Abadie and Gardeazabal (2003)"}](https://doi.org/10.1257/000282803321455188)
+
+[![](images/intro/Abadie2010.png){fig-alt="Title for Abadie et al. (2010)" fig-align="center"}](https://doi.org/10.1198/jasa.2009.ap08746)
+:::
+:::
 
 ## QEs in Epidemiology and Public Health
 
+::: columns
+::: {.column width="50%"}
+[![](images/intro/Craig et al 2017.png){fig-alt="Title of Craig et al. (2017)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-031816-044327)
+:::
+
+::: {.column width="50%"}
+[![](images/intro/Wing et al 2018.png){fig-alt="Title of Wing et al. (2018)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-040617-013507)
+:::
+:::
+
+## QEs in Epidemiology and Public Health
+
+[![](images/intro/Waddington et al 2017.png){fig-alt="Title and citation of Waddington et al. (2017)" fig-align="center"}](https://doi.org/10.1016/j.jclinepi.2017.02.015)
+
+[![](images/intro/Matthay and Glymour 2022.png){fig-alt="Citation for Matthay and Glymour (2022)"}](https://doi.org/10.1007/s40471-022-00288-7)
+
 ## Considering the Role of Evidence
+
+::: columns
+::: {.column width="50%"}
+-   Allows use of routinely-collected data
+
+-   Evaluates interventions in-context
+
+-   Provides "real world evidence"
+
+-   Answers questions randomized trials and observational studies cannot
+
+-   But ... has threats to internal and external validity
+:::
+
+::: {.column width="50%"}
+[![](images/intro/Matthay et al 2020.png){fig-alt="Title of Matthay et al. (2020)" fig-align="center"}](https://doi.org/10.1016/j.ssmph.2019.100526)
+
+[![](images/intro/Nianogo et al 2023.png){fig-alt="Title of Nianogo et al. (2023)"}](https://doi.org/10.1093/ije/dyad032)
+:::
+:::
 
 ## Workshop Plan: Part I
 
@@ -60,7 +128,21 @@ editor: visual
 
 ## A Note on the Examples
 
-Infectious disease examples from published literature with available data
+I will focus here on infectious disease examples from published literature with available data. Some issues are specific to ID, while others are not, but they illustrate the points of how to approach these questions.
+
+::: columns
+::: {.column width="50%"}
+[![](images/intro/Lopez Bernal et al 2019.png){fig-alt="Title of Lopez Bernal et al. (2019)" fig-align="center"}](https://doi.org/10.1093/cid/ciy906)
+
+[![](images/intro/Kennedy-Shaffer 2024.png){fig-alt="Title for Kennedy-Shaffer (2024)"}](https://doi.org/10.1093/aje/kwae019)
+:::
+
+::: {.column width="50%"}
+[![](images/intro/Goodman-Bacon and Marcus 2020.png){fig-alt="Title for Goodman-Bacon and Marcus (2020)" fig-align="center"}](https://doi.org/10.18148/srm/2020.v14i2.7723)
+
+[![](images/intro/Feng and Bilinski 2024.png){fig-alt="Title for Feng and Bilinski (2024)" fig-align="center"}](https://doi.org/10.1101/2024.04.08.24305335)
+:::
+:::
 
 ## Let's Get To It!
 

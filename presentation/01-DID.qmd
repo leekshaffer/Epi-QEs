@@ -8,37 +8,324 @@ editor: visual
 
 ## Motivating Example: Cholera, London, 1850s
 
+[![](images/DID/Coleman_Map.png){fig-alt="Map of water service areas in 1850s London" fig-align="center" width="536"}](https://dx.doi.org/10.2139/ssrn.3262234)
+
+::: columns
+::: {.column width="50%"}
+[![](images/DID/Coleman_Header.png){fig-alt="Citation information for Coleman (2019)" fig-align="center" width="597"}](https://dx.doi.org/10.2139/ssrn.3262234)
+:::
+
+::: {.column width="50%"}
+[![](images/DID/Caniglia%20and%20Murray%202020.png){fig-alt="Title of Caniglia and Murray (2020)" fig-align="center" width="1022"}](https://doi.org/10.1007/s40471-020-00245-2)
+:::
+:::
+
 # Formal Development
 
-## Counterfactuals
+## Setting
+
+-   Two (or more) units: some treated/exposed, some untreated
+
+-   Two (or more) time periods: some prior to first treatment, some after
+
+. . .
+
+::: callout-tip
+## Example: South London "Grand Experiment" from [Coleman 2024](https://dx.doi.org/10.2139/ssrn.3696028)
+
+Untreated: Southwark & Vauxhall Districts (12)
+
+Treated: Joint Southwark & Vauxhall/Lambeth Districts (16)
+
+Time Periods: 1849 (pre-treatment) and 1854 (post-treatment) outbreaks
+:::
+
+## Potential Outcomes and Treatment Effect
+
+| Unit          | Pre-Treatment        | Post-Treatment       |
+|---------------|----------------------|----------------------|
+| **Exposed**   | $Y_{10} = Y_{10}(0)$ | $Y_{11} = Y_{11}(1)$ |
+| **Unexposed** | $Y_{00} = Y_{00}(0)$ | $Y_{01} = Y_{01}(0)$ |
+
+. . .
+
+Treatment Effect:
+
+$$\theta = E[Y_{11}(1) - Y_{11}(0)]$$
 
 ## Change Over Time
 
+Within each unit, we have an interrupted time series:
+
+$$
+\begin{aligned}
+\Delta_1 &= Y_{11} - Y_{10} \\
+\Delta_0 &= Y_{01} - Y_{00}
+\end{aligned}
+$$
+
+. . .
+
+::: callout-tip
+## Key Idea
+
+Use the observed $\Delta_0$ under control as the potential outcome for the unobserved $\Delta_1$ under treatment.
+:::
+
 ## Two-by-Two DID
+
+$$
+\begin{aligned}
+\hat{Y}_{11}(1) &= Y_{11} \\
+\hat{Y}_{11}(0) &= Y_{10} + \color{darkgreen}{(Y_{01} - Y_{00})} \\
+\hat{\theta} &= \color{purple}{(Y_{11} - Y_{10})} - \color{darkgreen}{(Y_{01} - Y_{00})} \\
+\end{aligned}
+$$
+
+## Two-by-Two DID: Example
+
+```{r}
+require(tidyverse)
+require(knitr)
+load(file="../data/cholera.Rda")
+## Summarize across districts:
+chol_2x2 <- regdata %>% 
+  mutate(Supplier=factor(supplier,
+                         levels=c("SouthwarkVauxhall_Lambeth",
+                                  "SouthwarkVauxhall",
+                                  "Diff, Treated-Untreated"),
+                         labels=c("Joint Southwark & Vauxhall/Lambert (Treated)",
+                                  "Southwark & Vauxhall Only (Untreated)",
+                                  "Diff, Treated-Untreated"))) %>%
+  group_by(Supplier,year) %>% 
+  dplyr::summarize(mortality=sum(deaths, na.rm=TRUE)/sum(pop1851, na.rm=TRUE)*10000,
+                   N=n())
+## Format into table:
+chol_2x2_f <- chol_2x2 %>%
+  pivot_wider(id_cols=c("Supplier","N"),
+              names_from=year,
+              values_from=mortality) %>%
+  rename(`Sub-Districts`=N,
+         `1849 Deaths per 10,000`=`1849`,
+         `1854 Deaths per 10,000`=`1854`) %>%
+  ungroup()
+
+## Print result:
+kable(chol_2x2_f,
+      digits=1)
+```
+
+## Two-by-Two DID: Example
+
+```{r}
+## Calculate differences between units:
+diffs <- chol_2x2_f %>%
+  dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambert (Treated)") %>% 
+  dplyr::select(`1849 Deaths per 10,000`,`1854 Deaths per 10,000`) - 
+  chol_2x2_f %>%
+  dplyr::filter(Supplier=="Southwark & Vauxhall Only (Untreated)") %>% 
+  dplyr::select(`1849 Deaths per 10,000`,`1854 Deaths per 10,000`)
+## Combine into table and calculate differences between time periods:
+chol_2x2_res <- chol_2x2_f %>% dplyr::select(-c(`Sub-Districts`)) %>%
+  add_row(cbind(Supplier="Diff, Treated-Untreated",diffs)) %>%
+  mutate(`Diff, 1854-1849`=`1854 Deaths per 10,000`-`1849 Deaths per 10,000`)
+
+## Print result:
+kable(chol_2x2_res,
+      digits=1)
+```
+
+## Two-by-Two DID: Example
+
+```{r}
+POs <- rep(chol_2x2 %>% dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambert (Treated)",
+                                      year==1849) %>% 
+             pull(mortality),2) + 
+  c(0,chol_2x2_res %>% 
+      dplyr::filter(Supplier=="Southwark & Vauxhall Only (Untreated)") %>% 
+      pull(`Diff, 1854-1849`))
+chol_2x2_po <- chol_2x2 %>% dplyr::select(-c(N)) %>%
+  mutate(Type="Observed") %>%
+  bind_rows(tibble(Supplier="Joint Southwark & Vauxhall/Lambert (Treated)",
+                   year=c("1849","1854"),
+                   mortality=POs,
+                   Type="Counterfactual")) %>%
+  mutate(Type=factor(Type,levels=c("Observed","Counterfactual")),
+         Supplier=factor(Supplier,levels=c("Joint Southwark & Vauxhall/Lambert (Treated)",
+                                           "Southwark & Vauxhall Only (Untreated)"),
+                         labels=c("Treated","Untreated")),
+         group=paste0(Type,", ",Supplier))
+ggplot(chol_2x2_po) + 
+  geom_line(mapping=aes(x=year, y=mortality, color=Supplier, linetype=Type, group=group),
+linewidth=1.5) + 
+  theme_bw() +
+  scale_y_continuous(name="Deaths Per 10,000",
+                     limits=c(80,150), breaks=seq(80,150,by=10)) +
+  scale_x_discrete(name="Year") +
+  scale_linetype_discrete(name="") +
+  scale_color_manual(breaks=c("Treated","Untreated"),
+                     values=c("purple","darkgreen")) +
+  labs(title="Two-by-Two Difference-in-Differences, South London Cholera")
+```
 
 ## Controlled ITS
 
-# Assumptions
+Compare to other possible estimates of $\hat{Y}_{11}(0)$:
 
-## Parallel Trends
+::: incremental
+-   $Y_{10}$: assumes no time trends
 
-## Selecting Scale
+-   $Y_{01}$: assumes no differences in units
 
-## Incorporating Covariates
+-   Modeled trend for $Y_{1t}$ over time: requires time model and more data
 
-## No Spillover
+-   Regress $Y_{1t}$ on $Y_{0t}$: requires covariates, additional control units, and/or specific model
+:::
 
-## No Anticipation
+## Regression Formulation
 
-## Placebo and Specification Tests
+$$
+Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it},
+$$
 
-# Tradeoffs
+where:
+
+-   $\alpha_i$ is the fixed effect for unit $i$,
+
+-   $\gamma_t$ is the fixed effect for time $t$,
+
+-   $\epsilon_{it}$ is the error term for unit $i$ in time $t$, and
+
+-   $X_{it}$ is the indicator of whether unit $i$ is treated at time $t$.
+
+. . .
+
+::: callout-note
+This is called the **two-way fixed effects (TWFE) model** for DID.
+:::
+
+# Details and Assumptions
+
+## Statistical Inference
+
+Inference can be conducted using the TWFE regression model. This accounts for variability in the outcome if there are multiple treated/untreated units and multiple periods.
+
+Generally, the standard errors are *clustered* by unit to account for correlation. This can also be done with a *block-bootstrap* variance estimation.
+
+. . .
+
+::: callout-caution
+This accounts for *statistical uncertainty* but not *causal uncertainty* in the model assumptions. Those cannot be fully assessed statistically.
+:::
+
+## Key Assumptions
+
+::: incremental
+-   Parallel trends (in expectation of potential outcomes):
+
+    $$
+    E[\color{purple}{Y_{11}(0) - Y_{10}(0)}] = E[\color{darkgreen}{Y_{01}(0) - Y_{00}(0)}]
+    $$
+
+-   No spillover
+
+-   No anticipation/clear time point for treatment
+:::
+
+## Assessing Parallel Trends
+
+Placebo/specification tests:
+
+::: incremental
+-   In-time: conduct the same DID analysis on a time period prior to the actual treatment initiation
+
+-   In-space: conduct the same DID analysis as if an untreated unit were the treated one
+
+-   Alternative outcome: conduct the same DID analysis on an outcome that should not be affected by the treatment
+:::
+
+## Assessing Parallel Trends
+
+These approaches can be used either:
+
+::: incremental
+-   as a heuristic justification for the assumption,
+
+-   to obtain a null distribution for permutation tests, or
+
+-   to adjust the estimate for the "null" effect (difference-in-difference-in-differences or triple-differences).
+:::
+
+## Improving Assumptions: Re-scale
+
+Changing the scale of the outcome changes the parallel trends assumption. The most common transformation is to use the **natural log**.
+
+E.g., $\log(Y_{it}) = \alpha_i + \gamma_t + \theta I(X_{it}=1) + \epsilon_{it}$
+
+Changes parallel trends assumption to:
+
+$$
+\begin{aligned}
+E[\color{purple}{\log Y_{11}(0) - \log Y_{10}(0)}] &= E[\color{darkgreen}{\log Y_{01}(0) - \log Y_{00}(0)}] \\
+E \left[ \log \left( \color{purple}{\frac{Y_{11}(0)}{Y_{10}(0)}} \right) \right] &= E \left[ \log \left( \color{darkgreen}{\frac{Y_{01}(0)}{Y_{00}(0)}} \right) \right]
+\end{aligned}
+$$
+
+## Improving Assumptions: Re-scale
+
+::: callout-caution
+-   Only one scale can actually have parallel trends
+
+-   This changes the estimand (e.g., additive -\> multiplicative)
+
+    See [Kahn-Lang and Lang (2020)](https://doi.org/10.1080/07350015.2018.1546591) for more considerations and [Feng and Bilinski (2024)](https://doi.org/10.1101/2024.04.08.24305335) for examples of different scales/specifications.
+:::
+
+## Improving Assumptions: Covariates
+
+Incorporating covariates makes the parallel trends assumption *conditional* on those covariates.
+
+E.g., $Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it}=1) + \beta Z_{i} + \epsilon_{it}$
+
+Changes parallel trends assumption to:
+
+$$
+E[\color{purple}{Y_{11}(0) - Y_{10}(0)} ~ | ~ Z_1] = E[\color{darkgreen}{Y_{01}(0) - Y_{00}(0)} ~ | ~ Z_0]
+$$
+
+## Improving Assumptions: Covariates
+
+::: callout-caution
+-   This makes the parallel trends assumption more complex to consider and requires modeling covariates
+
+-   This changes the estimand and assumes the effect is homogeneous across covariates
+
+    See [Caetano and Callaway (2023)](https://doi.org/10.48550/arXiv.2202.02903)) for issues that arise with time-varying covariates.
+:::
+
+# Epidemiologic Considerations
 
 ## ATT Estimand
 
+::: callout-important
+## Estimand Interpretation
+
+DID estimates the **Average Treatment Effect on the Treated (ATT)**.
+
+This may not be generalizable to other units, including the untreated units in the study.
+:::
+
 ## Internal vs. External Validity
 
+-   Internal validity may be high if the assumptions are justified.
+
+-   External validity may be low because of limited transportability of the ATT and limited information on effect heterogeneity.
+
 ## Bias vs. Variance
+
+-   Incorporating additional units/periods can reduce variance, but may also risk violating the assumptions
+
+-   Generally conducted with limited, carefully-selected units: low bias but high variance
 
 # Analysis
 

@@ -8,7 +8,7 @@
 <link href="01-DID_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="01-DID_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="01-DID_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.554">
+  <meta name="generator" content="quarto-1.4.553">
 
   <meta name="author" content="Lee Kennedy-Shaffer, PhD">
   <meta name="dcterms.date" content="2024-06-18">
@@ -341,60 +341,399 @@ Lee Kennedy-Shaffer, PhD
 </section>
 <section id="motivating-example-cholera-london-1850s" class="slide level2">
 <h2>Motivating Example: Cholera, London, 1850s</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://dx.doi.org/10.2139/ssrn.3262234"><img data-src="images/DID/Coleman_Map.png" class="quarto-figure quarto-figure-center" alt="Map of water service areas in 1850s London" width="536"></a></p>
+</figure>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://dx.doi.org/10.2139/ssrn.3262234"><img data-src="images/DID/Coleman_Header.png" class="quarto-figure quarto-figure-center" alt="Citation information for Coleman (2019)" width="597"></a></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1007/s40471-020-00245-2"><img data-src="images/DID/Caniglia%20and%20Murray%202020.png" class="quarto-figure quarto-figure-center" alt="Title of Caniglia and Murray (2020)" width="1022"></a></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section>
 <section id="formal-development" class="title-slide slide level1 center">
 <h1>Formal Development</h1>
 
 </section>
-<section id="counterfactuals" class="slide level2">
-<h2>Counterfactuals</h2>
+<section id="setting" class="slide level2">
+<h2>Setting</h2>
+<ul>
+<li><p>Two (or more) units: some treated/exposed, some untreated</p></li>
+<li><p>Two (or more) time periods: some prior to first treatment, some after</p></li>
+</ul>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Example: South London “Grand Experiment” from <a href="https://dx.doi.org/10.2139/ssrn.3696028">Coleman 2024</a></strong></p>
+</div>
+<div class="callout-content">
+<p>Untreated: Southwark &amp; Vauxhall Districts (12)</p>
+<p>Treated: Joint Southwark &amp; Vauxhall/Lambeth Districts (16)</p>
+<p>Time Periods: 1849 (pre-treatment) and 1854 (post-treatment) outbreaks</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="potential-outcomes-and-treatment-effect" class="slide level2">
+<h2>Potential Outcomes and Treatment Effect</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Unit</th>
+<th>Pre-Treatment</th>
+<th>Post-Treatment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Exposed</strong></td>
+<td><span class="math inline">\(Y_{10} = Y_{10}(0)\)</span></td>
+<td><span class="math inline">\(Y_{11} = Y_{11}(1)\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Unexposed</strong></td>
+<td><span class="math inline">\(Y_{00} = Y_{00}(0)\)</span></td>
+<td><span class="math inline">\(Y_{01} = Y_{01}(0)\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p>Treatment Effect:</p>
+<p><span class="math display">\[\theta = E[Y_{11}(1) - Y_{11}(0)]\]</span></p>
+</div>
 </section>
 <section id="change-over-time" class="slide level2">
 <h2>Change Over Time</h2>
+<p>Within each unit, we have an interrupted time series:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\Delta_1 &amp;= Y_{11} - Y_{10} \\
+\Delta_0 &amp;= Y_{01} - Y_{00}
+\end{aligned}
+\]</span></p>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Key Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>Use the observed <span class="math inline">\(\Delta_0\)</span> under control as the potential outcome for the unobserved <span class="math inline">\(\Delta_1\)</span> under treatment.</p>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="two-by-two-did" class="slide level2">
 <h2>Two-by-Two DID</h2>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{Y}_{11}(1) &amp;= Y_{11} \\
+\hat{Y}_{11}(0) &amp;= Y_{10} + \color{darkgreen}{(Y_{01} - Y_{00})} \\
+\hat{\theta} &amp;= \color{purple}{(Y_{11} - Y_{10})} - \color{darkgreen}{(Y_{01} - Y_{00})} \\
+\end{aligned}
+\]</span></p>
 </section>
+<section id="two-by-two-did-example" class="slide level2">
+<h2>Two-by-Two DID: Example</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table>
+<colgroup>
+<col style="width: 42%">
+<col style="width: 13%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Supplier</th>
+<th style="text-align: right;">Sub-Districts</th>
+<th style="text-align: right;">1849 Deaths per 10,000</th>
+<th style="text-align: right;">1854 Deaths per 10,000</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Joint Southwark &amp; Vauxhall/Lambert (Treated)</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">130.1</td>
+<td style="text-align: right;">84.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Southwark &amp; Vauxhall Only (Untreated)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">134.9</td>
+<td style="text-align: right;">146.6</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="two-by-two-did-example-1" class="slide level2">
+<h2>Two-by-Two DID: Example</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table>
+<colgroup>
+<col style="width: 42%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Supplier</th>
+<th style="text-align: right;">1849 Deaths per 10,000</th>
+<th style="text-align: right;">1854 Deaths per 10,000</th>
+<th style="text-align: right;">Diff, 1854-1849</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Joint Southwark &amp; Vauxhall/Lambert (Treated)</td>
+<td style="text-align: right;">130.1</td>
+<td style="text-align: right;">84.9</td>
+<td style="text-align: right;">-45.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Southwark &amp; Vauxhall Only (Untreated)</td>
+<td style="text-align: right;">134.9</td>
+<td style="text-align: right;">146.6</td>
+<td style="text-align: right;">11.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Diff, Treated-Untreated</td>
+<td style="text-align: right;">-4.8</td>
+<td style="text-align: right;">-61.8</td>
+<td style="text-align: right;">-57.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="two-by-two-did-example-2" class="slide level2">
+<h2>Two-by-Two DID: Example</h2>
+
+<img data-src="01-DID_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="controlled-its" class="slide level2">
 <h2>Controlled ITS</h2>
+<p>Compare to other possible estimates of <span class="math inline">\(\hat{Y}_{11}(0)\)</span>:</p>
+<div>
+<ul>
+<li class="fragment"><p><span class="math inline">\(Y_{10}\)</span>: assumes no time trends</p></li>
+<li class="fragment"><p><span class="math inline">\(Y_{01}\)</span>: assumes no differences in units</p></li>
+<li class="fragment"><p>Modeled trend for <span class="math inline">\(Y_{1t}\)</span> over time: requires time model and more data</p></li>
+<li class="fragment"><p>Regress <span class="math inline">\(Y_{1t}\)</span> on <span class="math inline">\(Y_{0t}\)</span>: requires covariates, additional control units, and/or specific model</p></li>
+</ul>
+</div>
+</section>
+<section id="regression-formulation" class="slide level2">
+<h2>Regression Formulation</h2>
+<p><span class="math display">\[
+Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it},
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><p><span class="math inline">\(\alpha_i\)</span> is the fixed effect for unit <span class="math inline">\(i\)</span>,</p></li>
+<li><p><span class="math inline">\(\gamma_t\)</span> is the fixed effect for time <span class="math inline">\(t\)</span>,</p></li>
+<li><p><span class="math inline">\(\epsilon_{it}\)</span> is the error term for unit <span class="math inline">\(i\)</span> in time <span class="math inline">\(t\)</span>, and</p></li>
+<li><p><span class="math inline">\(X_{it}\)</span> is the indicator of whether unit <span class="math inline">\(i\)</span> is treated at time <span class="math inline">\(t\)</span>.</p></li>
+</ul>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>This is called the <strong>two-way fixed effects (TWFE) model</strong> for DID.</p>
+</div>
+</div>
+</div>
+</div>
 </section></section>
 <section>
-<section id="assumptions" class="title-slide slide level1 center">
-<h1>Assumptions</h1>
+<section id="details-and-assumptions" class="title-slide slide level1 center">
+<h1>Details and Assumptions</h1>
 
 </section>
-<section id="parallel-trends" class="slide level2">
-<h2>Parallel Trends</h2>
+<section id="statistical-inference" class="slide level2">
+<h2>Statistical Inference</h2>
+<p>Inference can be conducted using the TWFE regression model. This accounts for variability in the outcome if there are multiple treated/untreated units and multiple periods.</p>
+<p>Generally, the standard errors are <em>clustered</em> by unit to account for correlation. This can also be done with a <em>block-bootstrap</em> variance estimation.</p>
+<div class="fragment">
+<div class="callout callout-caution callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Caution</strong></p>
+</div>
+<div class="callout-content">
+<p>This accounts for <em>statistical uncertainty</em> but not <em>causal uncertainty</em> in the model assumptions. Those cannot be fully assessed statistically.</p>
+</div>
+</div>
+</div>
+</div>
 </section>
-<section id="selecting-scale" class="slide level2">
-<h2>Selecting Scale</h2>
+<section id="key-assumptions" class="slide level2">
+<h2>Key Assumptions</h2>
+<div>
+<ul>
+<li class="fragment"><p>Parallel trends (in expectation of potential outcomes):</p>
+<p><span class="math display">\[
+E[\color{purple}{Y_{11}(0) - Y_{10}(0)}] = E[\color{darkgreen}{Y_{01}(0) - Y_{00}(0)}]
+\]</span></p></li>
+<li class="fragment"><p>No spillover</p></li>
+<li class="fragment"><p>No anticipation/clear time point for treatment</p></li>
+</ul>
+</div>
 </section>
-<section id="incorporating-covariates" class="slide level2">
-<h2>Incorporating Covariates</h2>
+<section id="assessing-parallel-trends" class="slide level2">
+<h2>Assessing Parallel Trends</h2>
+<p>Placebo/specification tests:</p>
+<div>
+<ul>
+<li class="fragment"><p>In-time: conduct the same DID analysis on a time period prior to the actual treatment initiation</p></li>
+<li class="fragment"><p>In-space: conduct the same DID analysis as if an untreated unit were the treated one</p></li>
+<li class="fragment"><p>Alternative outcome: conduct the same DID analysis on an outcome that should not be affected by the treatment</p></li>
+</ul>
+</div>
 </section>
-<section id="no-spillover" class="slide level2">
-<h2>No Spillover</h2>
+<section id="assessing-parallel-trends-1" class="slide level2">
+<h2>Assessing Parallel Trends</h2>
+<p>These approaches can be used either:</p>
+<div>
+<ul>
+<li class="fragment"><p>as a heuristic justification for the assumption,</p></li>
+<li class="fragment"><p>to obtain a null distribution for permutation tests, or</p></li>
+<li class="fragment"><p>to adjust the estimate for the “null” effect (difference-in-difference-in-differences or triple-differences).</p></li>
+</ul>
+</div>
 </section>
-<section id="no-anticipation" class="slide level2">
-<h2>No Anticipation</h2>
+<section id="improving-assumptions-re-scale" class="slide level2">
+<h2>Improving Assumptions: Re-scale</h2>
+<p>Changing the scale of the outcome changes the parallel trends assumption. The most common transformation is to use the <strong>natural log</strong>.</p>
+<p>E.g., <span class="math inline">\(\log(Y_{it}) = \alpha_i + \gamma_t + \theta I(X_{it}=1) + \epsilon_{it}\)</span></p>
+<p>Changes parallel trends assumption to:</p>
+<p><span class="math display">\[
+\begin{aligned}
+E[\color{purple}{\log Y_{11}(0) - \log Y_{10}(0)}] &amp;= E[\color{darkgreen}{\log Y_{01}(0) - \log Y_{00}(0)}] \\
+E \left[ \log \left( \color{purple}{\frac{Y_{11}(0)}{Y_{10}(0)}} \right) \right] &amp;= E \left[ \log \left( \color{darkgreen}{\frac{Y_{01}(0)}{Y_{00}(0)}} \right) \right]
+\end{aligned}
+\]</span></p>
 </section>
-<section id="placebo-and-specification-tests" class="slide level2">
-<h2>Placebo and Specification Tests</h2>
+<section id="improving-assumptions-re-scale-1" class="slide level2">
+<h2>Improving Assumptions: Re-scale</h2>
+<div class="callout callout-caution callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Caution</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><p>Only one scale can actually have parallel trends</p></li>
+<li><p>This changes the estimand (e.g., additive -&gt; multiplicative)</p>
+<p>See <a href="https://doi.org/10.1080/07350015.2018.1546591">Kahn-Lang and Lang (2020)</a> for more considerations and <a href="https://doi.org/10.1101/2024.04.08.24305335">Feng and Bilinski (2024)</a> for examples of different scales/specifications.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="improving-assumptions-covariates" class="slide level2">
+<h2>Improving Assumptions: Covariates</h2>
+<p>Incorporating covariates makes the parallel trends assumption <em>conditional</em> on those covariates.</p>
+<p>E.g., <span class="math inline">\(Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it}=1) + \beta Z_{i} + \epsilon_{it}\)</span></p>
+<p>Changes parallel trends assumption to:</p>
+<p><span class="math display">\[
+E[\color{purple}{Y_{11}(0) - Y_{10}(0)} ~ | ~ Z_1] = E[\color{darkgreen}{Y_{01}(0) - Y_{00}(0)} ~ | ~ Z_0]
+\]</span></p>
+</section>
+<section id="improving-assumptions-covariates-1" class="slide level2">
+<h2>Improving Assumptions: Covariates</h2>
+<div class="callout callout-caution callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Caution</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><p>This makes the parallel trends assumption more complex to consider and requires modeling covariates</p></li>
+<li><p>This changes the estimand and assumes the effect is homogeneous across covariates</p>
+<p>See <a href="https://doi.org/10.48550/arXiv.2202.02903">Caetano and Callaway (2023)</a>) for issues that arise with time-varying covariates.</p></li>
+</ul>
+</div>
+</div>
+</div>
 </section></section>
 <section>
-<section id="tradeoffs" class="title-slide slide level1 center">
-<h1>Tradeoffs</h1>
+<section id="epidemiologic-considerations" class="title-slide slide level1 center">
+<h1>Epidemiologic Considerations</h1>
 
 </section>
 <section id="att-estimand" class="slide level2">
 <h2>ATT Estimand</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Estimand Interpretation</strong></p>
+</div>
+<div class="callout-content">
+<p>DID estimates the <strong>Average Treatment Effect on the Treated (ATT)</strong>.</p>
+<p>This may not be generalizable to other units, including the untreated units in the study.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="internal-vs.-external-validity" class="slide level2">
 <h2>Internal vs.&nbsp;External Validity</h2>
+<ul>
+<li><p>Internal validity may be high if the assumptions are justified.</p></li>
+<li><p>External validity may be low because of limited transportability of the ATT and limited information on effect heterogeneity.</p></li>
+</ul>
 </section>
 <section id="bias-vs.-variance" class="slide level2">
 <h2>Bias vs.&nbsp;Variance</h2>
+<ul>
+<li><p>Incorporating additional units/periods can reduce variance, but may also risk violating the assumptions</p></li>
+<li><p>Generally conducted with limited, carefully-selected units: low bias but high variance</p></li>
+</ul>
 </section></section>
 <section>
 <section id="analysis" class="title-slide slide level1 center">
@@ -640,6 +979,44 @@ Lee Kennedy-Shaffer, PhD
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

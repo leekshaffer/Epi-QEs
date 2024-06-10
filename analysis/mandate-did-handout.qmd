@@ -294,7 +294,24 @@ ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
   theme_bw()
 ```
 
-If you were able to install the `DIDmultiplegtDYN` package, a faster analytical implementation of standard errors is available through the `did_multiplegtDYN` function.
+If you install the `DIDmultiplegtDYN` package, a faster implementation of standard errors and more standard interface is available through the `did_multiplegtDYN` function:
+
+```{r}
+## Use the following lines to run with DIDmultiplegtDYN package:
+# install.packages("DIDmultiplegtDYN")
+require(DIDmultiplegtDYN)
+
+dCdH_dyn <- did_multiplegt_dyn(df=Vax_firstWeek,
+                               outcome="D1P",
+                               group="StateID",
+                               time="MMWR_week",
+                               treatment="mandate",
+                               effects=8,
+                               placebo=8,
+                               cluster="StateID",
+                               graph_off=FALSE)
+dCdH_dyn
+```
 
 ## Additional Options
 

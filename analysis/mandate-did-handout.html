@@ -144,7 +144,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill=</span><span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 4250 rows containing missing values (`geom_tile()`).</code></pre>
+<pre><code>Warning: Removed 4250 rows containing missing values or values outside the scale range
+(`geom_tile()`).</code></pre>
 </div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -181,10 +182,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 2490 rows containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 2490 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1660 rows containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 1660 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
 </div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -222,10 +225,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 29 rows containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 29 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 18 rows containing missing values (`geom_line()`).</code></pre>
+<pre><code>Warning: Removed 18 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
 </div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -453,22 +458,16 @@ unit only. We drop these cohorts.</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor
-
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor</code></pre>
 </div>
@@ -798,7 +797,73 @@ $N_placebo_10
 </div>
 </div>
 </div>
-<p>If you were able to install the <code>DIDmultiplegtDYN</code> package, a faster analytical implementation of standard errors is available through the <code>did_multiplegtDYN</code> function.</p>
+<p>If you install the <code>DIDmultiplegtDYN</code> package, a faster implementation of standard errors and more standard interface is available through the <code>did_multiplegtDYN</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Use the following lines to run with DIDmultiplegtDYN package:</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("DIDmultiplegtDYN")</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(DIDmultiplegtDYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: DIDmultiplegtDYN</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn <span class="ot">&lt;-</span> <span class="fu">did_multiplegt_dyn</span>(<span class="at">df=</span>Vax_firstWeek,</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">outcome=</span><span class="st">"D1P"</span>,</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">group=</span><span class="st">"StateID"</span>,</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">time=</span><span class="st">"MMWR_week"</span>,</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">treatment=</span><span class="st">"mandate"</span>,</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">effects=</span><span class="dv">8</span>,</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">placebo=</span><span class="dv">8</span>,</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">cluster=</span><span class="st">"StateID"</span>,</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">graph_off=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+----------------------------------------------------------------------
+       Estimation of treatment effects: Event-study effects
+----------------------------------------------------------------------
+             Estimate SE      LB CI    UB CI   N   Switchers
+Effect_1     -0.00994 0.04814 -0.10429 0.08441 321 18       
+Effect_2     -0.14092 0.09131 -0.31988 0.03804 280 15       
+Effect_3     -0.15732 0.13387 -0.41971 0.10507 275 15       
+Effect_4     -0.17125 0.17020 -0.50485 0.16234 263 15       
+Effect_5     -0.43402 0.29681 -1.01576 0.14772 218 10       
+Effect_6     -0.49881 0.40189 -1.28650 0.28887 186 9        
+Effect_7     -0.47229 0.44699 -1.34838 0.40381 177 9        
+Effect_8     -0.28885 0.56507 -1.39638 0.81867 138 8        
+
+----------------------------------------------------------------------
+    Average cumulative (total) effect per treatment unit
+----------------------------------------------------------------------
+ Estimate        SE     LB CI     UB CI         N Switchers 
+ -0.22841   0.21237  -0.64464   0.18783       545        99 
+Average number of time periods over which a treatment effect is accumulated: 3.8788
+
+----------------------------------------------------------------------
+     Testing the parallel trends and no anticipation assumptions
+----------------------------------------------------------------------
+             Estimate SE      LB CI    UB CI   N   Switchers
+Placebo_1    0.01751  0.05495 -0.09019 0.12521 321 18       
+Placebo_2    0.13483  0.12339 -0.10701 0.37668 280 15       
+Placebo_3    0.19539  0.18846 -0.17399 0.56477 275 15       
+Placebo_4    0.25257  0.25594 -0.24907 0.75421 263 15       
+Placebo_5    0.44685  0.39496 -0.32725 1.22096 218 10       
+Placebo_6    0.84753  0.67821 -0.48173 2.17679 145 6        
+Placebo_7    0.62478  0.89497 -1.12932 2.37889 98  5        
+Placebo_8    0.48793  0.70533 -0.89448 1.87035 31  2        
+
+Test of joint nullity of the placebos : p-value = 0.0000
+
+
+The development of this package was funded by the European Union.
+ERC REALLYCREDIBLE - GA N. 101043899</code></pre>
+</div>
+</div>
 </section>
 <section id="additional-options" class="level2">
 <h2 class="anchored" data-anchor-id="additional-options">Additional Options</h2>

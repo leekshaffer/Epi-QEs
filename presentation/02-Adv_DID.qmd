@@ -152,6 +152,8 @@ Review/survey papers:
 
 -   [Baker et al. (2022)](https://doi.org/10.1016/j.jfineco.2022.01.004)
 
+-   [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf)
+
 -   [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008)
 
 -   [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017)
@@ -160,7 +162,7 @@ Review/survey papers:
 :::
 
 ::: {.column width="60%"}
-![Roth et al. (2023), Table 2.](images/Adv_DID/Roth%20et%20al%202023%20Tbl%202.png){alt="Roth et al. (2023), Table 2." fig-alt="Table showing several R and Stata commands for advanced DID methods." fig-align="center" width="2142"}
+![Roth et al. (2023), Table 2.](images/Adv_DID/Roth%20et%20al%202023%20Tbl%202.png){fig-alt="Table showing several R and Stata commands for advanced DID methods." fig-align="center" width="2142"}
 :::
 :::
 

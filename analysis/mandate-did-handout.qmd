@@ -25,9 +25,9 @@ Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clu
 
 1.  `bacondecomp` implements the decomposition from [Goodman-Bacon (2021)](https://doi.org/10.1016/j.jeconom.2021.03.014);
 
-2.  `did2s` implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
+2.  `did2s`, described in [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf), implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
 
-3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169).
+3.  `DIDmultiplegt` and `DIDmultiplegtDYN` implement the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
 
 We now load the required libraries.
 
@@ -35,13 +35,15 @@ We now load the required libraries.
 #| output: false
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages("bacondecomp","did2s","DIDmultiplegt")
+# install.packages("bacondecomp","did2s","DIDmultiplegt,"DIDmultiplegtDYN")
 require(tidyverse)
 require(knitr)
 require(lme4)
 require(bacondecomp)
 require(did2s)
-require(DIDmuliplegt)
+## If only DIDmultiplegt can be installed for you, only use that one:
+require(DIDmultiplegt)
+require(DIDmultiplegtDYN)
 ```
 
 ## Graphical Exploration
@@ -155,138 +157,150 @@ knitr::kable(TWFE_results,
 
 The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well giving the changing circumstances of the states involved.
 
-## Two-by-Two DID Summary
+## Goodman-Bacon Decomposition
 
-We can start by examining just two time periods: 2014, prior to the outbreak, and 2016, the first year where the outbreak could have affected live birth rates throughout the year. Note that we exclude 2015, which may have been partially affected. We continue to use the `zika_summ` data set here, looking at the two states as a whole.
-
-```{r}
-## Get differences within-units:
-did_2x2 <- zika_summ %>% dplyr::filter(Year %in% c(2014,2016)) %>%
-  pivot_wider(id_cols=State,
-              names_from=Year,
-              values_from=Rate) %>%
-  mutate(`Diff, 2016–2014`=`2016`-`2014`)
-## Get differences within years:
-yr_diffs <- did_2x2 %>%
-  dplyr::filter(State=="Pernambuco") %>% 
-  dplyr::select(-c(State)) - 
-  did_2x2 %>%
-  dplyr::filter(State=="Rio Grande do Sul") %>% 
-  dplyr::select(-c(State))
-## Combine into presentation table:
-did_2x2_f <- did_2x2 %>% add_row(bind_cols(State="Diff, Treated–Untreated",
-                                 yr_diffs))
-```
-
-Table. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014
+We can conduct the Goodman-Bacon decomposition of the TWFE model to identify the weights given to different comparisons.
 
 ```{r}
-knitr::kable(did_2x2_f,
-             digits=1)
-```
-
-## Linear TWFE Model
-
-The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the `zika_full` data set, which has columns for our outcome (`Rate`), unit identifier (`State`), time identifier (`year`, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (`interaction`, coded as 0 for unexposed and 1 for exposed).
-
-```{r}
-zika_lm <- lm(Rate~State+year+interaction, data=zika_full)
-summary(zika_lm)
-confint(zika_lm, level=0.95)["interaction",]
-```
-
-This gives an effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, suggesting a negative effect of the outbreak on birth rates in Pernambuco. The standard errors and confidence intervals should be treated with suspicion, however, as they ignore the correlation between observations in the same municipality in different years.
-
-To correct the standard errors, we can cluster by the municipality using a linear mixed effects model with a random effect for municipality.
-
-```{r}
-zika_lmer <- lmer(Rate~State+year+interaction+(1|Code), data=zika_full)
-summary(zika_lmer)
-confint(zika_lmer, level=0.95)["interaction",]
-```
-
-This gives the same effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(confint(zika_lmer, level=0.95)["interaction",1], digits=3, nsmall=3)`, `r format(confint(zika_lmer, level=0.95)["interaction",2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect.
-
-Another approach to clustered inference is the block-bootstrap method.
-
-```{r}
-## First, get a list of unique codes by state
-codes <- zika_full %>% dplyr::select(Code,State) %>% distinct()
-## Then, write a function that samples codes within each state:
-boot_data <- function() slice_sample(codes, by=State, prop=1, replace=TRUE) %>%
-  expand_grid(StudyYear=rep(c(2014,2016))) %>%
-  left_join(zika_full, by = join_by(Code, State, StudyYear))
-## Set seed for reproducibility:
-set.seed(3671)
-## Run the sampling and analysis 1000 times to get a distribution:
-lm_boot <- replicate(n=1000,
-                     expr=lm(Rate~State+year+interaction,
-                             data=boot_data())$coefficients["interaction"])
-## Examine the median (estimate) and 2.5 and 97.5 percentiles:
-quantile(lm_boot, probs=c(0.5,0.025,0.975))
-```
-
-This method gives an effect estimate of `r format(quantile(lm_boot, probs=0.5), digits=2, nsmall=2)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(quantile(lm_boot, probs=0.025), digits=3, nsmall=3)`, `r format(quantile(lm_boot, probs=0.975), digits=3, nsmall=3)`\], very similar to the previous results.
-
-## Discussion Questions
-
-1.  How should this result be interpreted?
-
-2.  What do the three key assumptions mean for this setting?
-
-3.  Which of these assumptions are reasonable? Which are unlikely to be valid?
-
-## Placebo Test in Time
-
-We can use the `zika_summ` data set to run the two-by-two DID analysis on all pairs of years that are two years apart, starting with 2010 vs. 2008. Since there were no Zika outbreaks in those prior years, if the parallel trends assumption holds true, the estimates should be around 0.
-
-```{r}
-## Create a data set with a row for each pair of years
-zika_plac <- tibble(`Treated Year`=unique(zika_summ$Year),
-                    `Untreated Year`=`Treated Year`-2) %>%
-  dplyr::filter(`Untreated Year` %in% unique(zika_summ$Year)) %>%
-  left_join(zika_summ %>% dplyr::select(Year,State,Rate) %>% 
-              pivot_wider(id_cols=Year, names_from=State, values_from=Rate),
-            by=join_by(`Treated Year`==Year)) %>% 
-  rename(P1=Pernambuco, R1=`Rio Grande do Sul`) %>%
-  left_join(zika_summ %>% dplyr::select(Year,State,Rate) %>% 
-              pivot_wider(id_cols=Year, names_from=State, values_from=Rate),
-            by=join_by(`Untreated Year`==Year)) %>% 
-  rename(P0=Pernambuco, R0=`Rio Grande do Sul`)
-## Get the estimate for each pair of years
-zika_plac <- zika_plac %>%
-  mutate(Estimate=(P1-P0)-(R1-R0))
+## Conduct the decomposition and print summary:
+bacon <- bacon(D1P~mandate,
+               data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
+               id_var="State",
+               time_var="MMWR_week")
+## Full decomposition:
+bacon
 ```
 
 ```{r}
-#| fig-cap: "Plot of two-by-two DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"
-#| fig-alt: "A scatter plot with points ranging from around -0.868 to -0.135 in the 2010 through 2015 years, with a point around -1.3 in 2016."
-ggplot(data=zika_plac) +
-  geom_point(mapping=aes(x=`Treated Year`, y=Estimate),
-             size=2) +
-  theme_bw() +
-  labs(x="Treated (Placebo) Year", y="DID Estimate") +
-  scale_y_continuous(limits=c(-2,0), breaks=seq(-2,0,by=.5))
+#| fig-cap: "Goodman-Bacon decomposition plot for TWFE model with no covariates"
+#| fig-alt: "Scatter plot of weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
+ggplot(data=bacon, mapping=aes(x=estimate,y=weight,shape=type,color=type)) +
+  geom_point() + theme_bw()
 ```
 
-## Re-Scaling: Natural Log
+The decomposition indicates that the vast majority of the weight is on Treated vs Untreated comparisons (because of the large number of untreated units). One particular observation has a large negative estimate driving the overall estimate.
 
-One approach that might improve the parallel trends assumption in this case is to use a log transformation. We implement this using the linear mixed effects model to get a cluster-robust confidence interval.
+## Dynamic Specification and IW Estimator
+
+The `event_study` function in the `did2s` package implements many proposed DID/staggered adoption methods. These can be chosen using the `estimator` option, or all can be fit by setting `estimator="all"`.
 
 ```{r}
-zika_log_lmer <- lmer(LogRate~State+year+interaction+(1|Code), data=zika_full)
-summary(zika_log_lmer)
-confint(zika_log_lmer, level=0.95)
-exp(summary(zika_log_lmer)$coefficients["interaction","Estimate"])
-exp(confint(zika_log_lmer, level=0.95))
+## Run event_study function with estimator="all":
+ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
+                    left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
+                                dplyr::select(State,MMWR_week) %>%
+                                rename(First_Week=MMWR_week),
+                              by=join_by(State)) %>%
+                    left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
+                                arrange(State) %>%
+                                mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
+                              by=join_by(State)),
+                  yname="SCP",
+                  idname="StateID",
+                  gname="First_Week",
+                  tname="MMWR_week",
+                  estimator="all")
+## List all results:
+ES
+## Pick out a specific method:
+ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")
 ```
 
-This approach gives an effect estimate of `r format(summary(zika_log_lmer)$coefficients["interaction","Estimate"], digits=3, nsmall=3)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(confint(zika_log_lmer, level=0.95)["interaction",1], digits=3, nsmall=3)`, `r format(confint(zika_log_lmer, level=0.95)["interaction",2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect. On the multiplicative scale, by exponentiating, we get an estimate of `r format(exp(summary(zika_log_lmer)$coefficients["interaction","Estimate"]), digits=3, nsmall=3)` with a 95\\% CI of \[`r format(exp(confint(zika_log_lmer, level=0.95)["interaction",1]), digits=3, nsmall=3)`, `r format(exp(confint(zika_log_lmer, level=0.95)["interaction",2]), digits=3, nsmall=3)`\].
+```{r}
+## Plot the results of the various estimators:
+#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."
+#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."
+plot_event_study(ES)
+```
+
+For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.
+
+```{r}
+#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+plot_event_study(ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
+                 horizon=c(-10,8))
+```
+
+```{r}
+#| fig-cap: "Event-study results using the IW Estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+plot_event_study(ES %>% dplyr::filter(estimator=="Sun and Abraham (2020)"),
+                 horizon=c(-10,8))
+```
+
+## First-Difference Switching Effect
+
+Using the `did_multiplegt` function from the `DIDmultiplegt` package, we can fit the de Chaisemartin and d'Haultfoeuille (2020) method to estimate the average treatment effect of the first period after adoption. Standard errors can be derived using the `brep` and `cluster` options, but we set it to 0 here to speed up the analysis.
+
+```{r}
+## First, we prepare a data set with a variable with the First_Week of
+##  mandate for each mandate state and a unique state ID number.
+Vax_firstWeek <- Vax_adj %>% 
+  dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
+  left_join(Vax_adj %>% 
+              dplyr::filter(LeadLag==0) %>% 
+              dplyr::select(State,MMWR_week) %>%
+              rename(First_Week=MMWR_week),
+            by=join_by(State)) %>%
+  left_join(tibble(State=unique(Vax_adj %>% pull(State))) %>%
+              arrange(State) %>%
+              mutate(StateID=1:length(unique(Vax_adj %>% pull(State)))),
+            by=join_by(State))
+## Run analysis method:
+dCdH <- did_multiplegt(df=Vax_firstWeek,
+                       Y="D1P",
+                       G="StateID",
+                       T="MMWR_week",
+                       D="mandate",
+                       placebo=10,
+                       dynamic=7,
+                       brep=0,
+                       cluster="StateID")
+## See full results:
+dCdH
+```
+
+The treatment effect estimate is `r format(dCdH$effect["treatment"], digits=3, nsmall=3)`. We can also pull the dynamic and placebo effect estimates from the output.
+
+```{r}
+## Creating data set of placebo (in-time) effects. Note the time is negated to match usual event time notation.
+placebo <- as_tibble(dCdH) %>% dplyr::select(starts_with("placebo")) %>%
+  pivot_longer(cols=everything(),
+               names_to="Lead",
+               names_prefix="placebo_",
+               values_to="Estimate") %>%
+  mutate(`Event Time`=-1*as.numeric(Lead))
+## Creating data set of single first-switch estimate.
+estimate <- tibble(`Event Time`=1,
+                   Estimate=dCdH$effect["treatment"])
+## Creating data set of dynamic effects. Note the time is incremented by 1 to match usual event time notation where 1 is the first period on treatment.
+dynamic <- as_tibble(dCdH) %>% dplyr::select(starts_with("dynamic")) %>%
+  pivot_longer(cols=everything(),
+               names_to="Lag",
+               names_prefix="dynamic_",
+               values_to="Estimate") %>%
+  mutate(`Event Time`=as.numeric(Lag)+1)
+## Combined event time data set from this method:
+dCdH_comb <- bind_rows(placebo %>% dplyr::select(-Lead),
+                       estimate,
+                       dynamic %>% dplyr::select(-Lag))
+dCdH_comb %>% arrange(`Event Time`)
+```
+
+```{r}
+#| fig-cap: "Event-study results using the First-Switching Estimator from de Chaisemartin and d'Haultfoeuille (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates at each lead/lag time from -10 to 8. The event times less than 0 tend to have small negative estimates (between 0 and -0.125), except for time -9 which has an estimate of nearly 0.25. The event time of 1 has an estimate slightly below 0 as well. The estimates from event times 2 through 4 are around -0.15, from event times 5 to 7 are around -0.40, and from event time 8 is around -0.3."
+
+ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
+  theme_bw()
+```
+
+If you were able to install the `DIDmultiplegtDYN` package, a faster analytical implementation is available through the `did_multiplegtDYN` function.
 
 ## Additional Options
 
-Further modeling is possible. In this case, the authors also proposed Poisson and Negative Binomial models for the live birth counts in the DID framework. Further details on model fitting and interpretation can be found in the article.
+Other methods and specifications are possible, along with incorporating covariates into some of these methods. The review papers listed in the slides are a good place to start to investigate these.
 
 ## Discussion Question
-
-How does the transformation of the outcome change the interpretation of the estimate and of the assumptions required?
+Is this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?

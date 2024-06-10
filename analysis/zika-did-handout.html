@@ -122,68 +122,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## If you have not installed these packages before,</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  run the following line:</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse","knitr","lme4")</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidyverse)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(knitr)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Either way, the packages must be loaded:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidyverse)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(knitr)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="graphical-exploration" class="level2">
 <h2 class="anchored" data-anchor-id="graphical-exploration">Graphical Exploration</h2>
 <p>As always, we begin with exploratory data analysis, plotting the time series for visual inspection. Here, we plot the results akin to Figures 2(a) and 2(b) in Taddeo et al.&nbsp;(2022).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>Rate, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Birth Rate (per 1000)"</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">17</span>),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">16</span>,<span class="at">by=</span><span class="dv">4</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">16</span>,<span class="at">by=</span><span class="dv">2</span>)) <span class="sc">+</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot birth rate over time by state:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of live birth rate (per 1,000 population) by year and state, Brazil, 2008–2016"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with the line for Pernambuco slowly declining from around 16 in 2008 to around 15.5 in 2015 and then to 14 in 2016 while the line for Rio Grande do Sul slowly increases from around 12 in 2008 to around 13 in 2015 and then falls to 12.5 in 2016."</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>Rate, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Birth Rate (per 1000)"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">17</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">16</span>,<span class="at">by=</span><span class="dv">4</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">16</span>,<span class="at">by=</span><span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" alt="A line plot with the line for Pernambuco slowly declining from around 16 in 2008 to around 15.5 in 2015 and then to 14 in 2016 while the line for Rio Grande do Sul slowly increases from around 12 in 2008 to around 13 in 2015 and then falls to 12.5 in 2016." width="672"></p>
-<figcaption>Plot of live birth rate (per 1,000 population) by year and state, Brazil, 2008–2016</figcaption>
+<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>LogBirths, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Log number of live births"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">12</span>),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">12</span>,<span class="at">by=</span><span class="dv">1</span>),</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">12</span>,<span class="at">by=</span>.<span class="dv">25</span>)) <span class="sc">+</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot log of number of births over time by state:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of natural log of the number of live births by year and state, Brazil, 2008–2016"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with the line for Pernambuco steadily increasing from around 11.2 in 2008 to around 11.5 in 2015 and then falling to around 11.4 in 2016 while the line for Rio Grande do Sul steadily increases from around 11.3 in 2008 to around 11.7 in 2015 and then holds steady in 2016."</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>LogBirths, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Log number of live births"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">12</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">12</span>,<span class="at">by=</span><span class="dv">1</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">12</span>,<span class="at">by=</span>.<span class="dv">25</span>)) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" alt="A line plot with the line for Pernambuco steadily increasing from around 11.2 in 2008 to around 11.5 in 2015 and then falling to around 11.4 in 2016 while the line for Rio Grande do Sul steadily increases from around 11.3 in 2008 to around 11.7 in 2015 and then holds steady in 2016." width="672"></p>
-<figcaption>Plot of natural log of the number of live births by year and state, Brazil, 2008–2016</figcaption>
+<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>We can also plot the natural log of the birth rate.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>LogRate, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Log Birth Rate (per 1000)"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="at">by=</span>.<span class="dv">2</span>),</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="at">by=</span>.<span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot log of birth rate over time by state:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of natural log of the rate of live births (per 1,000 population) by year and state, Brazil, 2008–2016"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with the line for Pernambuco declining from 2.8 in 2008 to just above 2.7 in 2010, holding steady until 2015, and then declining to around 2.64 in 2016, while the line for Rio Grande do Sul holds steady around 2.5 from 2008 to 2010, then increases steadily to nearly 2.6 in 2015 and declines to around 2.54 in 2016."</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_summ) <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>Year, <span class="at">y=</span>LogRate, <span class="at">color=</span>State, <span class="at">linetype=</span>State),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">linewidth=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Log Birth Rate (per 1000)"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="at">by=</span>.<span class="dv">2</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">minor_breaks=</span><span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="at">by=</span>.<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">2015</span>, <span class="at">linetype=</span><span class="st">"longdash"</span>, <span class="at">color=</span><span class="st">"grey50"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" alt="A line plot with the line for Pernambuco declining from 2.8 in 2008 to just above 2.7 in 2010, holding steady until 2015, and then declining to around 2.64 in 2016, while the line for Rio Grande do Sul holds steady around 2.5 from 2008 to 2010, then increases steadily to nearly 2.6 in 2015 and declines to around 2.54 in 2016." width="672"></p>
-<figcaption>Plot of natural log of the rate of live births (per 1,000 population) by year and state, Brazil, 2008–2016</figcaption>
+<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -216,8 +223,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Table. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs.&nbsp;2014</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(did_2x2_f,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">digits=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Print formatted table of two-by-two analysis:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(did_2x2_f,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">digits=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <thead>
@@ -256,8 +264,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="linear-twfe-model">Linear TWFE Model</h2>
 <p>The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the <code>zika_full</code> data set, which has columns for our outcome (<code>Rate</code>), unit identifier (<code>State</code>), time identifier (<code>year</code>, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (<code>interaction</code>, coded as 0 for unexposed and 1 for exposed).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>zika_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction, <span class="at">data=</span>zika_full)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit linear TWFE model and extract estimate and 95% CI:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>zika_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction, <span class="at">data=</span>zika_full)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -289,8 +298,9 @@ F-statistic: 195.9 on 3 and 1360 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>This gives an effect estimate of -1.21 births per 1,000 population, suggesting a negative effect of the outbreak on birth rates in Pernambuco. The standard errors and confidence intervals should be treated with suspicion, however, as they ignore the correlation between observations in the same municipality in different years.</p>
 <p>To correct the standard errors, we can cluster by the municipality using a linear mixed effects model with a random effect for municipality.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), <span class="at">data=</span>zika_full)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit a linear mixed effects model to account for clustering by municipality:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), <span class="at">data=</span>zika_full)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
 Formula: Rate ~ State + year + interaction + (1 | Code)
@@ -383,17 +393,19 @@ interaction -0.319  0.374 -0.521</code></pre>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Estimate=</span>(P1<span class="sc">-</span>P0)<span class="sc">-</span>(R1<span class="sc">-</span>R0))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_plac) <span class="sc">+</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>Estimate),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"DID Estimate"</span>) <span class="sc">+</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>,<span class="at">by=</span>.<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot two-by-two DID estimates for placebo years:</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of two-by-two DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A scatter plot with points ranging from around -0.868 to -0.135 in the 2010 through 2015 years, with a point around -1.3 in 2016."</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_plac) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>Estimate),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"DID Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>,<span class="at">by=</span>.<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
+<div>
 <figure class="figure">
-<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" alt="A scatter plot with points ranging from around -0.868 to -0.135 in the 2010 through 2015 years, with a point around -1.3 in 2016." width="672"></p>
-<figcaption>Plot of two-by-two DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)</figcaption>
+<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -403,8 +415,9 @@ interaction -0.319  0.374 -0.521</code></pre>
 <h2 class="anchored" data-anchor-id="re-scaling-natural-log">Re-Scaling: Natural Log</h2>
 <p>One approach that might improve the parallel trends assumption in this case is to use a log transformation. We implement this using the linear mixed effects model to get a cluster-robust confidence interval.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>zika_log_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(LogRate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), <span class="at">data=</span>zika_full)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_log_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with clustering by municipality and log-scale:</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>zika_log_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(LogRate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), <span class="at">data=</span>zika_full)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_log_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
 Formula: LogRate ~ State + year + interaction + (1 | Code)
@@ -448,7 +461,8 @@ StateRio Grande do Sul -0.43223814 -0.340709224
 year                   -0.03652934  0.002008589
 interaction            -0.10770239 -0.033708693</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">summary</span>(zika_log_lmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate estimates and CI to get RR estimates:</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">summary</span>(zika_log_lmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.9317362</code></pre>
 </div>
@@ -471,6 +485,37 @@ interaction             0.8978948  0.9668531</code></pre>
 <section id="additional-options" class="level2">
 <h2 class="anchored" data-anchor-id="additional-options">Additional Options</h2>
 <p>Further modeling is possible. In this case, the authors also proposed Poisson and Negative Binomial models for the live birth counts in the DID framework. Further details on model fitting and interpretation can be found in the article.</p>
+<p>The following code can be run to fit the Poisson GLM with bootstrap CI or GLMM, clustered by municipality:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute this code into the document, change the previous line to true</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLM:</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>zika_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span>zika_full,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_glm)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute bootstrap 95% CI for Poisson GLM:</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4008335</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>glm_boot <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="at">n=</span><span class="dv">1000</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">expr=</span><span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span><span class="fu">boot_data</span>(),</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>])</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>glm_boot_res <span class="ot">&lt;-</span> <span class="fu">quantile</span>(glm_boot, <span class="at">probs=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">coef</span>(zika_glm)[<span class="st">"interaction"</span>]),</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>glm_boot_res[<span class="st">"2.5%"</span>],</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>glm_boot_res[<span class="st">"97.5%"</span>]))</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLMM, clustered by municipality:</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>zika_glmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop))<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), </span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>zika_full,</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>zika_glmer_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(zika_glmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">summary</span>(zika_glmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>]),</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"2.5 %"</span>],</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"97.5 %"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="discussion-question-1" class="level2">
+<h2 class="anchored" data-anchor-id="discussion-question-1">Discussion Question</h2>
+<p>How does the transformation of the outcome change the interpretation of the estimate and of the assumptions required?</p>
 </section>
 
 </main>

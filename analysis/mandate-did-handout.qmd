@@ -27,7 +27,7 @@ Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clu
 
 2.  `did2s`, described in [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf), implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
 
-3.  `DIDmultiplegt` and `DIDmultiplegtDYN` implement the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
+3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169). Versions of this approach that can handle a wider array of settings, laid out in [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017) and [de Chaisemartin and d'Haultfoeiulle (2024)](https://doi.org/10.1162/rest_a_01414), along with sped-up analytic standard errors are implement in the `DIDmultiplegtDYN`, which requires Java for installation.
 
 We now load the required libraries.
 
@@ -35,15 +35,13 @@ We now load the required libraries.
 #| output: false
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages("bacondecomp","did2s","DIDmultiplegt,"DIDmultiplegtDYN")
+# install.packages("bacondecomp","did2s","DIDmultiplegt")
 require(tidyverse)
 require(knitr)
 require(lme4)
 require(bacondecomp)
 require(did2s)
-## If only DIDmultiplegt can be installed for you, only use that one:
 require(DIDmultiplegt)
-require(DIDmultiplegtDYN)
 ```
 
 ## Graphical Exploration
@@ -296,11 +294,12 @@ ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
   theme_bw()
 ```
 
-If you were able to install the `DIDmultiplegtDYN` package, a faster analytical implementation is available through the `did_multiplegtDYN` function.
+If you were able to install the `DIDmultiplegtDYN` package, a faster analytical implementation of standard errors is available through the `did_multiplegtDYN` function.
 
 ## Additional Options
 
 Other methods and specifications are possible, along with incorporating covariates into some of these methods. The review papers listed in the slides are a good place to start to investigate these.
 
 ## Discussion Question
+
 Is this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?

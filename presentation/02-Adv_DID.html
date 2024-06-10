@@ -341,65 +341,220 @@ Lee Kennedy-Shaffer, PhD
 </section>
 <section id="motivating-example-covid-19-vaccine-mandates" class="slide level2">
 <h2>Motivating Example: COVID-19 Vaccine Mandates</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Question</strong></p>
+</div>
+<div class="callout-content">
+<p>What happens when multiple units adopt the intervention at different times?</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Example</strong></p>
+</div>
+<div class="callout-content">
+<p>Different states adopted COVID-19 vaccine mandates for state employees at different times.</p>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section>
 <section id="staggered-adoption" class="title-slide slide level1 center">
 <h1>Staggered Adoption</h1>
 
 </section>
-<section id="setting" class="slide level2">
-<h2>Setting</h2>
-</section>
-<section id="variety-of-2x2s" class="slide level2">
-<h2>Variety of 2x2s</h2>
-</section>
+<section id="panel-data-setting" class="slide level2">
+<h2>Panel Data Setting</h2>
+<ul>
+<li><p>Multiple units, treated at different time points</p></li>
+<li><p>Multiple time points</p></li>
+</ul>
+
+<img data-src="images/Adv_DID/stagger_plain.png" class="quarto-figure quarto-figure-center r-stretch" alt="Schematic of multiple units observed over time, with transition from white squares (representing control) to green squares (representing intervention) over time"></section>
+<section id="variety-of-2x2-comparisons" class="slide level2">
+<h2>Variety of 2x2 Comparisons</h2>
+
+<img data-src="images/Adv_DID/stagger_simple2x2.png" class="quarto-figure quarto-figure-center r-stretch" alt="Staggered treatment adoption schematic with a 2x2 comparison of a late vs. early treatment adopter highlighted"></section>
+<section id="variety-of-2x2-comparisons-1" class="slide level2">
+<h2>Variety of 2x2 Comparisons</h2>
+
+<img data-src="images/Adv_DID/stagger_earlyvslate.png" alt="Staggered treatment adoption schematic with 2x2 comparison of early vs. late treatment adopter" class="r-stretch"></section>
 <section id="two-way-fixed-effects-model" class="slide level2">
 <h2>Two-Way Fixed Effects Model</h2>
+<div class="callout callout-caution callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Caution</strong></p>
+</div>
+<div class="callout-content">
+<p>The TWFE model can accommodate this:</p>
+<p><span class="math display">\[
+Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it}
+\]</span></p>
+<p>But as written it assumes <strong>treatment effect homogeneity</strong> across time periods, time-on-treatment, and units.</p>
+</div>
+</div>
+</div>
 </section></section>
 <section>
 <section id="challenge-heterogeneity" class="title-slide slide level1 center">
 <h1>Challenge: Heterogeneity</h1>
 
 </section>
-<section id="treatment-effect-heterogeneities" class="slide level2">
-<h2>Treatment Effect Heterogeneities</h2>
+<section id="treatment-effect-heterogeneity" class="slide level2">
+<h2>Treatment Effect Heterogeneity</h2>
+<p>In many settings, especially in epidemiology, heterogeneity is common, especially with non-randomized adoption.</p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Question</strong></p>
+</div>
+<div class="callout-content">
+<p>What might cause heterogeneity in the effect of a state employee COVID-19 vaccine mandate?</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/Adv_DID/Goodman-Bacon.png" class="quarto-figure quarto-figure-center" alt="Citation for Goodman-Bacon (2021)" width="881"></p>
+</figure>
+</div>
+</div>
 </section>
+<section id="weighted-average-of-effects" class="slide level2">
+<h2>Weighted Average of Effects</h2>
+
+<img data-src="images/Adv_DID/Goodman-Bacon%20Fig1.png" alt="Line plot (schematic) of outcomes over time for two units treated at different times with different responses to intervention and one untreated unit." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 1.</p></section>
 <section id="goodman-bacon-decomposition" class="slide level2">
 <h2>Goodman-Bacon Decomposition</h2>
-</section></section>
+<p>The TWFE model estimates a weighted average of all 2x2 comparisons.</p>
+
+<img data-src="images/Adv_DID/Goodman-Bacon%20Fig6.png" alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 6.</p></section>
+<section id="goodman-bacon-decomposition-1" class="slide level2">
+<h2>Goodman-Bacon Decomposition</h2>
+<p>This is equivalent to a weighted average of all unit-period-specific treatment effects, with some having negative weights.</p>
+
+<img data-src="images/Adv_DID/Goodman-Bacon%20Fig7.png" alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 7.</p></section></section>
 <section>
 <section id="proposed-solutions" class="title-slide slide level1 center">
 <h1>Proposed Solutions</h1>
 
 </section>
-<section id="sun-and-abraham" class="slide level2">
-<h2>Sun and Abraham</h2>
+<section id="dynamic-specification" class="slide level2">
+<h2>Dynamic Specification</h2>
+<p><span class="math display">\[
+Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq 0} \delta_{k} I(K_{it} = k)+\epsilon_{it},
+\]</span></p>
+<p>where <span class="math inline">\(K_{it}\)</span> is the lead/lag for unit <span class="math inline">\(i\)</span> in period <span class="math inline">\(t\)</span> (e.g., <span class="math inline">\(K_{it} = 1\)</span> in the first exposed period).</p>
+<p>See <a href="https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf">Borusyak and Jaravel (2018)</a> and <a href="https://doi.org/10.1093/restud/rdae007">Borusyak et al.&nbsp;(2024)</a>.</p>
 </section>
-<section id="callaway-and-santanna" class="slide level2">
-<h2>Callaway and Sant’Anna</h2>
+<section id="interaction-weighted-estimator" class="slide level2">
+<h2>Interaction-weighted estimator</h2>
+<p>Group units by adoption timing (<span class="math inline">\(G_i\)</span>), keep one group out as the “control” (<span class="math inline">\(C\)</span>, ideally never-treated) and fit the dynamic specification with the effect interacted by the timing group:</p>
+<p><span class="math display">\[
+Y_{it} = \alpha_i + \gamma_t + \sum_{g \neq C} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) +\epsilon_{it}
+\]</span></p>
+<p>The overall estimator <span class="math inline">\(\hat{\theta}\)</span> is a weighted average of the <span class="math inline">\(\hat{\delta}_{g,k}\)</span> estimators, with weights by share of population in each timing group.</p>
+<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a>.</p>
 </section>
-<section id="de-chaisemartin-and-dhaultfoueille" class="slide level2">
-<h2>de Chaisemartin and d’Haultfoueille</h2>
+<section id="aggregated-non-parametric-identification" class="slide level2">
+<h2>Aggregated Non-Parametric Identification</h2>
+<p>Estimate <span class="math inline">\(\widehat{ATT}_{g,t}\)</span> for each timing group <span class="math inline">\(g\)</span> and period <span class="math inline">\(t\)</span> using a non-parametric scheme: suggested approaches are IPW, OR, and DR.</p>
+<p>Summarize to an overall average effect:</p>
+<p><span class="math display">\[
+\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t},
+\]</span></p>
+<p>weighted by specified weights <span class="math inline">\(w_{g,t}\)</span>.</p>
+<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">Callaway and Sant’Anna (2021)</a>.</p>
 </section>
-<section id="borusyak-javazel" class="slide level2">
-<h2>Borusyak &amp; Javazel</h2>
+<section id="first-difference-switching-effect" class="slide level2">
+<h2>First-Difference Switching Effect</h2>
+<p>For each time period <span class="math inline">\(t\)</span> with at least one unit untreated at <span class="math inline">\(t-1\)</span> and treated at <span class="math inline">\(t\)</span> and at least one unit untreated at both <span class="math inline">\(t-1\)</span> and <span class="math inline">\(t\)</span>, compute:</p>
+<p><span class="math display">\[
+\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} \sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) - \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
+\]</span></p>
+<p>Average these across all time periods <span class="math inline">\(t\)</span>, weighted by number of units or individuals.</p>
+<p>See <a href="https://doi.org/10.1257/aer.20181169">de Chaisemartin and d’Haultfoeuille (2020)</a> and <a href="https://doi.org/10.1093/ectj/utac017">de Chaisemartin and d’Haultfoeuille (2023)</a>.</p>
 </section>
 <section id="x2-building-blocks" class="slide level2">
 <h2>2x2 Building Blocks</h2>
+<p>More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand.</p>
+<p><span class="math display">\[
+\hat{\theta} = \sum_{i,i',t,t'} \left[ \left( Y_{i,t'} - Y_{i,t} \right) - \left( Y_{i',t'} - Y_{i',t} \right) \right]
+\]</span></p>
+<p>See <a href="https://doi.org/10.48550/arXiv.2405.08730">Kennedy-Shaffer (2024)</a>.</p>
 </section>
-<section id="review-papers" class="slide level2">
-<h2>Review Papers</h2>
+<section id="summary-of-options" class="slide level2">
+<h2>Summary of Options</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p>Review/survey papers:</p>
+<ul>
+<li><p><a href="https://doi.org/10.1016/j.jfineco.2022.01.004">Baker et al.&nbsp;(2022)</a></p></li>
+<li><p><a href="https://doi.org/10.1016/j.jeconom.2023.03.008">Roth et al.&nbsp;(2023)</a></p></li>
+<li><p><a href="https://doi.org/10.1093/ectj/utac017">de Chaisemartin and d’Haultfoeuille (2023)</a></p></li>
+<li><p><a href="https://doi.org/10.48550/arXiv.2401.12309">Roth (2024)</a></p></li>
+</ul>
+</div><div class="column" style="width:60%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/Adv_DID/Roth%20et%20al%202023%20Tbl%202.png" alt="Table showing several R and Stata commands for advanced DID methods." width="2142"></p>
+<figcaption>Roth et al.&nbsp;(2023), Table 2.</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section></section>
 <section>
 <section id="other-challenges" class="title-slide slide level1 center">
 <h1>Other Challenges</h1>
 
 </section>
-<section id="parallel-trends" class="slide level2">
-<h2>Parallel Trends</h2>
+<section id="parallel-trends-and-covariates" class="slide level2">
+<h2>Parallel Trends and Covariates</h2>
+<p>These are complicated by staggered adoption and the longer time frames implied by panel data. Recent work has focused on how to interpret and test for these assumptions and how to incorporate time-varying covariates.</p>
 </section>
-<section id="other-assumptions" class="slide level2">
-<h2>Other Assumptions</h2>
+<section id="other-assumptions-and-limitations" class="slide level2">
+<h2>Other Assumptions and Limitations</h2>
+<p>The no-anticipation (or known/limited anticipation) assumption still must hold, as must the no-spillover assumption.</p>
+<div class="fragment">
+<p>All of these approaches change the precise specification of the estimand as well: the <strong>ATT</strong> must be interpreted in terms of the included time periods, lags, and units, and how they are weighted.</p>
+</div>
+</section>
+<section id="when-is-did-useful-when-is-it-lacking" class="slide level2">
+<h2>When is DID useful? When is it lacking?</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>It’s easy to ignore the fundamentals when using the more advanced methods. Consider the validity of the data, the question being asked, and the feasibility of the effect.</p>
+</div>
+</div>
+</div>
 </section></section>
 <section>
 <section id="analysis" class="title-slide slide level1 center">
@@ -421,7 +576,7 @@ Lee Kennedy-Shaffer, PhD
 <section id="two-way-fixed-effects" class="slide level2">
 <h2>Two-Way Fixed Effects</h2>
 </section>
-<section id="goodman-bacon-decomposition-1" class="slide level2">
+<section id="goodman-bacon-decomposition-2" class="slide level2">
 <h2>Goodman-Bacon Decomposition</h2>
 </section>
 <section id="analysis-1" class="slide level2">
@@ -435,15 +590,12 @@ Lee Kennedy-Shaffer, PhD
 </section>
 <section id="interpretation-and-assumptions" class="slide level2">
 <h2>Interpretation and Assumptions</h2>
-</section></section>
-<section id="when-is-did-useful-when-is-it-lacking" class="title-slide slide level1 center">
-<h1>When is DID useful? When is it lacking?</h1>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 

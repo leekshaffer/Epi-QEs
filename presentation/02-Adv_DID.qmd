@@ -8,39 +8,181 @@ editor: visual
 
 ## Motivating Example: COVID-19 Vaccine Mandates
 
+::: callout-important
+## Question
+
+What happens when multiple units adopt the intervention at different times?
+:::
+
+. . .
+
+::: callout-note
+## Example
+
+Different states adopted COVID-19 vaccine mandates for state employees at different times.
+:::
+
 # Staggered Adoption
 
 ## Panel Data Setting
 
-## Variety of 2x2s
+-   Multiple units, treated at different time points
+
+-   Multiple time points
+
+![](images/Adv_DID/stagger_plain.png){fig-alt="Schematic of multiple units observed over time, with transition from white squares (representing control) to green squares (representing intervention) over time" fig-align="center"}
+
+## Variety of 2x2 Comparisons
+
+![](images/Adv_DID/stagger_simple2x2.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of a late vs. early treatment adopter highlighted" fig-align="center"}
+
+## Variety of 2x2 Comparisons
+
+![](images/Adv_DID/stagger_earlyvslate.png){fig-alt="Staggered treatment adoption schematic with 2x2 comparison of early vs. late treatment adopter"}
 
 ## Two-Way Fixed Effects Model
 
+::: callout-caution
+The TWFE model can accommodate this:
+
+$$
+Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it}
+$$
+
+But as written it assumes **treatment effect homogeneity** across time periods, time-on-treatment, and units.
+:::
+
 # Challenge: Heterogeneity
 
-## Treatment Effect Heterogeneities
+## Treatment Effect Heterogeneity
+
+In many settings, especially in epidemiology, heterogeneity is common, especially with non-randomized adoption.
+
+::: callout-note
+## Question
+
+What might cause heterogeneity in the effect of a state employee COVID-19 vaccine mandate?
+:::
+
+. . .
+
+![](images/Adv_DID/Goodman-Bacon.png){fig-alt="Citation for Goodman-Bacon (2021)" fig-align="center" width="881"}
+
+## Weighted Average of Effects
+
+![Goodman-Bacon (2021), Figure 1.](images/Adv_DID/Goodman-Bacon%20Fig1.png){fig-alt="Line plot (schematic) of outcomes over time for two units treated at different times with different responses to intervention and one untreated unit." fig-align="center"}
 
 ## Goodman-Bacon Decomposition
 
+The TWFE model estimates a weighted average of all 2x2 comparisons.
+
+![Goodman-Bacon (2021), Figure 6.](images/Adv_DID/Goodman-Bacon%20Fig6.png){fig-alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2."}
+
+## Goodman-Bacon Decomposition
+
+This is equivalent to a weighted average of all unit-period-specific treatment effects, with some having negative weights.
+
+![Goodman-Bacon (2021), Figure 7.](images/Adv_DID/Goodman-Bacon%20Fig7.png){fig-alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." fig-align="center"}
+
 # Proposed Solutions
 
-## Sun and Abraham
+## Dynamic Specification
 
-## Callaway and Sant'Anna
+$$
+Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq 0} \delta_{k} I(K_{it} = k)+\epsilon_{it},
+$$
 
-## de Chaisemartin and d'Haultfoueille
+where $K_{it}$ is the lead/lag for unit $i$ in period $t$ (e.g., $K_{it} = 1$ in the first exposed period).
 
-## Borusyak & Javazel
+See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007).
+
+## Interaction-weighted estimator
+
+Group units by adoption timing ($G_i$), keep one group out as the "control" ($C$, ideally never-treated) and fit the dynamic specification with the effect interacted by the timing group:
+
+$$
+Y_{it} = \alpha_i + \gamma_t + \sum_{g \neq C} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) +\epsilon_{it}
+$$
+
+The overall estimator $\hat{\theta}$ is a weighted average of the $\hat{\delta}_{g,k}$ estimators, with weights by share of population in each timing group.
+
+See [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006).
+
+## Aggregated Non-Parametric Identification
+
+Estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme: suggested approaches are IPW, OR, and DR.
+
+Summarize to an overall average effect:
+
+$$
+\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t},
+$$
+
+weighted by specified weights $w_{g,t}$.
+
+See [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001).
+
+## First-Difference Switching Effect
+
+For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
+
+$$
+\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} \sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) - \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
+$$
+
+Average these across all time periods $t$, weighted by number of units or individuals.
+
+See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
 
 ## 2x2 Building Blocks
 
-## Review Papers
+More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand.
+
+$$
+\hat{\theta} = \sum_{i,i',t,t'} \left[ \left( Y_{i,t'} - Y_{i,t} \right) - \left( Y_{i',t'} - Y_{i',t} \right) \right]
+$$
+
+See [Kennedy-Shaffer (2024)](https://doi.org/10.48550/arXiv.2405.08730).
+
+## Summary of Options
+
+::: columns
+::: {.column width="40%"}
+Review/survey papers:
+
+-   [Baker et al. (2022)](https://doi.org/10.1016/j.jfineco.2022.01.004)
+
+-   [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008)
+
+-   [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017)
+
+-   [Roth (2024)](https://doi.org/10.48550/arXiv.2401.12309)
+:::
+
+::: {.column width="60%"}
+![Roth et al. (2023), Table 2.](images/Adv_DID/Roth%20et%20al%202023%20Tbl%202.png){alt="Roth et al. (2023), Table 2." fig-alt="Table showing several R and Stata commands for advanced DID methods." fig-align="center" width="2142"}
+:::
+:::
 
 # Other Challenges
 
-## Parallel Trends
+## Parallel Trends and Covariates
 
-## Other Assumptions
+These are complicated by staggered adoption and the longer time frames implied by panel data. Recent work has focused on how to interpret and test for these assumptions and how to incorporate time-varying covariates.
+
+## Other Assumptions and Limitations
+
+The no-anticipation (or known/limited anticipation) assumption still must hold, as must the no-spillover assumption.
+
+. . .
+
+All of these approaches change the precise specification of the estimand as well: the **ATT** must be interpreted in terms of the included time periods, lags, and units, and how they are weighted.
+
+## When is DID useful? When is it lacking?
+
+::: callout-important
+It's easy to ignore the fundamentals when using the more advanced methods. Consider the validity of the data, the question being asked, and the feasibility of the effect.
+:::
 
 # Analysis
 
@@ -63,5 +205,3 @@ editor: visual
 ## Comparison
 
 ## Interpretation and Assumptions
-
-# When is DID useful? When is it lacking?

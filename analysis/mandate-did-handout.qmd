@@ -1,0 +1,292 @@
+---
+title: "Staggered Adoption DID Analysis: COVID-19 Vaccine Mandates"
+author: "Lee Kennedy-Shaffer, PhD"
+format: html
+editor: visual
+---
+
+## Setting and Data
+
+The concept of this analysis is based on that in [Rains and Richards (2024)](https://doi.org/10.1073/pnas.2313610121). The authors seek to understand the effect of COVID-19 vaccine mandates for state employees, which were implemented in 20 U.S. states, beginning on different dates in August–October 2021 ([Ballotpedia](https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023)). The vaccination data used are from the [CDC's COVID Vaccination Trends](https://data.cdc.gov/Vaccinations/COVID-19-Vaccination-Trends-in-the-United-States-N/rh2h-3yt2/about_data) data set. Note that the data might vary somewhat from that in the Rains and Richards (2024) [replication files](https://doi.org/10.1073/pnas.2313610121).
+
+The goal of the analysis is to test the hypothesis that the state mandates increased either the number of first vaccinations in the state or the proportion of the state's adult population that was fully vaccinated. Although not used by Rains and Richards (2024), we use non-mandate states as controls.
+
+The data are available in the `mandate.Rda` file. `Vax_weekly` contains the full data set, by state and summarized by MMWR week, for January 2021 through May 2023, for two variables: `SCP` has the proportion of the adult population that has a complete vaccination series and `D1P` has the proportion of the adult population with at least one dose. The weekly increments are in the `_diff` variables. Information on the mandate for each start are in the `Mandate_Start`, `ever_mandate`, and `mandate` variables, and lead/lag information by week is in `Wks_mandate` and `LeadLag`.
+
+First, load the data into R.
+
+```{r}
+load(file="../data/mandate.Rda")
+```
+
+## Libraries
+
+Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clustered TWFE models. [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008) has a summary table with `R` packages that implement advanced DID methods. We will use three of them:
+
+1.  `bacondecomp` implements the decomposition from [Goodman-Bacon (2021)](https://doi.org/10.1016/j.jeconom.2021.03.014);
+
+2.  `did2s` implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
+
+3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169).
+
+We now load the required libraries.
+
+```{r}
+#| output: false
+## If you have not installed these packages before,
+##  run the following line:
+# install.packages("bacondecomp","did2s","DIDmultiplegt")
+require(tidyverse)
+require(knitr)
+require(lme4)
+require(bacondecomp)
+require(did2s)
+require(DIDmuliplegt)
+```
+
+## Graphical Exploration
+
+We begin by plotting the time series for visual inspection. First, we plot a timeline of the mandate times.
+
+```{r}
+#| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"
+#| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
+ggplot(data=Vax_weekly, mapping=aes(x=End_Date,y=State, fill=mandate)) + geom_tile() +
+  scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
+               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
+               date_labels="%m/%d/%y") +
+  theme_bw() + guides(fill="none")
+```
+
+We can then plot the time series of the outcomes by state, noting which states implement a mandate and when.
+
+```{r}
+## Get lists of the states in the data and the states with a mandate at some point
+states <- unique(Vax_weekly %>% pull(State))
+mandate_states <- unique(Vax_weekly %>% 
+                           dplyr::filter(mandate) %>% pull(State))
+```
+
+```{r}
+#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, June 2021–February 2022"
+#| fig-alt: "A line plot with lines for each state for dates from June 2021 to February 2022, and first-dose percentages generally increasing from a range around 45–80 at the beginning to a range around 70–90 at the end."
+ggplot() +
+  geom_line(data=Vax_weekly %>% dplyr::filter(!(State %in% mandate_states)),
+            mapping=aes(x=End_Date, y=D1P, group=State),
+            color="grey50", linetype="dashed") +
+  geom_line(data=Vax_weekly %>% dplyr::filter(State %in% mandate_states),
+            mapping=aes(x=End_Date, y=D1P, group=State,
+                        color=mandate),
+            linetype="solid") +
+  scale_color_manual(name="Mandate",
+                       breaks=c(TRUE,FALSE),
+                     values=c("blue","grey50"),
+                       labels=c("Post-Mandate","Pre-/No Mandate")) +
+  scale_y_continuous(name="First-Dose Percentage",limits=c(0,100), expand=c(0,0)) +
+  scale_x_date(name="Date", date_breaks="6 weeks", expand=c(0,0),
+               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
+               date_labels="%m/%d/%y") +
+  theme_bw()
+```
+
+Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these two states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.
+
+```{r}
+## Exclude New Hampshire, Pennsylvania, Washington:
+Vax_adj <- Vax_weekly %>% dplyr::filter(!(State %in% c("NH","PA","WA")))
+## Select weeks for analysis:
+Yr_Wk_Sel <- paste0("2021_",(25:42))
+```
+
+We re-plot on this adjusted group of states and weeks.
+
+```{r}
+#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"
+#| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."
+ggplot() +
+  geom_line(data=Vax_adj %>% dplyr::filter(!(State %in% mandate_states), Yr_Wk %in% Yr_Wk_Sel),
+            mapping=aes(x=End_Date, y=D1P, group=State),
+            color="grey50", linetype="dashed") +
+  geom_line(data=Vax_adj %>% dplyr::filter(State %in% mandate_states, Yr_Wk %in% Yr_Wk_Sel),
+            mapping=aes(x=End_Date, y=D1P, group=State,
+                        color=mandate),
+            linetype="solid") +
+  scale_color_manual(name="Mandate",
+                     breaks=c(TRUE,FALSE),
+                     values=c("blue","grey50"),
+                     labels=c("Post-Mandate","Pre-/No Mandate")) +
+  scale_y_continuous(name="Full Vaccination Percentage",limits=c(0,100), expand=c(0,0)) +
+  scale_x_date(name="Date", date_breaks="3 weeks", expand=c(0,0),
+               limits=c(as.Date("2021-07-03"),as.Date("2021-10-24")),
+               date_labels="%m/%d/%y") +
+  theme_bw()
+```
+
+Similar plotting and analyses could be done on the complete series percentage by replacing `D1P` in the above code by `SCP`.
+
+## Discussion Questions
+
+1.  Is one outcome better suited to answering the question of interest than the other?
+
+2.  What forms of effect heterogeneity may be present in this staggered adoption setting?
+
+## TWFE Models
+
+First, we fit TWFE models (using `lmer` to get clustered confidence intervals), the so-called "static" specification. We fit it once with just the fixed effects, and once adding `D1P_prior` as a covariate.
+
+```{r}
+TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
+                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
+TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+mandate+(1|State),
+                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, parm="mandateTRUE", level=0.95)
+
+TWFE_results <- tibble(Model=c("Fixed Effects Only",
+                               "Fixed Effects + Prior Week Value"),
+                       Estimate=format(c(summary(TWFE_D1P)$coefficients["mandateTRUE","Estimate"],
+                                  summary(TWFE_D1P_ctrl)$coefficients["mandateTRUE","Estimate"]), digits=3, nsmall=3),
+                       `95% CI`=c(paste(format(TWFE_D1P_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", "),
+                                  paste(format(TWFE_D1P_ctrl_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", ")))
+
+knitr::kable(TWFE_results,
+             caption="Table of results from TWFE models")
+```
+
+The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well giving the changing circumstances of the states involved.
+
+## Two-by-Two DID Summary
+
+We can start by examining just two time periods: 2014, prior to the outbreak, and 2016, the first year where the outbreak could have affected live birth rates throughout the year. Note that we exclude 2015, which may have been partially affected. We continue to use the `zika_summ` data set here, looking at the two states as a whole.
+
+```{r}
+## Get differences within-units:
+did_2x2 <- zika_summ %>% dplyr::filter(Year %in% c(2014,2016)) %>%
+  pivot_wider(id_cols=State,
+              names_from=Year,
+              values_from=Rate) %>%
+  mutate(`Diff, 2016–2014`=`2016`-`2014`)
+## Get differences within years:
+yr_diffs <- did_2x2 %>%
+  dplyr::filter(State=="Pernambuco") %>% 
+  dplyr::select(-c(State)) - 
+  did_2x2 %>%
+  dplyr::filter(State=="Rio Grande do Sul") %>% 
+  dplyr::select(-c(State))
+## Combine into presentation table:
+did_2x2_f <- did_2x2 %>% add_row(bind_cols(State="Diff, Treated–Untreated",
+                                 yr_diffs))
+```
+
+Table. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014
+
+```{r}
+knitr::kable(did_2x2_f,
+             digits=1)
+```
+
+## Linear TWFE Model
+
+The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the `zika_full` data set, which has columns for our outcome (`Rate`), unit identifier (`State`), time identifier (`year`, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (`interaction`, coded as 0 for unexposed and 1 for exposed).
+
+```{r}
+zika_lm <- lm(Rate~State+year+interaction, data=zika_full)
+summary(zika_lm)
+confint(zika_lm, level=0.95)["interaction",]
+```
+
+This gives an effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, suggesting a negative effect of the outbreak on birth rates in Pernambuco. The standard errors and confidence intervals should be treated with suspicion, however, as they ignore the correlation between observations in the same municipality in different years.
+
+To correct the standard errors, we can cluster by the municipality using a linear mixed effects model with a random effect for municipality.
+
+```{r}
+zika_lmer <- lmer(Rate~State+year+interaction+(1|Code), data=zika_full)
+summary(zika_lmer)
+confint(zika_lmer, level=0.95)["interaction",]
+```
+
+This gives the same effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(confint(zika_lmer, level=0.95)["interaction",1], digits=3, nsmall=3)`, `r format(confint(zika_lmer, level=0.95)["interaction",2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect.
+
+Another approach to clustered inference is the block-bootstrap method.
+
+```{r}
+## First, get a list of unique codes by state
+codes <- zika_full %>% dplyr::select(Code,State) %>% distinct()
+## Then, write a function that samples codes within each state:
+boot_data <- function() slice_sample(codes, by=State, prop=1, replace=TRUE) %>%
+  expand_grid(StudyYear=rep(c(2014,2016))) %>%
+  left_join(zika_full, by = join_by(Code, State, StudyYear))
+## Set seed for reproducibility:
+set.seed(3671)
+## Run the sampling and analysis 1000 times to get a distribution:
+lm_boot <- replicate(n=1000,
+                     expr=lm(Rate~State+year+interaction,
+                             data=boot_data())$coefficients["interaction"])
+## Examine the median (estimate) and 2.5 and 97.5 percentiles:
+quantile(lm_boot, probs=c(0.5,0.025,0.975))
+```
+
+This method gives an effect estimate of `r format(quantile(lm_boot, probs=0.5), digits=2, nsmall=2)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(quantile(lm_boot, probs=0.025), digits=3, nsmall=3)`, `r format(quantile(lm_boot, probs=0.975), digits=3, nsmall=3)`\], very similar to the previous results.
+
+## Discussion Questions
+
+1.  How should this result be interpreted?
+
+2.  What do the three key assumptions mean for this setting?
+
+3.  Which of these assumptions are reasonable? Which are unlikely to be valid?
+
+## Placebo Test in Time
+
+We can use the `zika_summ` data set to run the two-by-two DID analysis on all pairs of years that are two years apart, starting with 2010 vs. 2008. Since there were no Zika outbreaks in those prior years, if the parallel trends assumption holds true, the estimates should be around 0.
+
+```{r}
+## Create a data set with a row for each pair of years
+zika_plac <- tibble(`Treated Year`=unique(zika_summ$Year),
+                    `Untreated Year`=`Treated Year`-2) %>%
+  dplyr::filter(`Untreated Year` %in% unique(zika_summ$Year)) %>%
+  left_join(zika_summ %>% dplyr::select(Year,State,Rate) %>% 
+              pivot_wider(id_cols=Year, names_from=State, values_from=Rate),
+            by=join_by(`Treated Year`==Year)) %>% 
+  rename(P1=Pernambuco, R1=`Rio Grande do Sul`) %>%
+  left_join(zika_summ %>% dplyr::select(Year,State,Rate) %>% 
+              pivot_wider(id_cols=Year, names_from=State, values_from=Rate),
+            by=join_by(`Untreated Year`==Year)) %>% 
+  rename(P0=Pernambuco, R0=`Rio Grande do Sul`)
+## Get the estimate for each pair of years
+zika_plac <- zika_plac %>%
+  mutate(Estimate=(P1-P0)-(R1-R0))
+```
+
+```{r}
+#| fig-cap: "Plot of two-by-two DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"
+#| fig-alt: "A scatter plot with points ranging from around -0.868 to -0.135 in the 2010 through 2015 years, with a point around -1.3 in 2016."
+ggplot(data=zika_plac) +
+  geom_point(mapping=aes(x=`Treated Year`, y=Estimate),
+             size=2) +
+  theme_bw() +
+  labs(x="Treated (Placebo) Year", y="DID Estimate") +
+  scale_y_continuous(limits=c(-2,0), breaks=seq(-2,0,by=.5))
+```
+
+## Re-Scaling: Natural Log
+
+One approach that might improve the parallel trends assumption in this case is to use a log transformation. We implement this using the linear mixed effects model to get a cluster-robust confidence interval.
+
+```{r}
+zika_log_lmer <- lmer(LogRate~State+year+interaction+(1|Code), data=zika_full)
+summary(zika_log_lmer)
+confint(zika_log_lmer, level=0.95)
+exp(summary(zika_log_lmer)$coefficients["interaction","Estimate"])
+exp(confint(zika_log_lmer, level=0.95))
+```
+
+This approach gives an effect estimate of `r format(summary(zika_log_lmer)$coefficients["interaction","Estimate"], digits=3, nsmall=3)` births per 1,000 population, with a 95\\% confidence interval of \[`r format(confint(zika_log_lmer, level=0.95)["interaction",1], digits=3, nsmall=3)`, `r format(confint(zika_log_lmer, level=0.95)["interaction",2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect. On the multiplicative scale, by exponentiating, we get an estimate of `r format(exp(summary(zika_log_lmer)$coefficients["interaction","Estimate"]), digits=3, nsmall=3)` with a 95\\% CI of \[`r format(exp(confint(zika_log_lmer, level=0.95)["interaction",1]), digits=3, nsmall=3)`, `r format(exp(confint(zika_log_lmer, level=0.95)["interaction",2]), digits=3, nsmall=3)`\].
+
+## Additional Options
+
+Further modeling is possible. In this case, the authors also proposed Poisson and Negative Binomial models for the live birth counts in the DID framework. Further details on model fitting and interpretation can be found in the article.
+
+## Discussion Question
+
+How does the transformation of the outcome change the interpretation of the estimate and of the assumptions required?

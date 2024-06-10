@@ -17,9 +17,10 @@ Files included:
 Based on Rains and Richards 2024 (https://doi.org/10.1073/pnas.2313610121). Note that the data used are not exactly those used in that paper, as LKS was unable to match the figures exactly using the below data sources.
 Files included:
 - mandate_did_test.csv: Replication data for Rains and Richards 2024 (https://doi.org/10.1073/pnas.2313610121), downloaded from https://osf.io/j3tqd/ on May 8, 2024. Note that this file is not used in the analysis by LKS but is available for comparison.
-- MandateDates.xlsx: Compiled by LKS from https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023 on May 8, 2024. Additional sources on data issues include (https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania).
+- MandateDates.xlsx: Compiled by LKS from https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023 on May 8, 2024. Additional sources on data issues include (https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), (https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and (https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/).
 - NST-EST2023-POP.xlsx: Census population estimates by state, 2023, downloaded from https://www.census.gov/data/tables/time-series/demo/popest/2020s-national-total.html on May 8, 2024.
 - Census_Pops.xlsx: simplified xlsx file from NST-EST2023-POP.xlsx file, compiled by LKS.
+- COVID-19_Vaccinations_in_the_United_States_Jurisdiction_20240508.csv: U.S. CDC COVID-19 vaccination tracking data, downloaded from https://data.cdc.gov/Vaccinations/COVID-19-Vaccination-Trends-in-the-United-States-N/rh2h-3yt2/about_data on May 8, 2024.
 
 ## lottery
 Replication data for Fuller et al. 2022 (https://doi.org/10.1371/journal.pone.0274374) and Lang et al. 2023 (https://doi.org/10.1017/XPS.2021.32), downloaded from https://doi.org/10.7910/DVN/K1XX02 and https://doi.org/10.7910/DVN/QYXN9L, respectively, on May 24, 2024.

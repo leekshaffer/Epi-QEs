@@ -7,11 +7,13 @@ editor: visual
 
 ## Setting and Data
 
-The concept of this analysis is based on that in [Rains and Richards (2024)](https://doi.org/10.1073/pnas.2313610121). The authors seek to understand the effect of COVID-19 vaccine mandates for state employees, which were implemented in 20 U.S. states, beginning on different dates in August–October 2021 ([Ballotpedia](https://ballotpedia.org/State_employee_vaccine_requirements_during_the_coronavirus_(COVID-19)_pandemic,_2021-2023)). The vaccination data used are from the [CDC's COVID Vaccination Trends](https://data.cdc.gov/Vaccinations/COVID-19-Vaccination-Trends-in-the-United-States-N/rh2h-3yt2/about_data) data set. Note that the data might vary somewhat from that in the Rains and Richards (2024) [replication files](https://doi.org/10.1073/pnas.2313610121).
+There are several published analyses of the effect of COVID-19 vaccine lotteries in the U.S. We use the data and analysis based on that by [Lang et al. (2023)](https://doi.org/10.1017/XPS.2021.32). The replication files that are used are available through [Harvard Dataverse](https://doi.org/10.7910/DVN/QYXN9L).
 
-The goal of the analysis is to test the hypothesis that the state mandates increased either the number of first vaccinations in the state or the proportion of the state's adult population that was fully vaccinated. Although not used by Rains and Richards (2024), we use non-mandate states as controls.
+[Fuller et al. (2022)](https://doi.org/10.1371/journal.pone.0274374) conducted a multiple-state analysis using the synthetic control, and have data available on [Harvard Dataverse](https://doi.org/10.7910/DVN/K1XX02) as well. Other analyses include [Sehgal (2021)](https://doi.org/10.1016/j.amjmed.2021.06.032) and [Brehm et al. (2022)](https://doi.org/10.1086/718512).
 
-The data are available in the `mandate.Rda` file. `Vax_weekly` contains the full data set, by state and summarized by MMWR week, for January 2021 through May 2023, for two variables: `SCP` has the proportion of the adult population that has a complete vaccination series and `D1P` has the proportion of the adult population with at least one dose. The weekly increments are in the `_diff` variables. Information on the mandate for each start are in the `Mandate_Start`, `ever_mandate`, and `mandate` variables, and lead/lag information by week is in `Wks_mandate` and `LeadLag`.
+Focusing on the Ohio Vax-A-Million lottery, we explore whether the lottery incentive, which was announced on May 12, 2021, had a noticeable impact on Ohio's vaccination rates. The outcome considered is the percentage of the adult population fully vaccinated for COVID-19; note that the lottery only required a first dose for entry.
+
+The outcome data were obtained by Lang et al. from Our World In Data's database, which draws from CDC reports. The relevant data for our analyses are in `lottery_lang.Rda`. `lang_0624` contains weekly case, vaccination, and death numbers by state, along with indicators and week numbers for any states that implemented their own lottery. These data are complete through late June 2021 (used in the main analysis in the publication), while `lang_0912` extends the data through mid-September. `lang_ann_dates` has announcement dates and notes on lotteries in various states. Note that the data used by Fuller et al. are available in `lottery_fuller.Rda` for comparison.
 
 First, load the data into R.
 
@@ -25,7 +27,7 @@ Again, we will use `tidyverse` and `knitr` for general coding. Several packages 
 
 1.  [`tidysynth`](https://github.com/edunford/tidysynth), which has a more user-friendly, tidyverse-style implementation of SC; and
 
-2.  [`augsynth`](https://github.com/ebenmichael/augsynth), which additionally allows for Augmented SC (to be discussed later).
+2.  [`augsynth`](https://github.com/ebenmichael/augsynth), which additionally allows for Augmented SC (to be discussed later). For the most recent version of `R`, this has to be installed from GitHub using the `devtools` package.
 
 We now load the required libraries.
 
@@ -33,299 +35,313 @@ We now load the required libraries.
 #| output: false
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages(c("tidysynth","augsynth"))
+# install.packages(c("tidysynth","devtools"))
 ## Either way, require the libraries:
 require(tidyverse)
 require(knitr)
 require(tidysynth)
+require(devtools)
+## If augsynth has not yet been installed, run the following line:
+# devtools::install_github("ebenmichael/augsynth")
 require(augsynth)
 ```
 
 ## Graphical Exploration
 
-We begin by plotting the time series for visual inspection. First, we plot a timeline of the mandate times.
+We begin by plotting the time series for visual inspection. First, we plot the percent fully vaccinated over time, up to late June 2021.
 
 ```{r}
+## We first save the annnouncement date for Ohio's lottery:
+Ohio_ann <- lang_ann_dates %>% dplyr::filter(state=="OH") %>%
+  pull(lott_date)
 ## Plot time series of mandates themselves:
-#| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"
-#| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
-ggplot(data=Vax_weekly, mapping=aes(x=End_Date,y=State, fill=mandate)) + geom_tile() +
-  scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
-               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
-               date_labels="%m/%d/%y") +
-  theme_bw() + guides(fill="none")
+#| fig-cap: "Plot of fully vaccinated percentages by state and lottery status, January–June 2021"
+#| fig-alt: "A line plot with line for each state over the time range specified. Ohio is highlighted and generally in the middle of the range."
+ggplot(data=lang_0624,
+       mapping=aes(group=state,linetype=type,color=type,alpha=type,
+                   x=last_day,y=people_fully_vaccinated_per_hundred)) +
+  scale_alpha_manual(name=NULL, breaks=c("Ohio","Other Lottery State","Non-Lottery State"),
+                     values=c(1,0.8,0.5)) +
+  geom_line() + theme_bw() +
+  geom_vline(xintercept=Ohio_ann, linetype="dotted") +
+  labs(x="Day (2021)", y="Percent Fully Vaccinated",
+       linetype=NULL,color=NULL)
 ```
 
-We can then plot the time series of the outcomes by state, noting which states implement a mandate and when.
+We can do the same with the larger data set to see if there are later time patterns that should be explored.
 
 ```{r}
-## Get lists of the states in the data and the states with a mandate at some point
-states <- unique(Vax_weekly %>% pull(State))
-mandate_states <- unique(Vax_weekly %>% 
-                           dplyr::filter(mandate) %>% pull(State))
+#| fig-cap: "Plot of fully vaccinated percentages by state and lottery status, January–September 2021"
+#| fig-alt: "A line plot with line for each state over the time range specified. Ohio is highlighted and generally in the middle of the range."
+ggplot(data=lang_0912,
+       mapping=aes(group=state,linetype=type,color=type,alpha=type,
+                   x=last_day,y=people_fully_vaccinated_per_hundred)) +
+  scale_alpha_manual(name=NULL, breaks=c("Ohio","Other Lottery State","Non-Lottery State"),
+                     values=c(1,0.8,0.5)) +
+  geom_line() + theme_bw() +
+  geom_vline(xintercept=Ohio_ann, linetype="dotted") +
+  labs(x="Day (2021)", y="Percent Fully Vaccinated",
+       linetype=NULL,color=NULL)
+```
+
+We can also plot Ohio versus the average outcome of the other states, grouped by whether they had a lottery.
+
+```{r}
+## Create data set that averages across states within each group:
+lang_avg <- lang_0624 %>% group_by(type,week,last_day) %>%
+  dplyr::summarize(full_vax_avg=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE))
 ```
 
 ```{r}
-## Plot time series of first-dose proportion by state:
-#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, June 2021–February 2022"
-#| fig-alt: "A line plot with lines for each state for dates from June 2021 to February 2022, and first-dose percentages generally increasing from a range around 45–80 at the beginning to a range around 70–90 at the end."
-ggplot() +
-  geom_line(data=Vax_weekly %>% dplyr::filter(!(State %in% mandate_states)),
-            mapping=aes(x=End_Date, y=D1P, group=State),
-            color="grey50", linetype="dashed") +
-  geom_line(data=Vax_weekly %>% dplyr::filter(State %in% mandate_states),
-            mapping=aes(x=End_Date, y=D1P, group=State,
-                        color=mandate),
-            linetype="solid") +
-  scale_color_manual(name="Mandate",
-                       breaks=c(TRUE,FALSE),
-                     values=c("blue","grey50"),
-                       labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="First-Dose Percentage",limits=c(0,100), expand=c(0,0)) +
-  scale_x_date(name="Date", date_breaks="6 weeks", expand=c(0,0),
-               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
-               date_labels="%m/%d/%y") +
-  theme_bw()
+#| fig-cap: "Plot of average fully vaccinated percentages by lottery status, January–June 2021. Note the mean is computed across states, not weighted by population."
+#| fig-alt: "A line plot with line for each of Ohio, Other Lottery States (Mean), and Non-Lottery States (Mean) over the time range specified. Ohio increases more slowly than the other two until mid-April, then much more quickly until early May, then more slowly again. Other Lottery States appears to increase more quickly than Non-Lottery States both before and after Ohio's lottery announcement."
+ggplot(data=lang_avg,
+       mapping=aes(linetype=type,color=type,alpha=type,
+                   x=last_day,y=full_vax_avg)) +
+  scale_alpha_manual(name=NULL, breaks=c("Ohio","Other Lottery States (Mean)","Non-Lottery States (Mean)"),
+                     values=c(1,0.8,0.5)) +
+  geom_line() + theme_bw() +
+  geom_vline(xintercept=Ohio_ann, linetype="dotted") +
+  labs(x="Day (2021)", y="Percent Fully Vaccinated",
+       linetype=NULL,color=NULL)
 ```
-
-Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these two states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.
-
-```{r}
-## Exclude New Hampshire, Pennsylvania, Washington:
-Vax_adj <- Vax_weekly %>% dplyr::filter(!(State %in% c("NH","PA","WA")))
-## Select weeks for analysis:
-Yr_Wk_Sel <- paste0("2021_",(25:42))
-```
-
-We re-plot on this adjusted group of states and weeks.
-
-```{r}
-## Plot time series of first-dose proportion by state in smaller time window:
-#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"
-#| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."
-ggplot() +
-  geom_line(data=Vax_adj %>% dplyr::filter(!(State %in% mandate_states), Yr_Wk %in% Yr_Wk_Sel),
-            mapping=aes(x=End_Date, y=D1P, group=State),
-            color="grey50", linetype="dashed") +
-  geom_line(data=Vax_adj %>% dplyr::filter(State %in% mandate_states, Yr_Wk %in% Yr_Wk_Sel),
-            mapping=aes(x=End_Date, y=D1P, group=State,
-                        color=mandate),
-            linetype="solid") +
-  scale_color_manual(name="Mandate",
-                     breaks=c(TRUE,FALSE),
-                     values=c("blue","grey50"),
-                     labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="Full Vaccination Percentage",limits=c(0,100), expand=c(0,0)) +
-  scale_x_date(name="Date", date_breaks="3 weeks", expand=c(0,0),
-               limits=c(as.Date("2021-07-03"),as.Date("2021-10-24")),
-               date_labels="%m/%d/%y") +
-  theme_bw()
-```
-
-Similar plotting and analyses could be done on the complete series percentage by replacing `D1P` in the above code by `SCP`.
 
 ## Discussion Questions
 
-1.  Is one outcome better suited to answering the question of interest than the other?
+1.  Does the above plot indicate that parallel trends would be reasonable?
 
-2.  What forms of effect heterogeneity may be present in this staggered adoption setting?
+2.  On visual inspection, does it appear that the lottery was effective?
 
-## TWFE Models
+## Synthetic Control
 
-First, we fit TWFE models (using `lmer` to get clustered confidence intervals), the so-called "static" specification. We fit it once with just the fixed effects, and once adding `D1P_prior` as a covariate.
+### Fit Model
+
+We will fit the synthetic control for Ohio, using only non-lottery states as the potential control units. For now, we will use only the pre-intervention time periods as predictors, ignoring any other covariates, and optimize the fit over the full pre-intervention window. We use the `synthetic_control` function from the `tidysynth` package. Note that this may take a minute or two to run.
 
 ```{r}
-## Fit TWFE model with no covariates:
-TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
-## Get 95% CI:
-TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
-## Fit TWFE model with prior-week as covariate:
-TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
-TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, parm="mandateTRUE", level=0.95)
-
-## Summarize results from the two models:
-TWFE_results <- tibble(Model=c("Fixed Effects Only",
-                               "Fixed Effects + Prior Week Value"),
-                       Estimate=format(c(summary(TWFE_D1P)$coefficients["mandateTRUE","Estimate"],
-                                  summary(TWFE_D1P_ctrl)$coefficients["mandateTRUE","Estimate"]), digits=3, nsmall=3),
-                       `95% CI`=c(paste(format(TWFE_D1P_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", "),
-                                  paste(format(TWFE_D1P_ctrl_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", ")))
-
-## Print the formatted table:
-knitr::kable(TWFE_results,
-             caption="Table of results from TWFE models")
+## Conduct SC analysis for Ohio, excluding other lottery states:
+synth_ohio <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
+  ## initialize SC object by specifying outcome, unit variable, time variable, 
+  ### and when/where intervention turns on:
+  synthetic_control(outcome=people_fully_vaccinated_per_hundred,
+                    unit=state,
+                    time=centered_week,
+                    i_unit="OH",
+                    i_time=0,
+                    generate_placebos=T) %>%
+  ## create predictors for SC model:
+  generate_predictor(time_window=-17,lag17=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-16,lag16=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-15,lag15=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-14,lag14=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-13,lag13=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-12,lag12=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-11,lag11=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-10,lag10=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-9,lag09=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-8,lag08=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-7,lag07=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-6,lag06=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-5,lag05=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-4,lag04=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-3,lag03=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-2,lag02=people_fully_vaccinated_per_hundred) %>%
+  generate_predictor(time_window=-1,lag01=people_fully_vaccinated_per_hundred) %>%
+  ## generate SC weights:
+  generate_weights(optimization_window=(-17):(-1),
+                   margin_ipop = .02,sigf_ipop = 7,bound_ipop = 6) %>%
+  ## run SC:
+  generate_control()
 ```
 
-The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well giving the changing circumstances of the states involved.
+The `synth_ohio` object contains all of the information about the fit. `tidysynth` provides many functions to pull the results for inspection.
 
-## Goodman-Bacon Decomposition
+### Inspect Fit
 
-We can conduct the Goodman-Bacon decomposition of the TWFE model to identify the weights given to different comparisons.
-
-```{r}
-## Conduct the decomposition and print summary:
-bacon <- bacon(D1P~mandate,
-               data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
-               id_var="State",
-               time_var="MMWR_week")
-## Full decomposition:
-bacon
-```
+We can investigate the weights given to different control units and variables:
 
 ```{r}
-## Plot decomposition results:
-#| fig-cap: "Goodman-Bacon decomposition plot for TWFE model with no covariates"
-#| fig-alt: "Scatter plot of weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
-ggplot(data=bacon, mapping=aes(x=estimate,y=weight,shape=type,color=type)) +
-  geom_point() + theme_bw()
-```
-
-The decomposition indicates that the vast majority of the weight is on Treated vs Untreated comparisons (because of the large number of untreated units). One particular observation has a large negative estimate driving the overall estimate.
-
-## Dynamic Specification and IW Estimator
-
-The `event_study` function in the `did2s` package implements many proposed DID/staggered adoption methods. These can be chosen using the `estimator` option, or all can be fit by setting `estimator="all"`.
-
-```{r}
-## Run event_study function with estimator="all":
-ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
-                    left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
-                                dplyr::select(State,MMWR_week) %>%
-                                rename(First_Week=MMWR_week),
-                              by=join_by(State)) %>%
-                    left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
-                                arrange(State) %>%
-                                mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
-                              by=join_by(State)),
-                  yname="SCP",
-                  idname="StateID",
-                  gname="First_Week",
-                  tname="MMWR_week",
-                  estimator="all")
-## List all results:
-ES
-## Pick out a specific method:
-ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")
+## Pull weights and print in descending order
+synth_ohio %>% grab_unit_weights() %>% 
+  dplyr::filter(weight > 0.001) %>% dplyr::arrange(desc(weight))
 ```
 
 ```{r}
-## Plot the results of the various estimators:
-#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."
-#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."
-plot_event_study(ES)
+## Plot the weights for control units and variables.
+#| fig-cap: "Control unit and variable weights for synthetic control fit of Ohio's fully vaccinated percentage prior to the lottery implementation, May 12, 2021."
+#| fig-alt: "Left: bar plot of control unit weights. The positive weights are only for Kansas (0.256), Wisconsin (0.192), Virginia (0.173), Georgia (0.168), Iowa (0.066), Hawaii (0.061), Pennsylvania (0.056), and Connecticut (0.029). Right: bar plot of variable weights, from lag01 down to lag17. The weight on lag01 is above 0.20, falling roughly exponentially to about 0 for lag17."
+## Plot weights on control units and variables:
+synth_ohio %>% plot_weights()
 ```
 
-For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.
+The top four control states by weight are Kansas, Wisconsin, Viriginia, and Georgia. **Do these seem reasonable?** The variables are given weight in reverse chronological order: **does this make sense for minimizing pre-intervention MSPE?**
+
+We can also examine the pre-intervention fit directly between true Ohio, synthetic Ohio, and the average of the donor pool.
 
 ```{r}
-## Plot the results for just the dynamic estimator:
-#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
-#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
-                 horizon=c(-10,8))
+## Examine fit:
+synth_ohio %>% grab_balance_table()
 ```
 
-```{r}
-## Plot the results for just the IW estimator:
-#| fig-cap: "Event-study results using the IW Estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
-#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Sun and Abraham (2020)"),
-                 horizon=c(-10,8))
-```
+### Plot Results
 
-## First-Difference Switching Effect
-
-Using the `did_multiplegt` function from the `DIDmultiplegt` package, we can fit the de Chaisemartin and d'Haultfoeuille (2020) method to estimate the average treatment effect of the first period after adoption. Standard errors can be derived using the `brep` and `cluster` options, but we set it to 0 here to speed up the analysis.
+We can plot both the observed and synthetic time series themselves, and the gap between them.
 
 ```{r}
-## First, we prepare a data set with a variable with the First_Week of
-##  mandate for each mandate state and a unique state ID number.
-Vax_firstWeek <- Vax_adj %>% 
-  dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
-  left_join(Vax_adj %>% 
-              dplyr::filter(LeadLag==0) %>% 
-              dplyr::select(State,MMWR_week) %>%
-              rename(First_Week=MMWR_week),
-            by=join_by(State)) %>%
-  left_join(tibble(State=unique(Vax_adj %>% pull(State))) %>%
-              arrange(State) %>%
-              mutate(StateID=1:length(unique(Vax_adj %>% pull(State)))),
-            by=join_by(State))
-## Run analysis method:
-dCdH <- did_multiplegt(df=Vax_firstWeek,
-                       Y="D1P",
-                       G="StateID",
-                       T="MMWR_week",
-                       D="mandate",
-                       placebo=10,
-                       dynamic=7,
-                       brep=0,
-                       cluster="StateID")
-## See full results:
-dCdH
-```
-
-The treatment effect estimate is `r format(dCdH$effect["treatment"], digits=3, nsmall=3)`. We can also pull the dynamic and placebo effect estimates from the output.
-
-```{r}
-## Creating data set of placebo (in-time) effects. Note the time is negated to match usual event time notation.
-placebo <- as_tibble(dCdH) %>% dplyr::select(starts_with("placebo")) %>%
-  pivot_longer(cols=everything(),
-               names_to="Lead",
-               names_prefix="placebo_",
-               values_to="Estimate") %>%
-  mutate(`Event Time`=-1*as.numeric(Lead))
-## Creating data set of single first-switch estimate.
-estimate <- tibble(`Event Time`=1,
-                   Estimate=dCdH$effect["treatment"])
-## Creating data set of dynamic effects. Note the time is incremented by 1 to match usual event time notation where 1 is the first period on treatment.
-dynamic <- as_tibble(dCdH) %>% dplyr::select(starts_with("dynamic")) %>%
-  pivot_longer(cols=everything(),
-               names_to="Lag",
-               names_prefix="dynamic_",
-               values_to="Estimate") %>%
-  mutate(`Event Time`=as.numeric(Lag)+1)
-## Combined event time data set from this method:
-dCdH_comb <- bind_rows(placebo %>% dplyr::select(-Lead),
-                       estimate,
-                       dynamic %>% dplyr::select(-Lag))
-dCdH_comb %>% arrange(`Event Time`)
-```
-
-```{r}
-## Plot the results of first-switching analysis:
-#| fig-cap: "Event-study results using the First-Switching Estimator from de Chaisemartin and d'Haultfoeuille (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
-#| fig-alt: "A single event-study plot showing effect estimates at each lead/lag time from -10 to 8. The event times less than 0 tend to have small negative estimates (between 0 and -0.125), except for time -9 which has an estimate of nearly 0.25. The event time of 1 has an estimate slightly below 0 as well. The estimates from event times 2 through 4 are around -0.15, from event times 5 to 7 are around -0.40, and from event time 8 is around -0.3."
-
-ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
+#| fig-cap: "Time series of observed and synthetic Ohio's percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021)."
+#| fig-alt: "Line plot with series Observed and Synthetic. Both move relatively closely together until the vertical line indicating the time of the intervention, at which point the observed diverges below the synthetic by around 1–2 percentage points."
+synth_ohio %>% plot_trends() +
+  labs(x="Weeks from Lottery Announcement",
+       y="Percent Fully Vaccinated",
+       title=NULL) +
   theme_bw()
 ```
 
-If you install the `DIDmultiplegtDYN` package, a faster implementation of standard errors and more standard interface is available through the `did_multiplegtDYN` function. Note that this package requires Java and at least R 4.3.3, and may cause errors in other settings.
-
 ```{r}
-## Run the above analysis with the DIDmultiplegtDYN package instead:
-# install.packages("DIDmultiplegtDYN")
-require(DIDmultiplegtDYN)
-
-dCdH_dyn <- did_multiplegt_dyn(df=Vax_firstWeek,
-                               outcome="D1P",
-                               group="StateID",
-                               time="MMWR_week",
-                               treatment="mandate",
-                               effects=8,
-                               placebo=8,
-                               cluster="StateID",
-                               graph_off=FALSE)
-dCdH_dyn
+#| fig-cap: "Time series of the difference, Observed – Synthetic Ohio, in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021)."
+#| fig-alt: "Line plot that fluctuates near 0 from Week -17 to -6, is at -0.6 at Week -5, between -0.25 and 0.3 from Weeks -4 to -2, and then decreases steadily to -1.25 at Week 3 and stays near there until Week 6."
+synth_ohio %>% plot_differences() +
+  labs(x="Weeks from Lottery Announcement",
+       y="Difference in Percent Fully Vaccinated, Observed–Synthetic",
+       title=NULL) +
+  theme_bw()
 ```
 
-## Additional Options
+### Inference
 
-Other methods and specifications are possible, along with incorporating covariates into some of these methods. The review papers listed in the slides are a good place to start to investigate these.
+Placebo in-space tests are conducted by default in `synthetic_control` and can be plotted. The default plot prunes those with pre-intervention square root of the MSPE values above twice the value for the actual analysis, but this can be turned off with `prune=FALSE`.
 
-## Discussion Question
+```{r}
+#| fig-cap: "Actual and placebo synthetic control gaps in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021), excluding placebos with high pre-intervention MSPE values."
+#| fig-alt: "Line plot for gap between observed and synthetic Ohio shown above, supplemented with lines for various placebo synthetic control time series. About half of the placebos have generally positive post-intervention gaps and half are generally negative, with actual Ohio near the middle of the negative ones."
+synth_ohio %>% plot_placebos() +
+  labs(x="Weeks from Lottery Announcement",
+       y="Difference in Percent Fully Vaccinated, Observed–Synthetic",
+       title=NULL) +
+  theme_bw()
+```
 
-Is this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?
+```{r}
+#| fig-cap: "Actual and placebo synthetic control gaps in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021), all placebos."
+#| fig-alt: "Line plot for gap between observed and synthetic Ohio shown above, supplemented with lines for various placebo synthetic control time series. About half of the placebos have generally positive post-intervention gaps and half are generally negative, with actual Ohio at about one-third of the magnitude of the range of the negative ones. Compared to the previous plot, there are several much more extreme gap time series."
+synth_ohio %>% plot_placebos(prune=FALSE) +
+  labs(x="Weeks from Lottery Announcement",
+       y="Difference in Percent Fully Vaccinated, Observed–Synthetic",
+       title=NULL) +
+  theme_bw()
+```
+
+One measure of the reliability of the results is to compare the post-intervention MSPE to the pre-intervention MSPE. The result for the actual analysis can be compared to the distribution of the placebo analyses.
+
+```{r}
+#| fig-cap: "Ratio of the pre- and post-intervention MSPE, actual and placebo synthetic control analysis"
+#| fig-alt: "Bar plot for various states in the Donor group and the Treated state of Ohio. The largest Post-Period MSPE/Pre-Period MSPE occurs in New Hampshire, at a value around 340. Ohio has a value near the middle of the distribution, around 27, while the smallest, Wyoming, is around 0."
+synth_ohio %>% plot_mspe_ratio() +
+  labs(title=NULL) +
+  theme_bw()
+```
+
+An exact p-value can be computed from this distribution, by observing how many control units have as or more extreme ratios. This is done in the fit function and can be accessed using `grab_significance`.
+
+```{r}
+## Get all pre- and post-intervention MSPEs, ratios, and ranks:
+synth_ohio %>% grab_significance()
+## Get pre- and post-intervention MSPEs, ratio, and p-value 
+### for actual treated unit(s) only:
+synth_ohio %>% grab_significance() %>%
+  dplyr::filter(type=="Treated")
+```
+
+A similar exact p-value can be computed using any other estimator. We can get this by pulling the results at each time point using `grab_synthetic_control()`. We then compare the actual estimate to the placebo estimates.
+
+```{r}
+## Pull the synthetic control results for each time point:
+SC_res <- synth_ohio %>% grab_synthetic_control(placebo=TRUE) %>%
+  mutate(diff=real_y-synth_y)
+SC_res
+
+## For each time period, compute a permutation p-value
+time_an <- function(time) {
+  SC_res_time <- SC_res %>% dplyr::filter(time_unit==time)
+  Est <- SC_res_time %>% dplyr::filter(.placebo==0) %>% pull(diff)
+  P.Val <- mean(abs(SC_res_time %>% pull(diff)) >= abs(Est))
+  return(c(time_unit=time,estimate=Est,p.value=P.Val))
+}
+by_time_res <- as_tibble(t(sapply(X=unique(SC_res %>% pull(time_unit)),
+                                  FUN=time_an)))
+by_time_res
+```
+
+We can plot these placebo test p-values as well:
+
+```{r}
+#| fig-cap: "Placebo test p-value for estimate at each week"
+#| fig-alt: "Scatter plot of Placebo Test P-Values vs. Weeks from Lottery Announcement. The points are scattered generally between 0.5 and 1."
+ggplot(data=by_time_res) +
+  geom_point(mapping=aes(x=time_unit, y=p.value), size=1.5) +
+  theme_bw() +
+  geom_hline(yintercept=0.05, color="red", 
+             linetype="dotted", size=1.3) +
+  geom_vline(xintercept=0, linetype="dotted", 
+             linewidth=1.3) +
+  scale_y_continuous(limits=c(0,1), expand=expansion(),
+                     breaks=seq(0,1,by=0.2)) +
+  labs(title=NULL,
+       x="Weeks from Lottery Announcement",
+       y="Placebo Test P-Values")
+```
+
+## Discussion Questions
+
+1.  How would you interpret these results?
+
+2.  Would other specifications (outcomes, scales, etc.) be more convincing or conducive to answering the question?
+
+## Additional Analysis: Incorporating Covariates
+
+We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average the pre-intervention outcomes into groups by four weeks, except the week immediately prior.
+
+```{r}
+## Create synthetic control fit with covariates:
+synth_oh_cov <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
+  ## initialize SC object by specifying outcome, unit variable, time variable, 
+  ### and when/where intervention turns on:
+  synthetic_control(outcome=people_fully_vaccinated_per_hundred,
+                    unit=state,
+                    time=centered_week,
+                    i_unit="OH",
+                    i_time=0,
+                    generate_placebos=T) %>%
+  ## create predictors for SC model:
+  ### four-week groups for outcome:
+  generate_predictor(time_window=-17:-14,lag17_14=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-13:-10,lag13_10=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-9:-6,lag9_6=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-5:-2,lag5_2=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  ### outcome, case rate, death rate, and vaccination rate in week prior:
+  generate_predictor(time_window=-1,
+                     lag01=people_fully_vaccinated_per_hundred,
+                     total_cases=tot_cases_per_million,
+                     total_deaths=tot_death_per_million,
+                     vax_rate=daily_vaccinations_per_million) %>%
+  ### four previous week average for cases and deaths:
+  generate_predictor(time_window=-5:-2,
+                     recent_cases=mean(new_case_per_million, na.rm=TRUE),
+                     recent_deaths=mean(new_death_per_million, na.rm=TRUE)) %>%
+  ## generate SC weights on same optimization window:
+  generate_weights(optimization_window=-17:-1,
+                   margin_ipop = .02,sigf_ipop = 7,bound_ipop = 6) %>%
+  ## run SC:
+  generate_control()
+
+### Examine fit and results:
+synth_oh_cov %>% plot_weights()
+synth_oh_cov %>% grab_balance_table()
+synth_oh_cov %>% plot_trends()
+synth_oh_cov %>% plot_differences()
+synth_oh_cov %>% plot_placebos()
+synth_oh_cov %>% grab_significance() %>% 
+  dplyr::filter(type=="Treated")
+```
+
+This specification has a slightly higher pre-intervention MSPE (`r round(synth_oh_cov %>% grab_significance %>% dplyr::filter(type=="Treated") %>% pull(pre_mspe), digits=3)` compared to `r round(synth_ohio %>% grab_significance %>% dplyr::filter(type=="Treated") %>% pull(pre_mspe), digits=3)` in the initial specification), but gives an estimated effect nearly indistinguishable from 0. The control unit weights are somewhat changed, but the variable weights still place the vast majority of weight on pre-intervention outcomes.

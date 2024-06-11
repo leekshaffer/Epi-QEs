@@ -133,12 +133,13 @@ synth_oh_2 <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
   generate_control()
 
 ## Weights, trends, results:
-synth_oh_2 %>% grab_unit_weights() %>% 
+synth_oh_cov %>% grab_unit_weights() %>% 
   dplyr::filter(weight > 0.001) %>% dplyr::arrange(desc(weight))
-synth_oh_2 %>% grab_balance_table()
-synth_oh_2 %>% plot_trends()
-synth_oh_2 %>% plot_differences()
-synth_oh_2 %>% plot_placebos()
+synth_oh_cov %>% plot_weights()
+synth_oh_cov %>% grab_balance_table()
+synth_oh_cov %>% plot_trends()
+synth_oh_cov %>% plot_differences()
+synth_oh_cov %>% plot_placebos()
 
 
 #### Advanced SC:

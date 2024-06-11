@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Lee Kennedy-Shaffer, PhD">
+
+<title>Synthetic Control Analysis: COVID-19 Vaccine Lotteries</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lottery-sc-handout_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lottery-sc-handout_files/libs/quarto-html/quarto.js"></script>
+<script src="lottery-sc-handout_files/libs/quarto-html/popper.min.js"></script>
+<script src="lottery-sc-handout_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lottery-sc-handout_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lottery-sc-handout_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lottery-sc-handout_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lottery-sc-handout_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lottery-sc-handout_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lottery-sc-handout_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Synthetic Control Analysis: COVID-19 Vaccine Lotteries</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Lee Kennedy-Shaffer, PhD </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="setting-and-data" class="level2">
+<h2 class="anchored" data-anchor-id="setting-and-data">Setting and Data</h2>
+<p>There are several published analyses of the effect of COVID-19 vaccine lotteries in the U.S. We use the data and analysis based on that by <a href="https://doi.org/10.1017/XPS.2021.32">Lang et al.&nbsp;(2023)</a>. The replication files that are used are available through <a href="https://doi.org/10.7910/DVN/QYXN9L">Harvard Dataverse</a>.</p>
+<p><a href="https://doi.org/10.1371/journal.pone.0274374">Fuller et al.&nbsp;(2022)</a> conducted a multiple-state analysis using the synthetic control, and have data available on <a href="https://doi.org/10.7910/DVN/K1XX02">Harvard Dataverse</a> as well. Other analyses include <a href="https://doi.org/10.1016/j.amjmed.2021.06.032">Sehgal (2021)</a> and <a href="https://doi.org/10.1086/718512">Brehm et al.&nbsp;(2022)</a>.</p>
+<p>Focusing on the Ohio Vax-A-Million lottery, we explore whether the lottery incentive, which was announced on May 12, 2021, had a noticeable impact on Ohio’s vaccination rates. The outcome considered is the percentage of the adult population fully vaccinated for COVID-19; note that the lottery only required a first dose for entry.</p>
+<p>The outcome data were obtained by Lang et al.&nbsp;from Our World In Data’s database, which draws from CDC reports. The relevant data for our analyses are in <code>lottery_lang.Rda</code>. <code>lang_0624</code> contains weekly case, vaccination, and death numbers by state, along with indicators and week numbers for any states that implemented their own lottery. These data are complete through late June 2021 (used in the main analysis in the publication), while <code>lang_0912</code> extends the data through mid-September. <code>lang_ann_dates</code> has announcement dates and notes on lotteries in various states. Note that the data used by Fuller et al.&nbsp;are available in <code>lottery_fuller.Rda</code> for comparison.</p>
+<p>First, load the data into R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file=</span><span class="st">"../data/lottery_lang.Rda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
+<p>Again, we will use <code>tidyverse</code> and <code>knitr</code> for general coding. Several packages are available for synthetic control fitting, including: <a href="https://doi.org/10.18637/jss.v042.i13"><code>Synth</code></a>, developed by the original authors of Abadie et al.&nbsp;(2010); <a href="https://github.com/xuyiqing/gsynth"><code>gsynth</code></a>, which implements the generalized SC method; and <a href="https://doi.org/10.18637/jss.v097.i02"><code>microsynth</code></a>, which allows for disaggregated, micro-level data. We will use two others:</p>
+<ol type="1">
+<li><p><a href="https://github.com/edunford/tidysynth"><code>tidysynth</code></a>, which has a more user-friendly, tidyverse-style implementation of SC; and</p></li>
+<li><p><a href="https://github.com/ebenmichael/augsynth"><code>augsynth</code></a>, which additionally allows for Augmented SC (to be discussed later). For the most recent version of <code>R</code>, this has to be installed from GitHub using the <code>devtools</code> package.</p></li>
+</ol>
+<p>We now load the required libraries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## If you have not installed these packages before,</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  run the following line:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("tidysynth","devtools"))</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Either way, require the libraries:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidyverse)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(knitr)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidysynth)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(devtools)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="do">## If augsynth has not yet been installed, run the following line:</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># devtools::install_github("ebenmichael/augsynth")</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(augsynth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="graphical-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="graphical-exploration">Graphical Exploration</h2>
+<p>We begin by plotting the time series for visual inspection. First, we plot the percent fully vaccinated over time, up to late June 2021.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## We first save the annnouncement date for Ohio's lottery:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Ohio_ann <span class="ot">&lt;-</span> lang_ann_dates <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(state<span class="sc">==</span><span class="st">"OH"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(lott_date)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot time series of mandates themselves:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of fully vaccinated percentages by state and lottery status, January–June 2021"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with line for each state over the time range specified. Ohio is highlighted and generally in the middle of the range."</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>lang_0624,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">group=</span>state,<span class="at">linetype=</span>type,<span class="at">color=</span>type,<span class="at">alpha=</span>type,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x=</span>last_day,<span class="at">y=</span>people_fully_vaccinated_per_hundred)) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery State"</span>,<span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>Ohio_ann, <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">linetype=</span><span class="cn">NULL</span>,<span class="at">color=</span><span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can do the same with the larger data set to see if there are later time patterns that should be explored.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>lang_0912,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">group=</span>state,<span class="at">linetype=</span>type,<span class="at">color=</span>type,<span class="at">alpha=</span>type,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x=</span>last_day,<span class="at">y=</span>people_fully_vaccinated_per_hundred)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery State"</span>,<span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>Ohio_ann, <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">linetype=</span><span class="cn">NULL</span>,<span class="at">color=</span><span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" alt="A line plot with line for each state over the time range specified. Ohio is highlighted and generally in the middle of the range." width="672"></p>
+<figcaption>Plot of fully vaccinated percentages by state and lottery status, January–September 2021</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>We can also plot Ohio versus the average outcome of the other states, grouped by whether they had a lottery.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set that averages across states within each group:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>lang_avg <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(type,week,last_day) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">full_vax_avg=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'type', 'week'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>lang_avg,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">linetype=</span>type,<span class="at">color=</span>type,<span class="at">alpha=</span>type,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x=</span>last_day,<span class="at">y=</span>full_vax_avg)) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery States (Mean)"</span>,<span class="st">"Non-Lottery States (Mean)"</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>Ohio_ann, <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">linetype=</span><span class="cn">NULL</span>,<span class="at">color=</span><span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" alt="A line plot with line for each of Ohio, Other Lottery States (Mean), and Non-Lottery States (Mean) over the time range specified. Ohio increases more slowly than the other two until mid-April, then much more quickly until early May, then more slowly again. Other Lottery States appears to increase more quickly than Non-Lottery States both before and after Ohio's lottery announcement." width="672"></p>
+<figcaption>Plot of average fully vaccinated percentages by lottery status, January–June 2021. Note the mean is computed across states, not weighted by population.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="discussion-questions" class="level2">
+<h2 class="anchored" data-anchor-id="discussion-questions">Discussion Questions</h2>
+<ol type="1">
+<li><p>Does the above plot indicate that parallel trends would be reasonable?</p></li>
+<li><p>On visual inspection, does it appear that the lottery was effective?</p></li>
+</ol>
+</section>
+<section id="synthetic-control" class="level2">
+<h2 class="anchored" data-anchor-id="synthetic-control">Synthetic Control</h2>
+<section id="fit-model" class="level3">
+<h3 class="anchored" data-anchor-id="fit-model">Fit Model</h3>
+<p>We will fit the synthetic control for Ohio, using only non-lottery states as the potential control units. For now, we will use only the pre-intervention time periods as predictors, ignoring any other covariates, and optimize the fit over the full pre-intervention window. We use the <code>synthetic_control</code> function from the <code>tidysynth</code> package. Note that this may take a minute or two to run.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Conduct SC analysis for Ohio, excluding other lottery states:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">!=</span> <span class="st">"Other Lottery State"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">## initialize SC object by specifying outcome, unit variable, time variable, </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">### and when/where intervention turns on:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">synthetic_control</span>(<span class="at">outcome=</span>people_fully_vaccinated_per_hundred,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">unit=</span>state,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time=</span>centered_week,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">i_unit=</span><span class="st">"OH"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                    <span class="at">i_time=</span><span class="dv">0</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">generate_placebos=</span>T) <span class="sc">%&gt;%</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create predictors for SC model:</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">17</span>,<span class="at">lag17=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">16</span>,<span class="at">lag16=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">15</span>,<span class="at">lag15=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">14</span>,<span class="at">lag14=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">13</span>,<span class="at">lag13=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">12</span>,<span class="at">lag12=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">11</span>,<span class="at">lag11=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">10</span>,<span class="at">lag10=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">9</span>,<span class="at">lag09=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">8</span>,<span class="at">lag08=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">7</span>,<span class="at">lag07=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">6</span>,<span class="at">lag06=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span>,<span class="at">lag05=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">4</span>,<span class="at">lag04=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">3</span>,<span class="at">lag03=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">2</span>,<span class="at">lag02=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">1</span>,<span class="at">lag01=</span>people_fully_vaccinated_per_hundred) <span class="sc">%&gt;%</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="do">## generate SC weights:</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_weights</span>(<span class="at">optimization_window=</span>(<span class="sc">-</span><span class="dv">17</span>)<span class="sc">:</span>(<span class="sc">-</span><span class="dv">1</span>),</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>                   <span class="at">margin_ipop =</span> .<span class="dv">02</span>,<span class="at">sigf_ipop =</span> <span class="dv">7</span>,<span class="at">bound_ipop =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="do">## run SC:</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_control</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>synth_ohio</code> object contains all of the information about the fit. <code>tidysynth</code> provides many functions to pull the results for inspection.</p>
+</section>
+<section id="inspect-fit" class="level3">
+<h3 class="anchored" data-anchor-id="inspect-fit">Inspect Fit</h3>
+<p>We can investigate the weights given to different control units and variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pull weights and print in descending order</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">grab_unit_weights</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(weight <span class="sc">&gt;</span> <span class="fl">0.001</span>) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(<span class="fu">desc</span>(weight))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 2
+  unit  weight
+  &lt;chr&gt;  &lt;dbl&gt;
+1 KS    0.256 
+2 WI    0.192 
+3 VA    0.173 
+4 GA    0.168 
+5 IA    0.0664
+6 HI    0.0607
+7 PA    0.0561
+8 CT    0.0288</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the weights for control units and variables.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Control unit and variable weights for synthetic control fit of Ohio's fully vaccinated percentage prior to the lottery implementation, May 12, 2021."</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Left: bar plot of control unit weights. The positive weights are only for Kansas (0.256), Wisconsin (0.192), Virginia (0.173), Georgia (0.168), Iowa (0.066), Hawaii (0.061), Pennsylvania (0.056), and Connecticut (0.029). Right: bar plot of variable weights, from lag01 down to lag17. The weight on lag01 is above 0.20, falling roughly exponentially to about 0 for lag17."</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot weights on control units and variables:</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_weights</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The top four control states by weight are Kansas, Wisconsin, Viriginia, and Georgia. <strong>Do these seem reasonable?</strong> The variables are given weight in reverse chronological order: <strong>does this make sense for minimizing pre-intervention MSPE?</strong></p>
+<p>We can also examine the pre-intervention fit directly between true Ohio, synthetic Ohio, and the average of the donor pool.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Examine fit:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">grab_balance_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17 × 4
+   variable    OH synthetic_OH donor_sample
+   &lt;chr&gt;    &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+ 1 lag17     0.12        0.362        0.554
+ 2 lag16     0.61        0.775        1.09 
+ 3 lag15     1.4         1.43         1.88 
+ 4 lag14     2.44        2.41         2.96 
+ 5 lag13     3.83        3.76         4.33 
+ 6 lag12     5.56        5.71         6.19 
+ 7 lag11     7.67        7.69         7.91 
+ 8 lag10     9.44        9.50         9.75 
+ 9 lag09    11.9        11.8         12.0  
+10 lag08    13.9        13.8         14.0  
+11 lag07    16.1        16.1         16.3  
+12 lag06    18.8        18.8         19.2  
+13 lag05    21.6        22.2         22.6  
+14 lag04    26.3        26.1         25.9  
+15 lag03    30.1        29.8         28.9  
+16 lag02    33.2        33.0         31.6  
+17 lag01    35.6        35.8         34.1  </code></pre>
+</div>
+</div>
+</section>
+<section id="plot-results" class="level3">
+<h3 class="anchored" data-anchor-id="plot-results">Plot Results</h3>
+<p>We can plot both the observed and synthetic time series themselves, and the gap between them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_trends</span>() <span class="sc">+</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" alt="Line plot with series Observed and Synthetic. Both move relatively closely together until the vertical line indicating the time of the intervention, at which point the observed diverges below the synthetic by around 1–2 percentage points." width="672"></p>
+<figcaption>Time series of observed and synthetic Ohio’s percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021).</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_differences</span>() <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Difference in Percent Fully Vaccinated, Observed–Synthetic"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates near 0 from Week -17 to -6, is at -0.6 at Week -5, between -0.25 and 0.3 from Weeks -4 to -2, and then decreases steadily to -1.25 at Week 3 and stays near there until Week 6." width="672"></p>
+<figcaption>Time series of the difference, Observed – Synthetic Ohio, in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021).</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="inference" class="level3">
+<h3 class="anchored" data-anchor-id="inference">Inference</h3>
+<p>Placebo in-space tests are conducted by default in <code>synthetic_control</code> and can be plotted. The default plot prunes those with pre-intervention square root of the MSPE values above twice the value for the actual analysis, but this can be turned off with <code>prune=FALSE</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_placebos</span>() <span class="sc">+</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Difference in Percent Fully Vaccinated, Observed–Synthetic"</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" alt="Line plot for gap between observed and synthetic Ohio shown above, supplemented with lines for various placebo synthetic control time series. About half of the placebos have generally positive post-intervention gaps and half are generally negative, with actual Ohio near the middle of the negative ones." width="672"></p>
+<figcaption>Actual and placebo synthetic control gaps in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021), excluding placebos with high pre-intervention MSPE values.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_placebos</span>(<span class="at">prune=</span><span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Difference in Percent Fully Vaccinated, Observed–Synthetic"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" alt="Line plot for gap between observed and synthetic Ohio shown above, supplemented with lines for various placebo synthetic control time series. About half of the placebos have generally positive post-intervention gaps and half are generally negative, with actual Ohio at about one-third of the magnitude of the range of the negative ones. Compared to the previous plot, there are several much more extreme gap time series." width="672"></p>
+<figcaption>Actual and placebo synthetic control gaps in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021), all placebos.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>One measure of the reliability of the results is to compare the post-intervention MSPE to the pre-intervention MSPE. The result for the actual analysis can be compared to the distribution of the placebo analyses.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_mspe_ratio</span>() <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" alt="Bar plot for various states in the Donor group and the Treated state of Ohio. The largest Post-Period MSPE/Pre-Period MSPE occurs in New Hampshire, at a value around 340. Ohio has a value near the middle of the distribution, around 27, while the smallest, Wyoming, is around 0." width="672"></p>
+<figcaption>Ratio of the pre- and post-intervention MSPE, actual and placebo synthetic control analysis</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>An exact p-value can be computed from this distribution, by observing how many control units have as or more extreme ratios. This is done in the fit function and can be accessed using <code>grab_significance</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get all pre- and post-intervention MSPEs, ratios, and ranks:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">grab_significance</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 33 × 8
+   unit_name type  pre_mspe post_mspe mspe_ratio  rank fishers_exact_pvalue
+   &lt;chr&gt;     &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;
+ 1 NH        Donor   0.331     111.        336.      1               0.0303
+ 2 NE        Donor   0.0645     16.4       254.      2               0.0606
+ 3 KS        Donor   0.139      19.2       138.      3               0.0909
+ 4 ND        Donor   0.309      42.5       138.      4               0.121 
+ 5 VT        Donor   0.301      34.5       115.      5               0.152 
+ 6 VA        Donor   0.0463      3.98       85.9     6               0.182 
+ 7 WI        Donor   0.0560      3.80       67.8     7               0.212 
+ 8 MO        Donor   0.0329      2.09       63.5     8               0.242 
+ 9 IN        Donor   0.168       9.83       58.3     9               0.273 
+10 FL        Donor   0.0689      3.58       51.9    10               0.303 
+# ℹ 23 more rows
+# ℹ 1 more variable: z_score &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get pre- and post-intervention MSPEs, ratio, and p-value </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="do">### for actual treated unit(s) only:</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">grab_significance</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type<span class="sc">==</span><span class="st">"Treated"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  unit_name type    pre_mspe post_mspe mspe_ratio  rank fishers_exact_pvalue
+  &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;
+1 OH        Treated   0.0488      1.32       27.0    12                0.364
+# ℹ 1 more variable: z_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>A similar exact p-value can be computed using any other estimator. We can get this by pulling the results at each time point using <code>grab_synthetic_control()</code>. We then compare the actual estimate to the placebo estimates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pull the synthetic control results for each time point:</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>SC_res <span class="ot">&lt;-</span> synth_ohio <span class="sc">%&gt;%</span> <span class="fu">grab_synthetic_control</span>(<span class="at">placebo=</span><span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff=</span>real_y<span class="sc">-</span>synth_y)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>SC_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 792 × 6
+   .id   .placebo time_unit real_y synth_y    diff
+   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 OH           0       -17   0.12   0.362 -0.242 
+ 2 OH           0       -16   0.61   0.775 -0.165 
+ 3 OH           0       -15   1.4    1.43  -0.0346
+ 4 OH           0       -14   2.44   2.41   0.0294
+ 5 OH           0       -13   3.83   3.76   0.0732
+ 6 OH           0       -12   5.56   5.71  -0.149 
+ 7 OH           0       -11   7.67   7.69  -0.0216
+ 8 OH           0       -10   9.44   9.50  -0.0578
+ 9 OH           0        -9  11.9   11.8    0.0746
+10 OH           0        -8  13.9   13.8    0.0233
+# ℹ 782 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## For each time period, compute a permutation p-value</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>time_an <span class="ot">&lt;-</span> <span class="cf">function</span>(time) {</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  SC_res_time <span class="ot">&lt;-</span> SC_res <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(time_unit<span class="sc">==</span>time)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  Est <span class="ot">&lt;-</span> SC_res_time <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(.placebo<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(diff)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  P.Val <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">abs</span>(SC_res_time <span class="sc">%&gt;%</span> <span class="fu">pull</span>(diff)) <span class="sc">&gt;=</span> <span class="fu">abs</span>(Est))</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(<span class="at">time_unit=</span>time,<span class="at">estimate=</span>Est,<span class="at">p.value=</span>P.Val))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>by_time_res <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">t</span>(<span class="fu">sapply</span>(<span class="at">X=</span><span class="fu">unique</span>(SC_res <span class="sc">%&gt;%</span> <span class="fu">pull</span>(time_unit)),</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">FUN=</span>time_an)))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>by_time_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 24 × 3
+   time_unit estimate p.value
+       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+ 1       -17  -0.242    0.121
+ 2       -16  -0.165    0.576
+ 3       -15  -0.0346   0.939
+ 4       -14   0.0294   0.970
+ 5       -13   0.0732   0.970
+ 6       -12  -0.149    0.667
+ 7       -11  -0.0216   0.939
+ 8       -10  -0.0578   0.848
+ 9        -9   0.0746   0.848
+10        -8   0.0233   1    
+# ℹ 14 more rows</code></pre>
+</div>
+</div>
+<p>We can plot these placebo test p-values as well:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>by_time_res) <span class="sc">+</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time_unit, <span class="at">y=</span>p.value), <span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fl">0.05</span>, <span class="at">color=</span><span class="st">"red"</span>, </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype=</span><span class="st">"dotted"</span>, <span class="at">size=</span><span class="fl">1.3</span>) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>, <span class="at">linetype=</span><span class="st">"dotted"</span>, </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">linewidth=</span><span class="fl">1.3</span>) <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">expand=</span><span class="fu">expansion</span>(),</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="cn">NULL</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Placebo Test P-Values"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" alt="Scatter plot of Placebo Test P-Values vs. Weeks from Lottery Announcement. The points are scattered generally between 0.5 and 1." width="672"></p>
+<figcaption>Placebo test p-value for estimate at each week</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion-questions-1" class="level2">
+<h2 class="anchored" data-anchor-id="discussion-questions-1">Discussion Questions</h2>
+<ol type="1">
+<li><p>How would you interpret these results?</p></li>
+<li><p>Would other specifications (outcomes, scales, etc.) be more convincing or conducive to answering the question?</p></li>
+</ol>
+</section>
+<section id="additional-analysis-incorporating-covariates" class="level2">
+<h2 class="anchored" data-anchor-id="additional-analysis-incorporating-covariates">Additional Analysis: Incorporating Covariates</h2>
+<p>We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average the pre-intervention outcomes into groups by four weeks, except the week immediately prior.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create synthetic control fit with covariates:</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">!=</span> <span class="st">"Other Lottery State"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="do">## initialize SC object by specifying outcome, unit variable, time variable, </span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">### and when/where intervention turns on:</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">synthetic_control</span>(<span class="at">outcome=</span>people_fully_vaccinated_per_hundred,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">unit=</span>state,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time=</span>centered_week,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">i_unit=</span><span class="st">"OH"</span>,</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                    <span class="at">i_time=</span><span class="dv">0</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">generate_placebos=</span>T) <span class="sc">%&gt;%</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create predictors for SC model:</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="do">### four-week groups for outcome:</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">14</span>,<span class="at">lag17_14=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">13</span><span class="sc">:-</span><span class="dv">10</span>,<span class="at">lag13_10=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">9</span><span class="sc">:-</span><span class="dv">6</span>,<span class="at">lag9_6=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,<span class="at">lag5_2=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="do">### outcome, case rate, death rate, and vaccination rate in week prior:</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lag01=</span>people_fully_vaccinated_per_hundred,</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_cases=</span>tot_cases_per_million,</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_deaths=</span>tot_death_per_million,</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vax_rate=</span>daily_vaccinations_per_million) <span class="sc">%&gt;%</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="do">### four previous week average for cases and deaths:</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_cases=</span><span class="fu">mean</span>(new_case_per_million, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_deaths=</span><span class="fu">mean</span>(new_death_per_million, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="do">## generate SC weights on same optimization window:</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_weights</span>(<span class="at">optimization_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">1</span>,</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>                   <span class="at">margin_ipop =</span> .<span class="dv">02</span>,<span class="at">sigf_ipop =</span> <span class="dv">7</span>,<span class="at">bound_ipop =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>  <span class="do">## run SC:</span></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_control</span>()</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a><span class="do">### Examine fit and results:</span></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_weights</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">grab_balance_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 4
+   variable            OH synthetic_OH donor_sample
+   &lt;chr&gt;            &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+ 1 lag17_14          1.14         1.21         1.62
+ 2 lag13_10          6.62         6.64         7.05
+ 3 lag9_6           15.2         15.2         15.4 
+ 4 lag5_2           27.8         27.8         27.2 
+ 5 lag01            35.6         35.6         34.1 
+ 6 total_cases   92694.      110433.      102717.  
+ 7 total_deaths   1662.        1665.        1637.  
+ 8 vax_rate      36997        38907.       39114.  
+ 9 recent_cases   1091.         902.        1159.  
+10 recent_deaths    13.6         12.0         10.6 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_trends</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_differences</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-19-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_placebos</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-19-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">grab_significance</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type<span class="sc">==</span><span class="st">"Treated"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  unit_name type    pre_mspe post_mspe mspe_ratio  rank fishers_exact_pvalue
+  &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;
+1 OH        Treated   0.0535    0.0127      0.237    33                    1
+# ℹ 1 more variable: z_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>This specification has a slightly higher pre-intervention MSPE (0.053 compared to 0.049 in the initial specification), but gives an estimated effect nearly indistinguishable from 0. The control unit weights are somewhat changed, but the variable weights still place the vast majority of weight on pre-intervention outcomes.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

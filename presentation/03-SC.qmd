@@ -32,7 +32,6 @@ Funding for health ed
 :::
 
 ::: {.column width="50%"}
-
 [![](images/SC/OhioVAM.jpg){fig-alt="Logo for Ohio Vax-A-Million" fig-align="center" width="420"}](https://odh.ohio.gov/media-center/odh-news-releases/odh-news-release-05-17-21)
 
 OH May 2021:

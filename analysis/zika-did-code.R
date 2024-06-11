@@ -4,7 +4,7 @@ load(file="../data/zika.Rda")
 
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages("tidyverse","knitr","lme4")
+# install.packages(c("tidyverse","knitr","lme4"))
 ## Either way, the packages must be loaded:
 require(tidyverse)
 require(knitr)

@@ -4,7 +4,7 @@ load(file="../data/mandate.Rda")
 
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages("bacondecomp","did2s","DIDmultiplegt")
+# install.packages(c("bacondecomp","did2s","DIDmultiplegt"))
 ## Either way, require the libraries:
 require(tidyverse)
 require(knitr)

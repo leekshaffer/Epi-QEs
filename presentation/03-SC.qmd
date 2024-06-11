@@ -6,33 +6,208 @@ format: revealjs
 editor: visual
 ---
 
-## Idea: When Parallel Trends Fails Individually
+## Beyond Parallel Trends
 
-## Motivating Example: COVID-19 Vaccine Lottery
+::: callout-warning
+Difference-in-differences requires some form of parallel trends: similar time trends for treated and untreated units.
+:::
 
-# Formal Development
+. . .
 
-## Panel Data Setting
+::: callout-note
+Synthetic control can accommodate non-parallel trends
+:::
 
-## Assumptions
+## Motivating Example: State Health Policies
 
-## Model
+::: columns
+::: {.column width="50%"}
+[![](images/SC/Prop99.png){fig-alt="Legislative Mandate for Tobacco Control — Proposition 99" fig-align="center"}](https://www.cdph.ca.gov/Programs/CCDPHP/DCDIC/CTCB/Pages/LegislativeMandateforTobaccoControlProposition99-.aspx)
+
+CA Prop 99 in 1988:
+
+Raised cigarette taxes
+
+Funding for health ed
+:::
+
+::: {.column width="50%"}
+
+[![](images/SC/OhioVAM.jpg){fig-alt="Logo for Ohio Vax-A-Million" fig-align="center" width="420"}](https://odh.ohio.gov/media-center/odh-news-releases/odh-news-release-05-17-21)
+
+OH May 2021:
+
+Lottery for vaccinated people
+
+Followed by other states
+:::
+:::
+
+. . .
+
+::: callout-tip
+## Question
+
+What is the effect of these policies on cigarette sales and vaccine uptake, respectively?
+:::
+
+# Synthetic Control Method
+
+## Panel Data/Comparative Case Study Setting
+
+Generally requires:
+
+::: incremental
+-   One (or few) treated units
+
+-   Many untreated units
+
+-   Long pre-treatment history of outcomes for all units
+
+-   Post-treatment outcomes for time period of interest
+:::
+
+## Idea
+
+Find a weighted average of the control units that **best approximates** the pre-treatment history of the treated unit(s). This is the **synthetic control** unit, which is then compared to the treated unit's outcomes in the post-treatment period.
+
+## Example of Idea
+
+![](images/SC/Abadie2010cite.png){fig-alt="Citation for Abadie et al. (2010)" fig-align="center" width="1030"}
+
+::: columns
+::: {.column width="50%"}
+[![Abadie et al. (2010), Figure 1](images/SC/Abadie2010Fig1.png){fig-alt="Line plot showing cigarette sales per capita from 1970 to 2000 in California and the Rest of the US. California's line is falling more rapidly than that of the US, both before and after the break at 1988, creating a large and widening gap." fig-align="left"}](https://doi.org/10.1198/jasa.2009.ap08746)
+:::
+
+::: {.column width="50%"}
+:::
+:::
+
+## Example of Idea
+
+![](images/SC/Abadie2010cite.png){fig-alt="Citation for Abadie et al. (2010)" fig-align="center" width="1030"}
+
+::: columns
+::: {.column width="50%"}
+[![Abadie et al. (2010), Figure 1](images/SC/Abadie2010Fig1.png){fig-alt="Line plot showing cigarette sales per capita from 1970 to 2000 in California and the Rest of the US. California's line is falling more rapidly than that of the US, both before and after the break at 1988, creating a large and widening gap." fig-align="left"}](https://doi.org/10.1198/jasa.2009.ap08746)
+:::
+
+::: {.column width="50%"}
+[![Abadie et al. (2010), Figure 2](images/SC/Abadie2010Fig2.png){fig-alt="Line plot showing cigarette sales per capita from 1970 to 2000 in California and Synthetic California. The two lines nearly coincide prior to 1988 and diverge thereafter, with California's line falling more rapidly than that of synthetic California." fig-align="left"}](https://doi.org/10.1198/jasa.2009.ap08746)
+:::
+:::
+
+## Key Requirements
+
+[![](images/SC/Abadie2021cite.png){fig-alt="Title of Abadie (2021)" fig-align="center" width="500" height="150"}](https://doi.org/10.1257/jel.20191450)
+
+::: incremental
+-   Effect size larger than routine fluctuations
+-   No anticipation
+-   No spillover
+-   Suitable control units: "stable weights"
+-   Convex hull: non-extreme treated unit(s)
+-   Reasonable time horizon
+:::
+
+## Formal Specification
+
+$$
+\hat{\theta}_t = Y_{1t} - \sum_{i=1}^n w_i Y_{0it},
+$$
+
+where $Y_{1t}$ is the outcome of the treated unit in period $t$ and $Y_{0it}$ is the outcome of the $i$th untreated unit in period $t$.
+
+. . .
+
+The weights $w_1, \ldots, w_n$ are nonnegative and sum to 1.
 
 ## Minimizing Pre-Trend Difference
 
+In the simplest form, the weights are chosen to minimize:
+
+$$
+\sum_{t=1}^{T-1} \left( Y_{1t} - \sum_{i=1}^n w_i Y_{0it} \right)^2,
+$$
+
+where $T-1$ is the last period for which the treated unit is pre-intervention.
+
 ## Incorporating Covariates
+
+Covariates can be incorporated in the weight minimization. For covariates (including pre-treatment outcomes) labelled $k=1,\ldots,K$, choose a weight vector $w$ that minimizes:
+
+$$
+\sum_{k=1}^K v_k (X_{1k} - X_{0k} w)^2,
+$$
+
+where $v_k$ are weights on the importance of each covariate, which can themselves be chosen to minimize the pre-intervention difference or by cross-validation on a split sample of pre-intervention times.
 
 ## Weights
 
-## Estimands and Estimators
+::: columns
+::: {.column width="50%"}
+-   Do not use post-intervention outcomes
 
-# Inference
+-   Generally sparse
 
-## Placebo Test In-Time
+-   Avoid extrapolation, permit interpolation
+
+-   Transparent and (somewhat) interpretable
+:::
+
+::: {.column width="50%"}
+[![Abadie et al. (2010), Table 2](images/SC/Abadie2010Tbl2.png){fig-alt="Table showing the weights for the synthetic California. The only non-zero weights are Colorado (0.164), Connecticut (0.069), Montana (0.199), Nevada (0.234), and Utah (0.334)" fig-align="right"}](https://doi.org/10.1198/jasa.2009.ap08746)
+:::
+:::
+
+## Estimand
+
+::: callout-important
+The estimand is again the **average treatment effect on the treated (ATT)**: the effect of the policy on the treated unit compared to if it had not been treated.
+:::
+
+The choice of time and scale for the comparison can be made by the investigator based on subject-matter knowledge.
+
+# Robustness and Inference
+
+## Specification Tests
+
+The pre-intervention **mean squared prediction error (MSPE)** of the SC fit can be used to assess fit.
+
+. . .
+
+To test robustness of results, can change:
+
+-   Control units
+
+-   Time frame considered
+
+-   Covariates used
 
 ## Placebo Test In-Space
 
+Conduct the SC analysis with the **same specifications** for each control unit, excluding the treated unit. This gives a **null distribution of estimates**.
+
+Can exclude those with much higher pre-intervention MSPEs.
+
+## Placebo Test In-Space
+
+[![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="765"}](https://doi.org/10.1198/jasa.2009.ap08746)
+
+## Placebo Test In-Time
+
+Can also run the analysis on dummy intervention time points.
+
+::: callout-note
+This is related to the cross-validation approach for covariate weight selection, and both should not be used without caution.
+:::
+
 ## Placebo Test In-Outcome/Population
+
+In some cases, non-affected outcomes or populations may be available. These can be used as a null control or distribution.
+
+[![](images/SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="center"}](https://doi.org/10.1073/pnas.1612833114)
 
 # Analysis
 

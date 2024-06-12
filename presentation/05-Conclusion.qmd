@@ -8,8 +8,72 @@ editor: visual
 
 ## Additional Methods
 
+There are new methods for quasi-experiments coming out frequently! The staggered adoption setting, non-binary treatments, and inferential approaches are especially hot research areas.
+
+. . .
+
+Other quasi-experimental methods include:
+
+-   Interrupted time series
+-   Instrumental variables
+-   Regression discontinuity
+
 ## Uses and Advantages in Epidemiology
 
-## Challenges in Epidemiology
+::: {.fragment .fade-in-then-semi-out}
+-   Can use routine data
+:::
 
-## Limitations in Epidemiology
+::: {.fragment .fade-in-then-semi-out}
+-   Fewer covariates required
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Evaluate population-level impacts
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Clear interpretations/different set of assumptions
+:::
+
+## Challenges/Limitations in Epidemiology
+
+::: {.fragment .fade-in-then-semi-out}
+-   ATT is not usually target
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Limited generalizability
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Still require untested assumptions
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Limited inferential methods
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+-   Limited research on integrating with other study designs
+:::
+
+## Research Needed
+
+::: incremental
+-   Which epi settings are conducive to these methods? Which are not?
+
+-   How do we translate the statistical/causal assumptions into meaningful subject-matter questions?
+
+-   Which of these advanced methods are most useful in epi? How should they be selected in principled ways?
+:::
+
+## Additional Info
+
+All materials: <https://github.com/leekshaffer/Epi-QEs/>
+
+[![](images/QR.png){fig-alt="QR code for above link" fig-align="center" width="2in"}](https://github.com/leekshaffer/Epi-QEs)
+
+References list in main folder
+
+Contact me: [lee.kennedy-shaffer\@yale.edu](mailto:lee.kennedy-shaffer@yale.edu)

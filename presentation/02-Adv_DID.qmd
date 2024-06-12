@@ -159,6 +159,8 @@ Review/survey papers:
 -   [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017)
 
 -   [Roth (2024)](https://doi.org/10.48550/arXiv.2401.12309)
+
+-   [Wing et al. (2024)](https://doi.org/10.1146/annurev-publhealth- 061022-050825)
 :::
 
 ::: {.column width="60%"}

@@ -50,40 +50,42 @@ editor: visual
 
 ::: columns
 ::: {.column width="50%"}
-[![](images/intro/Craig et al 2017.png){fig-alt="Title of Craig et al. (2017)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-031816-044327)
+[![](images/intro/Craig%20et%20al%202017.png){fig-alt="Title of Craig et al. (2017)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-031816-044327)
 :::
 
 ::: {.column width="50%"}
-[![](images/intro/Wing et al 2018.png){fig-alt="Title of Wing et al. (2018)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-040617-013507)
+[![](images/intro/Wing%20et%20al%202018.png){fig-alt="Title of Wing et al. (2018)" fig-align="center"}](https://doi.org/10.1146/annurev-publhealth-040617-013507)
 :::
 :::
 
 ## QEs in Epidemiology and Public Health
 
-[![](images/intro/Waddington et al 2017.png){fig-alt="Title and citation of Waddington et al. (2017)" fig-align="center"}](https://doi.org/10.1016/j.jclinepi.2017.02.015)
+[![](images/intro/Waddington%20et%20al%202017.png){fig-alt="Title and citation of Waddington et al. (2017)" fig-align="center"}](https://doi.org/10.1016/j.jclinepi.2017.02.015)
 
-[![](images/intro/Matthay and Glymour 2022.png){fig-alt="Citation for Matthay and Glymour (2022)"}](https://doi.org/10.1007/s40471-022-00288-7)
+[![](images/intro/Matthay%20and%20Glymour%202022.png){fig-alt="Citation for Matthay and Glymour (2022)"}](https://doi.org/10.1007/s40471-022-00288-7)
 
 ## Considering the Role of Evidence
 
 ::: columns
 ::: {.column width="50%"}
+[![](images/intro/Nianogo%20et%20al%202023.png){fig-alt="Title of Nianogo et al. (2023)"}](https://doi.org/10.1093/ije/dyad032)
+:::
+
+::: {.column width="50%"}
+[![](images/intro/Matthay%20et%20al%202020.png){fig-alt="Title of Matthay et al. (2020)" fig-align="center"}](https://doi.org/10.1016/j.ssmph.2019.100526)
+:::
+:::
+
+::: incremental
 -   Allows use of routinely-collected data
 
 -   Evaluates interventions in-context
 
--   Provides "real world evidence"
+-   Provides "real world evidence"/population impact
 
 -   Answers questions randomized trials and observational studies cannot
 
 -   But ... has threats to internal and external validity
-:::
-
-::: {.column width="50%"}
-[![](images/intro/Matthay et al 2020.png){fig-alt="Title of Matthay et al. (2020)" fig-align="center"}](https://doi.org/10.1016/j.ssmph.2019.100526)
-
-[![](images/intro/Nianogo et al 2023.png){fig-alt="Title of Nianogo et al. (2023)"}](https://doi.org/10.1093/ije/dyad032)
-:::
 :::
 
 ## Workshop Plan: Part I
@@ -132,15 +134,15 @@ I will focus here on infectious disease examples from published literature with 
 
 ::: columns
 ::: {.column width="50%"}
-[![](images/intro/Lopez Bernal et al 2019.png){fig-alt="Title of Lopez Bernal et al. (2019)" fig-align="center"}](https://doi.org/10.1093/cid/ciy906)
+[![](images/intro/Lopez%20Bernal%20et%20al%202019.png){fig-alt="Title of Lopez Bernal et al. (2019)" fig-align="center"}](https://doi.org/10.1093/cid/ciy906)
 
-[![](images/intro/Kennedy-Shaffer 2024.png){fig-alt="Title for Kennedy-Shaffer (2024)"}](https://doi.org/10.1093/aje/kwae019)
+[![](images/intro/Kennedy-Shaffer%202024.png){fig-alt="Title for Kennedy-Shaffer (2024)"}](https://doi.org/10.1093/aje/kwae019)
 :::
 
 ::: {.column width="50%"}
-[![](images/intro/Goodman-Bacon and Marcus 2020.png){fig-alt="Title for Goodman-Bacon and Marcus (2020)" fig-align="center"}](https://doi.org/10.18148/srm/2020.v14i2.7723)
+[![](images/intro/Goodman-Bacon%20and%20Marcus%202020.png){fig-alt="Title for Goodman-Bacon and Marcus (2020)" fig-align="center"}](https://doi.org/10.18148/srm/2020.v14i2.7723)
 
-[![](images/intro/Feng and Bilinski 2024.png){fig-alt="Title for Feng and Bilinski (2024)" fig-align="center"}](https://doi.org/10.1101/2024.04.08.24305335)
+[![](images/intro/Feng%20and%20Bilinski%202024.png){fig-alt="Title for Feng and Bilinski (2024)" fig-align="center"}](https://doi.org/10.1101/2024.04.08.24305335)
 :::
 :::
 

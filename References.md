@@ -36,6 +36,8 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 -   Wing C, Yozwiak M, Hollingsworth A, et al. Designing difference-in-difference studies with staggered treatment adoption: Key concepts and practical guidelines. *Annu Rev Public Health* 2024;**45**:485-505. <https://doi.org/10.1146/annurev-publhealth-061022-050825>.
 
+-   Callaway B, Li T. Policy evaluation during a pandemic. *J Econom* 2023;**236**:105454. <https://doi.org/10.1016/j.jeconom.2023.03.009>.
+
 -   
 
 ## Methods Articles: DID and Staggered Adoption

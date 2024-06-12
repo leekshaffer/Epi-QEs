@@ -113,7 +113,7 @@ editor: visual
 :::
 
 ::: {.fragment .fade-in-then-semi-out}
-[11:00--11:30]{style="color: purple"} Analysis 3: SC of COVID-19 vaccine lottery
+[11:00--11:30]{style="color: purple"} Analysis 3: SC of Ohio's COVID-19 vaccine lottery
 :::
 
 ::: {.fragment .fade-in-then-semi-out}
@@ -121,7 +121,7 @@ editor: visual
 :::
 
 ::: {.fragment .fade-in-then-semi-out}
-[12:00--12:20]{style="color: purple"} Analysis 4: Advanced SC of PCVs
+[12:00--12:20]{style="color: purple"} Analysis 4: Advanced SC of multiple states' COVID-19 vaccine lottery
 :::
 
 ::: {.fragment .fade-in-then-semi-out}

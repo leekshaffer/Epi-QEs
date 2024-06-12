@@ -622,6 +622,517 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This specification has a slightly higher pre-intervention MSPE (0.053 compared to 0.049 in the initial specification), but gives an estimated effect nearly indistinguishable from 0. The control unit weights are somewhat changed, but the variable weights still place the vast majority of weight on pre-intervention outcomes.</p>
 </section>
+<section id="augmented-synthetic-control" class="level2">
+<h2 class="anchored" data-anchor-id="augmented-synthetic-control">Augmented Synthetic Control</h2>
+<section id="using-augsynth-function" class="level3">
+<h3 class="anchored" data-anchor-id="using-augsynth-function">Using <code>augsynth</code> Function</h3>
+<p>We can re-fit the Ohio SC analysis using the <code>augsynth</code> function from the <code>augsynth</code> package. By default this package uses all pre-treatment outcome variables as the predictors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="do">### First, create a dataset with a treatment indicator:</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>OH_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Non-Lottery State"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(state<span class="sc">==</span><span class="st">"OH"</span> <span class="sc">&amp;</span> rel_week <span class="sc">&gt;=</span> <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="do">### Then, run the augsynth function:</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>OH_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated, <span class="co"># outcome~treatment</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF, <span class="co"># units, as a factor variable</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week, <span class="co"># time period variable</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>OH_data, <span class="co"># data set</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="co"># fits without any outcome model</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="co"># fits with SC weighting</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">fixedeff=</span><span class="cn">FALSE</span>) <span class="co"># fits without de-meaning/intercepts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Prints average ATT estimate in post-intervention periods:</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>OH_as</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    t_int = t_int, data = data, progfunc = "None", scm = TRUE, 
+    fixedeff = FALSE)
+
+Average ATT Estimate: -1.024</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Prints estimate for each time period with conformal inference CI:</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(OH_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    t_int = t_int, data = data, progfunc = "None", scm = TRUE, 
+    fixedeff = FALSE)
+
+Average ATT Estimate (p Value for Joint Null):  -1.02   ( 0.69 )
+L2 Imbalance: 0.868
+Percent improvement from uniform weights: 72%
+
+Avg Estimated Bias: NA
+
+Inference type: Conformal inference
+
+ Time Estimate 95% CI Lower Bound 95% CI Upper Bound p Value
+   19   -0.355             -2.498              1.788   0.569
+   20   -0.837             -2.980              1.306   0.513
+   21   -0.961             -3.104              1.182   0.466
+   22   -1.257             -3.400              0.887   0.482
+   23   -1.272             -3.415              0.871   0.732
+   24   -1.220             -3.363              0.923   0.727
+   25   -1.266             -3.409              0.878   0.780</code></pre>
+</div>
+</div>
+<p>We can then compare the original SC fit from the <code>tidysynth</code> package to the <code>augsynth</code> fit with SC on but outcome model and fixed effects off. Note that the <code>augsynth</code> plot calls can take a minute to run.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="do">## The original SC fit from the tidysynth package:</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Time series of the difference, Observed – Synthetic Ohio, in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021)."</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Line plot that fluctuates near 0 from Week -17 to -6, is at -0.6 at Week -5, between -0.25 and 0.3 from Weeks -4 to -2, and then decreases steadily to -1.25 at Week 3 and stays near there until Week 6."</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>synth_ohio <span class="sc">%&gt;%</span> <span class="fu">plot_differences</span>() <span class="sc">+</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Weeks from Lottery Announcement"</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Difference in Percent Fully Vaccinated, Observed–Synthetic"</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="do">## The new SC fit from the augsynth package:</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Time series of the difference, Observed – Synthetic Ohio, in percent fully vaccinated rate by week, starting from the week ending 1/17/21."</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Line plot that is the same as the previous plot, except the x-axis goes from 0 to 25, with a vertical line at 19."</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(OH_as, </span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>) <span class="co"># Suppresses plotting of conformal inference CIs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These plots give the same results!</p>
+<p>In both cases, the pre-treatment fit is fairly good but not exact. We can alter the options to see different results.</p>
+<p>We can try a ridge outcome model first:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Run the augsynth fit with a ridge outcome model and SC</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>OH_as_r <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated, <span class="co"># outcome~treatment</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF, <span class="co"># units, as a factor variable</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week, <span class="co"># time period variable</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>OH_data, <span class="co"># data set</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"Ridge"</span>, <span class="co"># fits with ridge outcome model</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="co"># fits with SC weighting</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">fixedeff=</span><span class="cn">FALSE</span>) <span class="co"># fits without de-meaning/intercepts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Prints average ATT estimate in post-intervention periods:</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>OH_as_r</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    t_int = t_int, data = data, progfunc = "Ridge", scm = TRUE, 
+    fixedeff = FALSE)
+
+Average ATT Estimate: -1.037</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="do">## The ridge-adjusted SC fit from the augsynth package:</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Time series of the difference, Observed – Ridge-adjusted Synthetic Ohio, in percent fully vaccinated rate by week, starting from the week ending 1/17/21."</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Line plot that is very similar to the previous plot."</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(OH_as_r, </span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>) <span class="co"># Suppresses plotting of conformal inference CIs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This is very similar to the previous fit. We can try adding unit fixed effects (de-mean or intercept-shifted SC) instead:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Run the augsynth fit with fixed effects and no outcome model</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>OH_as_fe <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated, <span class="co"># outcome~treatment</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF, <span class="co"># units, as a factor variable</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week, <span class="co"># time period variable</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>OH_data, <span class="co"># data set</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="co"># fits without outcome model</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="co"># fits with SC weighting</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">fixedeff=</span><span class="cn">TRUE</span>) <span class="co"># fits with de-meaning/intercepts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Prints average ATT estimate in post-intervention periods:</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>OH_as_fe</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    t_int = t_int, data = data, progfunc = "None", scm = TRUE, 
+    fixedeff = TRUE)
+
+Average ATT Estimate: -1.739</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="do">## The de-meaned SC fit from the augsynth package:</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Time series of the difference, Observed – de-meaned Synthetic Ohio, in percent fully vaccinated rate by week, starting from the week ending 1/17/21."</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Line plot that fluctuates near 0, never exceeding 0.5 in either direction, from Week 0 to 18, and then steadily decreases to around -2 in Week 22 and stays around there through Week 25."</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(OH_as_fe, </span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>) <span class="co"># Suppresses plotting of conformal inference CIs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Some of the fluctuations are smoothed out here, as the SC fit is just matching the time trend without needing to match the level of the pre-intervention outcome. This produces a smoother and larger estimate of the intervention effect. However, this requires a different assumption: that matching de-meaned outcomes pre-intervention leads to stable weights.</p>
+</section>
+<section id="analysis-of-other-states" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-of-other-states">Analysis of Other States</h3>
+<p>As we saw, both New Mexico and Maine implemented lotteries, but may be outside of the “convex hull” condition required for SC.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>lang_0624,</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">group=</span>state, <span class="at">linetype=</span>type2, <span class="at">color=</span>type2,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">alpha=</span>type2, <span class="at">linewidth=</span>type2,</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x=</span>last_day,<span class="at">y=</span>people_fully_vaccinated_per_hundred)) <span class="sc">+</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"New Mexico"</span>,<span class="st">"Maine"</span>,</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Other Lottery State"</span>,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="fl">0.5</span>,<span class="fl">0.8</span>)) <span class="sc">+</span> </span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linewidth_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"New Mexico"</span>,<span class="st">"Maine"</span>,</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Other Lottery State"</span>,</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">values=</span><span class="fu">c</span>(<span class="fl">1.3</span>,<span class="fl">1.3</span>,<span class="fl">1.3</span>,<span class="dv">1</span>,<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data=</span>lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>               dplyr<span class="sc">::</span><span class="fu">filter</span>(type2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"New Mexico"</span>,<span class="st">"Maine"</span>),</span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>                                              rel_week<span class="sc">==</span><span class="dv">0</span>),</span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">xintercept=</span>lott_date, <span class="at">group=</span>type2, <span class="at">color=</span>type2),</span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">linetype=</span><span class="cn">NULL</span>,<span class="at">color=</span><span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" alt="Line plot with several Other Lottery States and Non-Lottery States, as well as three focused states: Ohio, New Mexico, and Maine. Maine is in the middle of the set of lines, while New Mexico is among the highest early on, and Maine is among the highest in May/June." width="672"></p>
+<figcaption>Plot of percent fully vaccinated rates by U.S. state, Jan.-Sept.&nbsp;2021</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>We can create data sets for both New Mexico and Maine, and then fit various SC models.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set for New Mexico as treated unit:</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>NM_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"New Mexico"</span>,<span class="st">"Non-Lottery State"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(state<span class="sc">==</span><span class="st">"NM"</span> <span class="sc">&amp;</span> rel_week <span class="sc">&gt;=</span> <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set for Maine as treated unit:</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>ME_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(type2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Maine"</span>,<span class="st">"Non-Lottery State"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(state<span class="sc">==</span><span class="st">"ME"</span> <span class="sc">&amp;</span> rel_week <span class="sc">&gt;=</span> <span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit standard SCs using augsynth:</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>NM_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>NM_data,</span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>ME_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<p>Starting with New Mexico, we can plot the standard SC:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(NM_as, </span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -0.3 to 2.5, until a vertical line at Week 22, and then remains in the 0.4 to 1.2 range through Week 25." width="672"></p>
+<figcaption>Time series of the difference, Observed – Synthetic New Mexico, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true value because New Mexico had very high vaccination rates even before the intervention.</p>
+<p>Adding a fixed effects term will be able to center the pre-treatment fit closer to zero.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit de-meaned SC using augsynth:</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>NM_as_fe <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>NM_data,</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(NM_as_fe, </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates from around -1 to 1, until a vertical line at Week 22, and then remains in the 0.7 to 1.5 range through Week 25." width="672"></p>
+<figcaption>Time series of the difference, Observed – De-meaned Synthetic New Mexico, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>There remain large fluctuations in the pre-treatment fit. A ridge outcome model may be able to de-bias these fluctuations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit ridge-adjusted SC using augsynth:</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>NM_as_r <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>NM_data,</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"Ridge"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(NM_as_r, </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates from around -0.05 to 0.05, until a vertical line at Week 22, and then rises quickly to just above 1 at Week 24 and remains there through Week 25." width="672"></p>
+<figcaption>Time series of the difference, Observed – Ridge-adjusted Synthetic New Mexico, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Turning now to Maine, we can plot the standard SC:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_as, </span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -2 to 1, until a vertical line at Week 24, and then is around -0.25 at Week 25." width="672"></p>
+<figcaption>Time series of the difference, Observed – Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Clearly, again, the pre-treatment fit is poor, with overestimation early on and underestimation closer to the start of treatment.</p>
+<p>Since the pre-treatment gaps are roughly centered around 0, adding a fixed effects term will not have much effect.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit de-meaned SC using augsynth:</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>ME_as_fe <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"None"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_as_fe, </span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" alt="Line plot that looks very similar to the previous plot." width="672"></p>
+<figcaption>Time series of the difference, Observed – De-meaned Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A ridge outcome model may be more useful here to de-bias the fluctuations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit ridge-adjusted SC using augsynth:</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>ME_as_r <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"Ridge"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_as_r, </span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -1.3 to 1, with peaks getting smaller as Week goes toward 22, is at -0.25 in Week 23, -0.6 in Week 24 and -0.5 in Week 25." width="672"></p>
+<figcaption>Time series of the difference, Observed – Ridge-adjusted Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The ridge adjustment may be more useful if it is not capturing the fixed effects as well, so we can use both unit fixed effects and a ridge outcome model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit de-meaned and ridge-adjusted SC using augsynth:</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>ME_as_r_fe <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"Ridge"</span>, <span class="at">scm=</span><span class="cn">TRUE</span>, <span class="at">fixedeff=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_as_r_fe, </span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" alt="Line plot that is at almost exactly 0 through Week 23, and then around -0.9 and -0.6 in Weeks 24 and 25, respectively." width="672"></p>
+<figcaption>Time series of the difference, Observed – De-meaned and Ridge-adjusted Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model.</p>
+<p>Another option is to fit the generalized SCM using the <code>gsynth</code> package. We first need to install and load the package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("gsynth") # Run once if not yet installed</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsynth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>## Syntax has been updated since v.1.2.0.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>## Comments and suggestions -&gt; yiqingxu@stanford.edu.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Then we can fit the model using the GSYN option for progfunc:</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>ME_gsynth <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"GSYN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cross-validating ... 
+ r = 0; sigma2 = 11.66101; IC = 2.93204; PC = 10.82591; MSPE = 31.94484
+ r = 1; sigma2 = 1.40596; IC = 1.27501; PC = 2.46655; MSPE = 0.41149
+ r = 2; sigma2 = 0.45730; IC = 0.59305; PC = 1.18116; MSPE = 0.21866
+ r = 3; sigma2 = 0.25203; IC = 0.42115; PC = 0.86045; MSPE = 0.14212*
+ r = 4; sigma2 = 0.15892; IC = 0.36661; PC = 0.67508; MSPE = 0.31365
+ r = 5; sigma2 = 0.11782; IC = 0.45662; PC = 0.59902; MSPE = 0.73545
+
+ r* = 3</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_gsynth, </span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -2 to 1, until a vertical line at Week 24, and then is around -1.5 and -1.2 at Weeks 24 and 25, respectively." width="672"></p>
+<figcaption>Time series of the difference, Observed – Generalized Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Again, different assumptions are being made here, and should be carefully considered. This appears mroe similar to the initial SC fit, however it has a larger effect estimate.</p>
+</section>
+</section>
+<section id="staggered-adoption" class="level2">
+<h2 class="anchored" data-anchor-id="staggered-adoption">Staggered Adoption</h2>
+<p>Finally, we can consider the multi-period, multi-unit staggered adoption case with the augmented synthetic control. We first set up the full data set by adding a treatment indicator variable, and then fit it using <code>augsynth</code>. Note that this defaults to including two-way fixed effects, balancing all pre-intervention periods, and partially pools the average and individual SC fits using the heuristic given by <a href="https://doi.org/10.1111/rssb.12448">Ben-Michael et al.&nbsp;(2022)</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set with indicator for treatment</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>Mult_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(<span class="sc">!</span>lottery,<span class="dv">0</span>,<span class="fu">if_else</span>(rel_week<span class="sc">&gt;=</span><span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>)))</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit augmented SC on full data set:</span></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>Mult_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">unit=</span>stateF,</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time=</span>week,</span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>Mult_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>More than one treatment time found. Running multisynth.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Print results and summary:</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>Mult_as</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    data = data)
+
+Average ATT Estimate: -0.170</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
+    data = data)
+
+Average ATT Estimate (Std. Error): -0.170  (2.451)
+
+Global L2 Imbalance: 0.034
+Scaled Global L2 Imbalance: 0.042
+Percent improvement from uniform global weights: 95.8
+
+Individual L2 Imbalance: 0.386
+Scaled Individual L2 Imbalance: 0.112
+Percent improvement from uniform individual weights: 88.8   
+
+ Time Since Treatment   Level   Estimate Std.Error lower_bound upper_bound
+                    0 Average -0.1157730  2.364638   -4.306613    4.818363
+                    1 Average -0.2238981  2.540301   -4.491036    5.162596</code></pre>
+</div>
+</div>
+<p>The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(Level)`</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `&lt;scale&gt;` argument of `guides()` cannot be `FALSE`. Use "none" instead as
+of ggplot2 3.3.4.
+ℹ The deprecated feature was likely used in the augsynth package.
+  Please report the issue to the authors.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 57 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 57 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+increasing max.overlaps</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" alt="Line plot with lines for 15 states, generally fluctuating between -1.25 and 1.25 prior to Week 0, and then expanding outward to a range of around -3 (New York) to 2.4 (Oregon) in Week 1. A darker average line is fairly close to 0 throughout" width="672"></p>
+<figcaption>Time series of the difference in fully vaccinated percentage using staggered adoption synthetic control estimates for treated states, by time relative to intervention.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 
 </main>
 <!-- /main column -->

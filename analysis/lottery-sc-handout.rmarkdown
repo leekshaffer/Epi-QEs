@@ -5,6 +5,7 @@ format: html
 editor: visual
 ---
 
+
 ## Setting and Data
 
 There are several published analyses of the effect of COVID-19 vaccine lotteries in the U.S. We use the data and analysis based on that by [Lang et al. (2023)](https://doi.org/10.1017/XPS.2021.32). The replication files that are used are available through [Harvard Dataverse](https://doi.org/10.7910/DVN/QYXN9L).
@@ -17,9 +18,11 @@ The outcome data were obtained by Lang et al. from Our World In Data's database,
 
 First, load the data into R.
 
+
 ```{r}
 load(file="../data/lottery_lang.Rda")
 ```
+
 
 ## Libraries
 
@@ -30,6 +33,7 @@ Again, we will use `tidyverse` and `knitr` for general coding. Several packages 
 2.  [`augsynth`](https://github.com/ebenmichael/augsynth), which additionally allows for Augmented SC (to be discussed later). For the most recent version of `R`, this has to be installed from GitHub using the `devtools` package.
 
 We now load the required libraries.
+
 
 ```{r}
 #| output: false
@@ -46,9 +50,11 @@ require(devtools)
 require(augsynth)
 ```
 
+
 ## Graphical Exploration
 
 We begin by plotting the time series for visual inspection. First, we plot the percent fully vaccinated over time, up to late June 2021.
+
 
 ```{r}
 ## We first save the annnouncement date for Ohio's lottery:
@@ -68,7 +74,9 @@ ggplot(data=lang_0624,
        linetype=NULL,color=NULL)
 ```
 
+
 We can do the same with the larger data set to see if there are later time patterns that should be explored.
+
 
 ```{r}
 #| fig-cap: "Plot of fully vaccinated percentages by state and lottery status, January–September 2021"
@@ -84,7 +92,9 @@ ggplot(data=lang_0912,
        linetype=NULL,color=NULL)
 ```
 
+
 We can also plot Ohio versus the average outcome of the other states, grouped by whether they had a lottery.
+
 
 ```{r}
 ## Create data set that averages across states within each group:
@@ -106,6 +116,7 @@ ggplot(data=lang_avg,
        linetype=NULL,color=NULL)
 ```
 
+
 ## Discussion Questions
 
 1.  Does the above plot indicate that parallel trends would be reasonable?
@@ -117,6 +128,7 @@ ggplot(data=lang_avg,
 ### Fit Model
 
 We will fit the synthetic control for Ohio, using only non-lottery states as the potential control units. For now, we will use only the pre-intervention time periods as predictors, ignoring any other covariates, and optimize the fit over the full pre-intervention window. We use the `synthetic_control` function from the `tidysynth` package. Note that this may take a minute or two to run.
+
 
 ```{r}
 ## Conduct SC analysis for Ohio, excluding other lottery states:
@@ -154,11 +166,13 @@ synth_ohio <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
   generate_control()
 ```
 
+
 The `synth_ohio` object contains all of the information about the fit. `tidysynth` provides many functions to pull the results for inspection.
 
 ### Inspect Fit
 
 We can investigate the weights given to different control units and variables:
+
 
 ```{r}
 ## Pull weights and print in descending order
@@ -174,18 +188,22 @@ synth_ohio %>% grab_unit_weights() %>%
 synth_ohio %>% plot_weights()
 ```
 
+
 The top four control states by weight are Kansas, Wisconsin, Viriginia, and Georgia. **Do these seem reasonable?** The variables are given weight in reverse chronological order: **does this make sense for minimizing pre-intervention MSPE?**
 
 We can also examine the pre-intervention fit directly between true Ohio, synthetic Ohio, and the average of the donor pool.
+
 
 ```{r}
 ## Examine fit:
 synth_ohio %>% grab_balance_table()
 ```
 
+
 ### Plot Results
 
 We can plot both the observed and synthetic time series themselves, and the gap between them.
+
 
 ```{r}
 #| fig-cap: "Time series of observed and synthetic Ohio's percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021)."
@@ -207,9 +225,11 @@ synth_ohio %>% plot_differences() +
   theme_bw()
 ```
 
+
 ### Inference
 
 Placebo in-space tests are conducted by default in `synthetic_control` and can be plotted. The default plot prunes those with pre-intervention square root of the MSPE values above twice the value for the actual analysis, but this can be turned off with `prune=FALSE`.
+
 
 ```{r}
 #| fig-cap: "Actual and placebo synthetic control gaps in percent fully vaccinated rate by week (centered at lottery announcement date, May 12, 2021), excluding placebos with high pre-intervention MSPE values."
@@ -231,7 +251,9 @@ synth_ohio %>% plot_placebos(prune=FALSE) +
   theme_bw()
 ```
 
+
 One measure of the reliability of the results is to compare the post-intervention MSPE to the pre-intervention MSPE. The result for the actual analysis can be compared to the distribution of the placebo analyses.
+
 
 ```{r}
 #| fig-cap: "Ratio of the pre- and post-intervention MSPE, actual and placebo synthetic control analysis"
@@ -241,7 +263,9 @@ synth_ohio %>% plot_mspe_ratio() +
   theme_bw()
 ```
 
+
 An exact p-value can be computed from this distribution, by observing how many control units have as or more extreme ratios. This is done in the fit function and can be accessed using `grab_significance`.
+
 
 ```{r}
 ## Get all pre- and post-intervention MSPEs, ratios, and ranks:
@@ -252,7 +276,9 @@ synth_ohio %>% grab_significance() %>%
   dplyr::filter(type=="Treated")
 ```
 
+
 A similar exact p-value can be computed using any other estimator. We can get this by pulling the results at each time point using `grab_synthetic_control()`. We then compare the actual estimate to the placebo estimates.
+
 
 ```{r}
 ## Pull the synthetic control results for each time point:
@@ -272,7 +298,9 @@ by_time_res <- as_tibble(t(sapply(X=unique(SC_res %>% pull(time_unit)),
 by_time_res
 ```
 
+
 We can plot these placebo test p-values as well:
+
 
 ```{r}
 #| fig-cap: "Placebo test p-value for estimate at each week"
@@ -291,6 +319,7 @@ ggplot(data=by_time_res) +
        y="Placebo Test P-Values")
 ```
 
+
 ## Discussion Questions
 
 1.  How would you interpret these results?
@@ -300,6 +329,7 @@ ggplot(data=by_time_res) +
 ## Additional Analysis: Incorporating Covariates
 
 We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average the pre-intervention outcomes into groups by four weeks, except the week immediately prior.
+
 
 ```{r}
 ## Create synthetic control fit with covariates:
@@ -344,6 +374,7 @@ synth_oh_cov %>% grab_significance() %>%
   dplyr::filter(type=="Treated")
 ```
 
+
 This specification has a slightly higher pre-intervention MSPE (`r round(synth_oh_cov %>% grab_significance %>% dplyr::filter(type=="Treated") %>% pull(pre_mspe), digits=3)` compared to `r round(synth_ohio %>% grab_significance %>% dplyr::filter(type=="Treated") %>% pull(pre_mspe), digits=3)` in the initial specification), but gives an estimated effect nearly indistinguishable from 0. The control unit weights are somewhat changed, but the variable weights still place the vast majority of weight on pre-intervention outcomes.
 
 ## Augmented Synthetic Control
@@ -351,6 +382,7 @@ This specification has a slightly higher pre-intervention MSPE (`r round(synth_o
 ### Using `augsynth` Function
 
 We can re-fit the Ohio SC analysis using the `augsynth` function from the `augsynth` package. By default this package uses all pre-treatment outcome variables as the predictors.
+
 
 ```{r}
 ### First, create a dataset with a treatment indicator:
@@ -371,7 +403,9 @@ OH_as
 summary(OH_as)
 ```
 
+
 We can then compare the original SC fit from the `tidysynth` package to the `augsynth` fit with SC on but outcome model and fixed effects off. Note that the `augsynth` plot calls can take a minute to run.
+
 
 ```{r}
 ## The original SC fit from the tidysynth package:
@@ -392,11 +426,13 @@ plot(OH_as,
      inf=FALSE) # Suppresses plotting of conformal inference CIs
 ```
 
+
 These plots give the same results!
 
 In both cases, the pre-treatment fit is fairly good but not exact. We can alter the options to see different results.
 
 We can try a ridge outcome model first:
+
 
 ```{r}
 ### Run the augsynth fit with a ridge outcome model and SC
@@ -419,7 +455,9 @@ plot(OH_as_r,
      inf=FALSE) # Suppresses plotting of conformal inference CIs
 ```
 
+
 This is very similar to the previous fit. We can try adding unit fixed effects (de-mean or intercept-shifted SC) instead:
+
 
 ```{r}
 ### Run the augsynth fit with fixed effects and no outcome model
@@ -442,11 +480,13 @@ plot(OH_as_fe,
      inf=FALSE) # Suppresses plotting of conformal inference CIs
 ```
 
+
 Some of the fluctuations are smoothed out here, as the SC fit is just matching the time trend without needing to match the level of the pre-intervention outcome. This produces a smoother and larger estimate of the intervention effect. However, this requires a different assumption: that matching de-meaned outcomes pre-intervention leads to stable weights.
 
 ### Analysis of Other States
 
 As we saw, both New Mexico and Maine implemented lotteries, but may be outside of the "convex hull" condition required for SC.
+
 
 ```{r}
 #| fig-cap: "Plot of percent fully vaccinated rates by U.S. state, Jan.-Sept. 2021"
@@ -473,7 +513,9 @@ ggplot(data=lang_0624,
        linetype=NULL,color=NULL)
 ```
 
+
 We can create data sets for both New Mexico and Maine, and then fit various SC models.
+
 
 ```{r}
 ## Create data set for New Mexico as treated unit:
@@ -498,7 +540,9 @@ ME_as <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
                   progfunc="None", scm=TRUE, fixedeff=FALSE)
 ```
 
+
 Starting with New Mexico, we can plot the standard SC and see the weights it gives:
+
 
 ```{r}
 #| fig-cap: "Time series of the difference, Observed – Synthetic New Mexico, in percent fully vaccinated rate by week, starting from the week ending 1/17/21."
@@ -516,9 +560,11 @@ NM_as_w <- tibble(State=rownames(NM_as$weights),
 NM_as_w
 ```
 
+
 Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true value because New Mexico had very high vaccination rates even before the intervention. Note that some weights appear negative but essentially round to 0.
 
 Adding a fixed effects term will be able to center the pre-treatment fit closer to zero.
+
 
 ```{r}
 ## Fit de-meaned SC using augsynth:
@@ -536,7 +582,9 @@ plot(NM_as_fe,
      inf=FALSE)
 ```
 
+
 We can print the weights that come from the de-meaned SC fit. Notice there are meaningful differences from the standard SC fit weights.
+
 
 ```{r}
 ## Create a data set with the weights and sort largest to smallest in absolute value.
@@ -547,7 +595,9 @@ NM_as_fe_w <- tibble(State=rownames(NM_as_fe$weights),
 NM_as_fe_w
 ```
 
+
 There remain large fluctuations in the pre-treatment fit. A ridge outcome model may be able to de-bias these fluctuations.
+
 
 ```{r}
 ## Fit ridge-adjusted SC using augsynth:
@@ -565,7 +615,9 @@ plot(NM_as_r,
      inf=FALSE)
 ```
 
+
 We can print the weights that come from the ridge-augmented SC fit. Notice there are meaningful differences from the previous weights and now there are states that get non-negligible negative weights.
+
 
 ```{r}
 ## Create a data set with the weights and sort largest to smallest in absolute value.
@@ -576,7 +628,9 @@ NM_as_r_w <- tibble(State=rownames(NM_as_r$weights),
 NM_as_r_w
 ```
 
+
 Turning now to Maine, we can plot the standard SC:
+
 
 ```{r}
 #| fig-cap: "Time series of the difference, Observed – Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21."
@@ -585,9 +639,11 @@ plot(ME_as,
      inf=FALSE)
 ```
 
+
 Clearly, again, the pre-treatment fit is poor, with overestimation early on and underestimation closer to the start of treatment.
 
 Since the pre-treatment gaps are roughly centered around 0, adding a fixed effects term will not have much effect.
+
 
 ```{r}
 ## Fit de-meaned SC using augsynth:
@@ -605,7 +661,9 @@ plot(ME_as_fe,
      inf=FALSE)
 ```
 
+
 A ridge outcome model may be more useful here to de-bias the fluctuations.
+
 
 ```{r}
 ## Fit ridge-adjusted SC using augsynth:
@@ -623,7 +681,9 @@ plot(ME_as_r,
      inf=FALSE)
 ```
 
+
 The ridge adjustment may be more useful if it is not capturing the fixed effects as well, so we can use both unit fixed effects and a ridge outcome model.
+
 
 ```{r}
 ## Fit de-meaned and ridge-adjusted SC using augsynth:
@@ -641,9 +701,11 @@ plot(ME_as_r_fe,
      inf=FALSE)
 ```
 
+
 Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model.
 
 Another option is to fit the generalized SCM using the `gsynth` package. We first need to install and load the package.
+
 
 ```{r}
 # install.packages("gsynth") # Run once if not yet installed
@@ -665,11 +727,13 @@ plot(ME_gsynth,
      inf=FALSE)
 ```
 
+
 Again, different assumptions are being made here, and should be carefully considered. This appears more similar to the initial SC fit, however it has a larger effect estimate.
 
 ## Staggered Adoption
 
 Finally, we can consider the multi-period, multi-unit staggered adoption case with the augmented synthetic control. We first set up the full data set by adding a treatment indicator variable, and then fit it using `augsynth`. Note that this defaults to including two-way fixed effects, balancing all pre-intervention periods, and partially pools the average and individual SC fits using the heuristic given by [Ben-Michael et al. (2022)](https://doi.org/10.1111/rssb.12448).
+
 
 ```{r}
 ## Create data set with indicator for treatment
@@ -685,10 +749,13 @@ Mult_as
 summary(Mult_as)
 ```
 
+
 The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:
+
 
 ```{r}
 #| fig-cap: "Time series of the difference in fully vaccinated percentage using staggered adoption synthetic control estimates for treated states, by time relative to intervention."
 #| fig-alt: "Line plot with lines for 15 states, generally fluctuating between -1.25 and 1.25 prior to Week 0, and then expanding outward to a range of around -3 (New York) to 2.4 (Oregon) in Week 1. A darker average line is fairly close to 0 throughout"
 plot(Mult_as)
 ```
+

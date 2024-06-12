@@ -28,15 +28,15 @@ load("../data/lottery_lang.Rda")
 ```{r}
 #| fig-cap: "Plot of percent fully vaccinated rates by U.S. state, Jan.-Sept. 2021"
 #| fig-alt: "Line plot with several Other Lottery States and Non-Lottery States, as well as three focused states: Ohio, New Mexico, and Maine. Maine is in the middle of the set of lines, while New Mexico is among the highest early on, and Maine is among the highest in May/June."
-ggplot(data=lang_0912,
+ggplot(data=lang_0624,
        mapping=aes(group=state, linetype=type2, color=type2,
                    alpha=type2, linewidth=type2,
                    x=last_day,y=people_fully_vaccinated_per_hundred)) +
-  scale_alpha_manual(name=NULL, breaks=c("Maine","New Mexico","Ohio",
+  scale_alpha_manual(name=NULL, breaks=c("Ohio","New Mexico","Maine",
                                          "Other Lottery State",
                                          "Non-Lottery State"),
-                     values=c(1,1,1,0.8,0.5)) + 
-  scale_linewidth_manual(name=NULL, breaks=c("Maine","New Mexico","Ohio",
+                     values=c(1,1,1,0.5,0.8)) + 
+  scale_linewidth_manual(name=NULL, breaks=c("Ohio","New Mexico","Maine",
                                          "Other Lottery State",
                                          "Non-Lottery State"),
                          values=c(1.3,1.3,1.3,1,1)) +
@@ -91,7 +91,7 @@ Incorporate unit weighting of SC with unit fixed effects of DID and time weighti
 
 ## Augmented Synthetic Control
 
-[![](images/Adv_SC/BM2021-1cite.png){fig-alt="Title of Ben-Michael et al., J Am Stat Assoc (2021)" fig-align="center"}](https://doi.org/10.1080/01621459.2021.1929245)
+[![](images/Adv_SC/BM2021-1cite.png){fig-alt="Title of Ben-Michael et al. (2021)" fig-align="center"}](https://doi.org/10.1080/01621459.2021.1929245)
 
 ::: callout-note
 ## Idea
@@ -111,7 +111,7 @@ De-bias SC estimate using an outcome model for the time series.
 
 ## ASCM: Multiple Periods
 
-[![](images/Adv_SC/BM2021-2cite.png){fig-alt="Title of Ben-Michael et al., JRSS B (2021)" fig-align="center"}](https://doi.org/10.1111/rssb.12448)
+[![](images/Adv_SC/BM2021-2cite.png){fig-alt="Title of Ben-Michael et al., (2022)" fig-align="center"}](https://doi.org/10.1111/rssb.12448)
 
 Options:
 

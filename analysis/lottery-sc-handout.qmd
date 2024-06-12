@@ -27,7 +27,7 @@ Again, we will use `tidyverse` and `knitr` for general coding. Several packages 
 
 1.  [`tidysynth`](https://github.com/edunford/tidysynth), which has a more user-friendly, tidyverse-style implementation of SC; and
 
-2.  [`augsynth`](https://github.com/ebenmichael/augsynth), which additionally allows for Augmented SC (to be discussed later). For the most recent version of `R`, this has to be installed from GitHub using the `devtools` package.
+2.  [`augsynth`](https://github.com/ebenmichael/augsynth), which additionally allows for Augmented SC (to be discussed later) and staggered adoption SC. For the most recent version of `R`, this has to be installed from GitHub using the `devtools` package.
 
 We now load the required libraries.
 

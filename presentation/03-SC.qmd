@@ -18,6 +18,8 @@ Difference-in-differences requires some form of parallel trends: similar time tr
 Synthetic control can accommodate non-parallel trends
 :::
 
+[![](images/SC/Bouttell2018cite.png){fig-alt="Title for Bouttell et al. (2018)" fig-align="center" width="902"}](http://dx.doi.org/10.1136/jech-2017-210106)
+
 ## Motivating Example: State Health Policies
 
 ::: columns

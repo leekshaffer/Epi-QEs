@@ -1,5 +1,5 @@
 ---
-title: "04-Adv_SC"
+title: "Advanced Synthetic Control Methods"
 author: "Lee Kennedy-Shaffer, PhD"
 date: "June 18, 2024"
 format: revealjs
@@ -9,30 +9,206 @@ editor: visual
 ## Key Ideas
 
 ::: incremental
+Allow for staggered adoption
+
 Account for exposed series outside of the convex hull
 
 Incorporate control series on different outcomes/scales from exposed series
 :::
 
-## Motivating Example: Pneumococcal Conjugate Vaccine
+## Motivating Example
+
+We saw in the previous example that multiple states initiated lotteries at different times.
+
+```{r}
+require(tidyverse)
+load("../data/lottery_lang.Rda")
+```
+
+```{r}
+#| fig-cap: "Plot of percent fully vaccinated rates by U.S. state, Jan.-Sept. 2021"
+#| fig-alt: "Line plot with several Other Lottery States and Non-Lottery States, as well as three focused states: Ohio, New Mexico, and Maine. Maine is in the middle of the set of lines, while New Mexico is among the highest early on, and Maine is among the highest in May/June."
+ggplot(data=lang_0912,
+       mapping=aes(group=state, linetype=type2, color=type2,
+                   alpha=type2, linewidth=type2,
+                   x=last_day,y=people_fully_vaccinated_per_hundred)) +
+  scale_alpha_manual(name=NULL, breaks=c("Maine","New Mexico","Ohio",
+                                         "Other Lottery State",
+                                         "Non-Lottery State"),
+                     values=c(1,1,1,0.8,0.5)) + 
+  scale_linewidth_manual(name=NULL, breaks=c("Maine","New Mexico","Ohio",
+                                         "Other Lottery State",
+                                         "Non-Lottery State"),
+                         values=c(1.3,1.3,1.3,1,1)) +
+  geom_line() + theme_bw() +
+  geom_vline(data=lang_0624 %>% 
+               dplyr::filter(type2 %in% c("Ohio","New Mexico","Maine"),
+                                              rel_week==0),
+             mapping=aes(xintercept=lott_date, group=type2, color=type2),
+             linetype="dotted") +
+  labs(x="Day (2021)", y="Percent Fully Vaccinated",
+       linetype=NULL,color=NULL)
+```
 
 # Methods
 
-## Augmented Synthetic Control
+## De-Meaned SCM
 
-## Generalized Synthetic Control
+::: columns
+::: {.column width="50%"}
+[![](images/Adv_SC/Doudchenko2016cite.png){fig-alt="Title for Doudchenko and Imbens (2016)" fig-align="left" width="1914"}](http://www.nber.org/papers/w22791)
+:::
+
+::: {.column width="50%"}
+[![](images/Adv_SC/Ferman2021cite.png){fig-alt="Title for Ferman and Pinto (2021)" fig-align="right" width="817"}](https://doi.org/10.3982/QE1596)
+:::
+:::
+
+::: callout-note
+## Idea
+
+De-mean the pre-treatment data, fit SC to the de-meaned observations, and apply the weights to both the post-treatment time trends and levels.
+:::
 
 ## Synthetic DID
 
+[![](images/Adv_SC/Arkhangelsky2021cite.png){fig-alt="Title for Arkhangelsky et al. (2021)" fig-align="center"}](https://doi.org/10.1257/aer.20190159)
+
+## SDID: Procedure
+
+::: callout-note
+## Idea
+
+Incorporate unit weighting of SC with unit fixed effects of DID and time weighting. "Localized" TWFE model.
+:::
+
+::: incremental
+1.  Compute regularization parameter
+2.  Compute regularized, intercept-adjusted/de-meaned SC weights
+3.  Compute time weights
+4.  Conduct weighted TWFE regression
+:::
+
+## Augmented Synthetic Control
+
+[![](images/Adv_SC/BM2021-1cite.png){fig-alt="Title of Ben-Michael et al., J Am Stat Assoc (2021)" fig-align="center"}](https://doi.org/10.1080/01621459.2021.1929245)
+
+::: callout-note
+## Idea
+
+De-bias SC estimate using an outcome model for the time series.
+:::
+
+## ASCM: Procedure
+
+::: incremental
+1.  Compute SC weights
+2.  Fit outcome model (e.g., ridge regression) to control units
+3.  Get model estimates for all units
+4.  Find difference between model estimate for treated unit and SC-weighted model estimates for control units
+5.  Add this difference to SC estimator
+:::
+
+## ASCM: Multiple Periods
+
+[![](images/Adv_SC/BM2021-2cite.png){fig-alt="Title of Ben-Michael et al., JRSS B (2021)" fig-align="center"}](https://doi.org/10.1111/rssb.12448)
+
+Options:
+
+-   Fit separate SCM for each unit
+
+-   Fit SCM on average of treated units
+
+-   Partially pooled SCM: mix of both
+
+-   With intercepts, akin to weighted DID approaches
+
+## SDID and ASCM: Summary
+
+[![](images/Adv_SC/Krajewski2024cite.png){fig-alt="Title for Krajewski and Hudgens (2024)" fig-align="center" width="399"}](https://doi.org/10.1177/09622802231224638)
+
+::: columns
+::: {.column width="50%"}
+Advantages:
+
+-   Allows intercept shift
+-   Allow negative weights with sparsity
+-   Improved performance in settings with poor SC fit
+:::
+
+::: {.column width="50%"}
+Disadvantages:
+
+-   Allows extrapolation
+-   Loss of interpretation of weights
+-   More user degrees of freedom
+-   Challenging inference
+:::
+:::
+
+## Generalized Synthetic Control
+
+[![](images/Adv_SC/Xu2017cite.png){fig-alt="Title for Xu (2017)" fig-align="center" width="799"}](https://doi.org/10.1017/pan.2016.2)
+
+::: callout-note
+## Idea
+
+Use control unit data to estimate unit fixed effects and time-varying coefficients. Use these coefficients to estimate treated unit fixed effects and then counterfactuals.
+:::
+
+. . .
+
+Allows extrapolation and relies on modeling of time series. But can achieve better fit, especially with shift. Allows multiple treated units to be estimated quickly.
+
 ## Bayesian Structural Time Series Modeling
+
+[![](images/Adv_SC/Brodersen2015cite.png){fig-alt="Title for Brodersen et al. (2015)" fig-align="center" width="758"}](https://doi.org/10.1214/14-AOAS788)
+
+::: callout-note
+## Idea
+
+Combine three information sources in state-time model:
+
+::: incremental
+-   Bayesian priors on covariate importance
+-   Time series modeling of outcome pre-intervention
+-   State-space model for treated unit based on controls
+:::
+:::
+
+## BSTS: Summary
+
+::: columns
+::: {.column width="50%"}
+[![](images/Adv_SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="left" width="914"}](https://doi.org/10.1073/pnas.1612833114)
+:::
+
+::: {.column width="50%"}
+[![](images/Adv_SC/Prunas2021cite.png){fig-alt="Title for Prunas et al. (2021)" fig-align="right" width="781"}](https://doi.org/10.1093/aje/kwab266)
+:::
+:::
+
+Allows extrapolation: weights don't sum to 1
+
+Incorporates prior information
+
+Explicit time series modeling
 
 # Tradeoffs and Interpretations
 
-## Internal vs. External Validity
+## Validity, Generalizability, and Assumptions
 
-## Bias vs. Variance
+-   Pooling across units enables better fit, but loses unit-specific information
+
+-   Extrapolation allows better pre-treatment fit, but may over-fit or rely on additional assumptions
+
+-   Advanced methods allow use of more control series: reduces variance but may introduce bias
 
 ## Interpretability of Weights
+
+-   A key benefit of SC is its interpretability
+
+-   This is somewhat lost in more advanced approaches
 
 # Analysis
 

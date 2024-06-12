@@ -12,7 +12,7 @@
 
   <meta name="author" content="Lee Kennedy-Shaffer, PhD">
   <meta name="dcterms.date" content="2024-06-18">
-  <title>04-Adv_SC</title>
+  <title>Advanced Synthetic Control Methods</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -327,7 +327,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">04-Adv_SC</h1>
+  <h1 class="title">Advanced Synthetic Control Methods</h1>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -342,43 +342,250 @@ Lee Kennedy-Shaffer, PhD
 <section id="key-ideas" class="slide level2">
 <h2>Key Ideas</h2>
 <div>
+<p>Allow for staggered adoption</p>
 <p>Account for exposed series outside of the convex hull</p>
 <p>Incorporate control series on different outcomes/scales from exposed series</p>
 </div>
 </section>
-<section id="motivating-example-pneumococcal-conjugate-vaccine" class="slide level2">
-<h2>Motivating Example: Pneumococcal Conjugate Vaccine</h2>
-</section>
+<section id="motivating-example" class="slide level2">
+<h2>Motivating Example</h2>
+<p>We saw in the previous example that multiple states initiated lotteries at different times.</p>
+
+<img data-src="04-Adv_SC_files/figure-revealjs/unnamed-chunk-2-1.png" alt="Line plot with several Other Lottery States and Non-Lottery States, as well as three focused states: Ohio, New Mexico, and Maine. Maine is in the middle of the set of lines, while New Mexico is among the highest early on, and Maine is among the highest in May/June." width="960" class="r-stretch quarto-figure-center"><p class="caption">Plot of percent fully vaccinated rates by U.S. state, Jan.-Sept.&nbsp;2021</p></section>
 <section>
 <section id="methods" class="title-slide slide level1 center">
 <h1>Methods</h1>
 
 </section>
-<section id="augmented-synthetic-control" class="slide level2">
-<h2>Augmented Synthetic Control</h2>
-</section>
-<section id="generalized-synthetic-control" class="slide level2">
-<h2>Generalized Synthetic Control</h2>
+<section id="de-meaned-scm" class="slide level2">
+<h2>De-Meaned SCM</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><a href="http://www.nber.org/papers/w22791"><img data-src="images/Adv_SC/Doudchenko2016cite.png" class="quarto-figure quarto-figure-left" alt="Title for Doudchenko and Imbens (2016)" width="1914"></a></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-right">
+<figure>
+<p><a href="https://doi.org/10.3982/QE1596"><img data-src="images/Adv_SC/Ferman2021cite.png" class="quarto-figure quarto-figure-right" alt="Title for Ferman and Pinto (2021)" width="817"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>De-mean the pre-treatment data, fit SC to the de-meaned observations, and apply the weights to both the post-treatment time trends and levels.</p>
+</div>
+</div>
+</div>
 </section>
 <section id="synthetic-did" class="slide level2">
 <h2>Synthetic DID</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1257/aer.20190159"><img data-src="images/Adv_SC/Arkhangelsky2021cite.png" class="quarto-figure quarto-figure-center" alt="Title for Arkhangelsky et al. (2021)"></a></p>
+</figure>
+</div>
+</section>
+<section id="sdid-procedure" class="slide level2">
+<h2>SDID: Procedure</h2>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>Incorporate unit weighting of SC with unit fixed effects of DID and time weighting. “Localized” TWFE model.</p>
+</div>
+</div>
+</div>
+<div>
+<ol type="1">
+<li class="fragment">Compute regularization parameter</li>
+<li class="fragment">Compute regularized, intercept-adjusted/de-meaned SC weights</li>
+<li class="fragment">Compute time weights</li>
+<li class="fragment">Conduct weighted TWFE regression</li>
+</ol>
+</div>
+</section>
+<section id="augmented-synthetic-control" class="slide level2">
+<h2>Augmented Synthetic Control</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1080/01621459.2021.1929245"><img data-src="images/Adv_SC/BM2021-1cite.png" class="quarto-figure quarto-figure-center" alt="Title of Ben-Michael et al., J Am Stat Assoc (2021)"></a></p>
+</figure>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>De-bias SC estimate using an outcome model for the time series.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="ascm-procedure" class="slide level2">
+<h2>ASCM: Procedure</h2>
+<div>
+<ol type="1">
+<li class="fragment">Compute SC weights</li>
+<li class="fragment">Fit outcome model (e.g., ridge regression) to control units</li>
+<li class="fragment">Get model estimates for all units</li>
+<li class="fragment">Find difference between model estimate for treated unit and SC-weighted model estimates for control units</li>
+<li class="fragment">Add this difference to SC estimator</li>
+</ol>
+</div>
+</section>
+<section id="ascm-multiple-periods" class="slide level2">
+<h2>ASCM: Multiple Periods</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1111/rssb.12448"><img data-src="images/Adv_SC/BM2021-2cite.png" class="quarto-figure quarto-figure-center" alt="Title of Ben-Michael et al., JRSS B (2021)"></a></p>
+</figure>
+</div>
+<p>Options:</p>
+<ul>
+<li><p>Fit separate SCM for each unit</p></li>
+<li><p>Fit SCM on average of treated units</p></li>
+<li><p>Partially pooled SCM: mix of both</p></li>
+<li><p>With intercepts, akin to weighted DID approaches</p></li>
+</ul>
+</section>
+<section id="sdid-and-ascm-summary" class="slide level2">
+<h2>SDID and ASCM: Summary</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1177/09622802231224638"><img data-src="images/Adv_SC/Krajewski2024cite.png" class="quarto-figure quarto-figure-center" alt="Title for Krajewski and Hudgens (2024)" width="399"></a></p>
+</figure>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Advantages:</p>
+<ul>
+<li>Allows intercept shift</li>
+<li>Allow negative weights with sparsity</li>
+<li>Improved performance in settings with poor SC fit</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p>Disadvantages:</p>
+<ul>
+<li>Allows extrapolation</li>
+<li>Loss of interpretation of weights</li>
+<li>More user degrees of freedom</li>
+<li>Challenging inference</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="generalized-synthetic-control" class="slide level2">
+<h2>Generalized Synthetic Control</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1017/pan.2016.2"><img data-src="images/Adv_SC/Xu2017cite.png" class="quarto-figure quarto-figure-center" alt="Title for Xu (2017)" width="799"></a></p>
+</figure>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>Use control unit data to estimate unit fixed effects and time-varying coefficients. Use these coefficients to estimate treated unit fixed effects and then counterfactuals.</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p>Allows extrapolation and relies on modeling of time series. But can achieve better fit, especially with shift. Allows multiple treated units to be estimated quickly.</p>
+</div>
 </section>
 <section id="bayesian-structural-time-series-modeling" class="slide level2">
 <h2>Bayesian Structural Time Series Modeling</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1214/14-AOAS788"><img data-src="images/Adv_SC/Brodersen2015cite.png" class="quarto-figure quarto-figure-center" alt="Title for Brodersen et al. (2015)" width="758"></a></p>
+</figure>
+</div>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Idea</strong></p>
+</div>
+<div class="callout-content">
+<p>Combine three information sources in state-time model:</p>
+<div>
+<ul>
+<li class="fragment">Bayesian priors on covariate importance</li>
+<li class="fragment">Time series modeling of outcome pre-intervention</li>
+<li class="fragment">State-space model for treated unit based on controls</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="bsts-summary" class="slide level2">
+<h2>BSTS: Summary</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><a href="https://doi.org/10.1073/pnas.1612833114"><img data-src="images/Adv_SC/Bruhn2017cite.png" class="quarto-figure quarto-figure-left" alt="Title for Bruhn et al. (2017)" width="914"></a></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-right">
+<figure>
+<p><a href="https://doi.org/10.1093/aje/kwab266"><img data-src="images/Adv_SC/Prunas2021cite.png" class="quarto-figure quarto-figure-right" alt="Title for Prunas et al. (2021)" width="781"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Allows extrapolation: weights don’t sum to 1</p>
+<p>Incorporates prior information</p>
+<p>Explicit time series modeling</p>
 </section></section>
 <section>
 <section id="tradeoffs-and-interpretations" class="title-slide slide level1 center">
 <h1>Tradeoffs and Interpretations</h1>
 
 </section>
-<section id="internal-vs.-external-validity" class="slide level2">
-<h2>Internal vs.&nbsp;External Validity</h2>
-</section>
-<section id="bias-vs.-variance" class="slide level2">
-<h2>Bias vs.&nbsp;Variance</h2>
+<section id="validity-generalizability-and-assumptions" class="slide level2">
+<h2>Validity, Generalizability, and Assumptions</h2>
+<ul>
+<li><p>Pooling across units enables better fit, but loses unit-specific information</p></li>
+<li><p>Extrapolation allows better pre-treatment fit, but may over-fit or rely on additional assumptions</p></li>
+<li><p>Advanced methods allow use of more control series: reduces variance but may introduce bias</p></li>
+</ul>
 </section>
 <section id="interpretability-of-weights" class="slide level2">
 <h2>Interpretability of Weights</h2>
+<ul>
+<li><p>A key benefit of SC is its interpretability</p></li>
+<li><p>This is somewhat lost in more advanced approaches</p></li>
+</ul>
 </section></section>
 <section>
 <section id="analysis" class="title-slide slide level1 center">
@@ -630,6 +837,44 @@ Lee Kennedy-Shaffer, PhD
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

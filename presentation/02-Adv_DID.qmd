@@ -1,5 +1,5 @@
 ---
-title: "02-Advanced_DID"
+title: "DID with Staggered Adoption"
 author: "Lee Kennedy-Shaffer, PhD"
 date: "June 18, 2024"
 format: revealjs
@@ -66,7 +66,7 @@ What might cause heterogeneity in the effect of a state employee COVID-19 vaccin
 
 . . .
 
-![](images/Adv_DID/Goodman-Bacon.png){fig-alt="Citation for Goodman-Bacon (2021)" fig-align="center" width="881"}
+![](images/Adv_DID/Goodman-Bacon.png){fig-alt="Citation for Goodman-Bacon (2021)" fig-align="center" width="611"}
 
 ## Weighted Average of Effects
 
@@ -152,7 +152,7 @@ Review/survey papers:
 
 -   [Baker et al. (2022)](https://doi.org/10.1016/j.jfineco.2022.01.004)
 
--   [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf)
+-   [Butts and Gardner (2022)](https://doi.org/10.32614/RJ-2022-048)
 
 -   [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008)
 
@@ -160,7 +160,7 @@ Review/survey papers:
 
 -   [Roth (2024)](https://doi.org/10.48550/arXiv.2401.12309)
 
--   [Wing et al. (2024)](https://doi.org/10.1146/annurev-publhealth- 061022-050825)
+-   [Wing et al. (2024)](https://doi.org/10.1146/annurev-publhealth-%20061022-050825)
 :::
 
 ::: {.column width="60%"}
@@ -187,25 +187,3 @@ All of these approaches change the precise specification of the estimand as well
 ::: callout-important
 It's easy to ignore the fundamentals when using the more advanced methods. Consider the validity of the data, the question being asked, and the feasibility of the effect.
 :::
-
-# Analysis
-
-## Data
-
-## Packages
-
-## Key Functions
-
-## Plotting
-
-## Two-Way Fixed Effects
-
-## Goodman-Bacon Decomposition
-
-## Analysis 1:
-
-## Analysis 2:
-
-## Comparison
-
-## Interpretation and Assumptions

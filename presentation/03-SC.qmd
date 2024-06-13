@@ -158,7 +158,7 @@ where $v_k$ are weights on the importance of each covariate, which can themselve
 :::
 
 ::: {.column width="50%"}
-[![Abadie et al. (2010), Table 2](images/SC/Abadie2010Tbl2.png){fig-alt="Table showing the weights for the synthetic California. The only non-zero weights are Colorado (0.164), Connecticut (0.069), Montana (0.199), Nevada (0.234), and Utah (0.334)" fig-align="right"}](https://doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Table 2](images/SC/Abadie2010Tbl2.png){fig-alt="Table showing the weights for the synthetic California. The only non-zero weights are Colorado (0.164), Connecticut (0.069), Montana (0.199), Nevada (0.234), and Utah (0.334)" fig-align="right" width="699"}](https://doi.org/10.1198/jasa.2009.ap08746)
 :::
 :::
 
@@ -194,7 +194,7 @@ Can exclude those with much higher pre-intervention MSPEs.
 
 ## Placebo Test In-Space
 
-[![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="765"}](https://doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="662"}](https://doi.org/10.1198/jasa.2009.ap08746)
 
 ## Placebo Test In-Time
 
@@ -209,25 +209,3 @@ This is related to the cross-validation approach for covariate weight selection,
 In some cases, non-affected outcomes or populations may be available. These can be used as a null control or distribution.
 
 [![](images/SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="center"}](https://doi.org/10.1073/pnas.1612833114)
-
-# Analysis
-
-## Data
-
-## Packages
-
-Decide whether to include Synth, tidysynth, gsynth, augsynth
-
-## Key Functions
-
-## Plotting
-
-## Running Fit
-
-## Examining Output
-
-## Plotting Results
-
-## Plotting Gap
-
-## Placebo Tests

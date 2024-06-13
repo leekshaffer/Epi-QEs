@@ -14,6 +14,8 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 -   Blackwell M. "Materials for Gov 2003: Causal Inference with Applications." Accessed June 12, 2024. <https://mattblackwell.github.io/gov2003-f21-site/materials.html>.
 
+-   Goldsmith-Pinkham P. "Applied Empirical Methods." Accessed June 13, 2024. <https://github.com/paulgp/applied-methods-phd>.
+
 ## Review Articles: Statistics/Econometrics/Methods
 
 -   Abadie A. Using synthetic controls: feasibility, data requirements, and methodological aspect. *J Econom Lit* 2021;**59**:391-425. <https://doi.org/10.1257/jel.20191450>.

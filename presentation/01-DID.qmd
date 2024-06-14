@@ -8,14 +8,14 @@ editor: visual
 
 ## Motivating Example: Cholera, London, 1850s
 
-[![](images/DID/Coleman_Map.png){fig-alt="Map of water service areas in 1850s London" fig-align="center" width="536"}](https://dx.doi.org/10.2139/ssrn.3262234)
-
 ::: columns
 ::: {.column width="50%"}
-[![](images/DID/Coleman_Header.png){fig-alt="Citation information for Coleman (2019)" fig-align="center" width="597"}](https://dx.doi.org/10.2139/ssrn.3262234)
+[![](images/DID/Coleman_Map.png){fig-alt="Map of water service areas in 1850s London" fig-align="center" width="536"}](https://dx.doi.org/10.2139/ssrn.3262234)
 :::
 
 ::: {.column width="50%"}
+[![](images/DID/Coleman_Header.png){fig-alt="Citation information for Coleman (2019)" fig-align="center" width="597"}](https://dx.doi.org/10.2139/ssrn.3262234)
+
 [![](images/DID/Caniglia%20and%20Murray%202020.png){fig-alt="Title of Caniglia and Murray (2020)" fig-align="center" width="1022"}](https://doi.org/10.1007/s40471-020-00245-2)
 :::
 :::
@@ -94,7 +94,7 @@ chol_2x2 <- regdata %>%
                          levels=c("SouthwarkVauxhall_Lambeth",
                                   "SouthwarkVauxhall",
                                   "Diff, Treated-Untreated"),
-                         labels=c("Joint Southwark & Vauxhall/Lambert (Treated)",
+                         labels=c("Joint Southwark & Vauxhall/Lambeth (Treated)",
                                   "Southwark & Vauxhall Only (Untreated)",
                                   "Diff, Treated-Untreated"))) %>%
   group_by(Supplier,year) %>% 
@@ -120,7 +120,7 @@ kable(chol_2x2_f,
 ```{r}
 ## Calculate differences between units:
 diffs <- chol_2x2_f %>%
-  dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambert (Treated)") %>% 
+  dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambeth (Treated)") %>% 
   dplyr::select(`1849 Deaths per 10,000`,`1854 Deaths per 10,000`) - 
   chol_2x2_f %>%
   dplyr::filter(Supplier=="Southwark & Vauxhall Only (Untreated)") %>% 
@@ -135,10 +135,10 @@ kable(chol_2x2_res,
       digits=1)
 ```
 
-## Two-by-Two DID: Example
+## Two-by-Two DID: Graphically
 
 ```{r}
-POs <- rep(chol_2x2 %>% dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambert (Treated)",
+POs <- rep(chol_2x2 %>% dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lambeth (Treated)",
                                       year==1849) %>% 
              pull(mortality),2) + 
   c(0,chol_2x2_res %>% 
@@ -146,15 +146,31 @@ POs <- rep(chol_2x2 %>% dplyr::filter(Supplier=="Joint Southwark & Vauxhall/Lamb
       pull(`Diff, 1854-1849`))
 chol_2x2_po <- chol_2x2 %>% dplyr::select(-c(N)) %>%
   mutate(Type="Observed") %>%
-  bind_rows(tibble(Supplier="Joint Southwark & Vauxhall/Lambert (Treated)",
+  bind_rows(tibble(Supplier="Joint Southwark & Vauxhall/Lambeth (Treated)",
                    year=c("1849","1854"),
                    mortality=POs,
                    Type="Counterfactual")) %>%
   mutate(Type=factor(Type,levels=c("Observed","Counterfactual")),
-         Supplier=factor(Supplier,levels=c("Joint Southwark & Vauxhall/Lambert (Treated)",
+         Supplier=factor(Supplier,levels=c("Joint Southwark & Vauxhall/Lambeth (Treated)",
                                            "Southwark & Vauxhall Only (Untreated)"),
                          labels=c("Treated","Untreated")),
          group=paste0(Type,", ",Supplier))
+ggplot(chol_2x2_po %>% dplyr::filter(Type=="Observed")) + 
+  geom_line(mapping=aes(x=year, y=mortality, color=Supplier, linetype=Type, group=group),
+linewidth=1.5) + 
+  theme_bw() +
+  scale_y_continuous(name="Deaths Per 10,000",
+                     limits=c(80,150), breaks=seq(80,150,by=10)) +
+  scale_x_discrete(name="Year") +
+  scale_linetype_discrete(name="") +
+  scale_color_manual(breaks=c("Treated","Untreated"),
+                     values=c("purple","darkgreen")) +
+  labs(title="Two-by-Two Difference-in-Differences, South London Cholera")
+```
+
+## Two-by-Two DID: Graphically
+
+```{r}
 ggplot(chol_2x2_po) + 
   geom_line(mapping=aes(x=year, y=mortality, color=Supplier, linetype=Type, group=group),
 linewidth=1.5) + 
@@ -182,6 +198,8 @@ Compare to other possible estimates of $\hat{Y}_{11}(0)$:
 -   Regress $Y_{1t}$ on $Y_{0t}$: requires covariates, additional control units, and/or specific model
 :::
 
+# Details and Assumptions
+
 ## Regression Formulation
 
 $$
@@ -203,8 +221,6 @@ where:
 ::: callout-note
 This is called the **two-way fixed effects (TWFE) model** for DID.
 :::
-
-# Details and Assumptions
 
 ## Statistical Inference
 
@@ -326,3 +342,17 @@ This may not be generalizable to other units, including the untreated units in t
 -   Incorporating additional units/periods can reduce variance, but may also risk violating the assumptions
 
 -   Generally conducted with limited, carefully-selected units: low bias but high variance
+
+. .
+
+::: callout-note
+## Examples
+
+-   More distant vs. closer untreated units
+
+-   Incorporating more untreated units
+
+-   Incorporating more recent time periods
+:::
+
+.

@@ -121,7 +121,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## If you have not installed these packages before,</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  run the following line:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse","knitr","lme4")</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("tidyverse","knitr","lme4"))</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Either way, the packages must be loaded:</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidyverse)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(knitr)</span>
@@ -340,7 +340,7 @@ interaction -0.319  0.374 -0.521</code></pre>
 -1.5583050 -0.8555737 </code></pre>
 </div>
 </div>
-<p>This gives the same effect estimate of -1.21 births per 1,000 population, with a 95\% confidence interval of [-1.558, -0.856], indicating a statistically significant negative effect.</p>
+<p>This gives the same effect estimate of -1.21 births per 1,000 population, with a 95% confidence interval of [-1.558, -0.856], indicating a statistically significant negative effect.</p>
 <p>Another approach to clustered inference is the block-bootstrap method.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## First, get a list of unique codes by state</span></span>
@@ -362,7 +362,7 @@ interaction -0.319  0.374 -0.521</code></pre>
 -1.2033250 -1.5202092 -0.8842974 </code></pre>
 </div>
 </div>
-<p>This method gives an effect estimate of -1.20 births per 1,000 population, with a 95\% confidence interval of [-1.520, -0.884], very similar to the previous results.</p>
+<p>This method gives an effect estimate of -1.20 births per 1,000 population, with a 95% confidence interval of [-1.520, -0.884], very similar to the previous results.</p>
 </section>
 <section id="discussion-questions" class="level2">
 <h2 class="anchored" data-anchor-id="discussion-questions">Discussion Questions</h2>
@@ -480,37 +480,60 @@ year                    0.9641298  1.0020106
 interaction             0.8978948  0.9668531</code></pre>
 </div>
 </div>
-<p>This approach gives an effect estimate of -0.0707 births per 1,000 population, with a 95\% confidence interval of [-0.108, -0.0337], indicating a statistically significant negative effect. On the multiplicative scale, by exponentiating, we get an estimate of 0.932 with a 95\% CI of [0.898, 0.967].</p>
+<p>This approach gives an effect estimate of -0.0707 births per 1,000 population, with a 95% confidence interval of [-0.108, -0.0337], indicating a statistically significant negative effect. On the multiplicative scale, by exponentiating, we get an estimate of 0.932 with a 95% CI of [0.898, 0.967].</p>
+<p>We can check the placebo in-time plot for the log-transformed outcome.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Add log-transformed DID estimate to placebo data set:</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>zika_plac <span class="ot">&lt;-</span> zika_plac <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">LogEstimate=</span><span class="fu">log</span>(P1<span class="sc">/</span>P0)<span class="sc">-</span><span class="fu">log</span>(R1<span class="sc">/</span>R0))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot two-by-two log-transformed DID estimates for placebo years:</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of two-by-two log-transformed DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A scatter plot with points ranging from around 0 to -0.05 in the 2010 through 2015 years, with a point around -0.09 in 2016."</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_plac) <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>LogEstimate),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"Log-Transformed DID Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.25</span>,<span class="fl">0.25</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.25</span>,<span class="fl">0.25</span>,<span class="at">by=</span>.<span class="dv">125</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="zika-did-handout_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="additional-options" class="level2">
 <h2 class="anchored" data-anchor-id="additional-options">Additional Options</h2>
 <p>Further modeling is possible. In this case, the authors also proposed Poisson and Negative Binomial models for the live birth counts in the DID framework. Further details on model fitting and interpretation can be found in the article.</p>
 <p>The following code can be run to fit the Poisson GLM with bootstrap CI or GLMM, clustered by municipality:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute this code into the document, change the previous line to true</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLM:</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>zika_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span>zika_full,</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_glm)</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute bootstrap 95% CI for Poisson GLM:</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4008335</span>)</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>glm_boot <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="at">n=</span><span class="dv">1000</span>,</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">expr=</span><span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span><span class="fu">boot_data</span>(),</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>])</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>glm_boot_res <span class="ot">&lt;-</span> <span class="fu">quantile</span>(glm_boot, <span class="at">probs=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">coef</span>(zika_glm)[<span class="st">"interaction"</span>]),</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>glm_boot_res[<span class="st">"2.5%"</span>],</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>glm_boot_res[<span class="st">"97.5%"</span>]))</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLMM, clustered by municipality:</span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>zika_glmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop))<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), </span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>zika_full,</span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>zika_glmer_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(zika_glmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">summary</span>(zika_glmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>]),</span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"2.5 %"</span>],</span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"97.5 %"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To execute this code into the document, change the previous line to true</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLM:</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>zika_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span>zika_full,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_glm)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute bootstrap 95% CI for Poisson GLM:</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4008335</span>)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>glm_boot <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="at">n=</span><span class="dv">1000</span>,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">expr=</span><span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span><span class="fu">boot_data</span>(),</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>])</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>glm_boot_res <span class="ot">&lt;-</span> <span class="fu">quantile</span>(glm_boot, <span class="at">probs=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">coef</span>(zika_glm)[<span class="st">"interaction"</span>]),</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>glm_boot_res[<span class="st">"2.5%"</span>],</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>glm_boot_res[<span class="st">"97.5%"</span>]))</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLMM, clustered by municipality:</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>zika_glmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop))<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), </span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>zika_full,</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>zika_glmer_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(zika_glmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">summary</span>(zika_glmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>]),</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"2.5 %"</span>],</span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"97.5 %"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="discussion-question-1" class="level2">

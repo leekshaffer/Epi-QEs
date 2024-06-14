@@ -95,16 +95,16 @@ This is equivalent to a weighted average of all unit-period-specific treatment e
 Let
 
 $$
-ATT(a,t) = E[Y_{it}(a) - Y_{it}(0)],
+ATT(g,t) = E[Y_{it}(g) - Y_{it}(0)],
 $$
 
-the group-time ATT in period $t$ for a unit first treated in period $a$, compared to if it had never been treated (or not yet treated by period $t$).
+the group-time ATT in period $t$ for a unit first treated in period $g$, compared to if it had never been treated (or not yet treated by period $t$).
 
 . . .
 
 Many solutions boil down to considering which group-time ATTs should be included in the estimand, how they differ, and how to weight them.
 
-TWFE assumes \$ATT(a,t) = \theta\$ for all $a \le t$.
+TWFE assumes $ATT(g,t) = \theta$ for all $g \le t$.
 
 ## Dynamic Specification
 
@@ -114,37 +114,31 @@ $$
 
 where $K_{it}$ is the lead/lag for unit $i$ in period $t$ (e.g., $K_{it} = 1$ in the first exposed period).
 
-See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007).
+See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007). Captures time-on-treatment heterogeneity.
 
-## Interaction-weighted estimator
+## Interaction-Weighting
 
-Group units by adoption timing ($G_i$), keep one group out as the "control" ($C$, ideally never-treated) and fit the dynamic specification with the effect interacted by the timing group:
-
-$$
-Y_{it} = \alpha_i + \gamma_t + \sum_{g \neq C} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) +\epsilon_{it}
-$$
-
-The overall estimator $\hat{\theta}$ is a weighted average of the $\hat{\delta}_{g,k}$ estimators, with weights by share of population in each timing group.
-
-See [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006).
-
-## Aggregated Non-Parametric Identification
-
-Estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme: suggested approaches are IPW, OR, and DR.
-
-Summarize to an overall average effect:
+We can account for timing cohort heterogeneity as well by further allowing the effect to vary by adoption timing group ($G_i$):
 
 $$
-\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t},
+Y_{it} = \alpha_i + \gamma_t + \sum_{g \in \mathcal{G}} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
 $$
 
-weighted by specified weights $w_{g,t}$.
+. . .
 
-See [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001).
+Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results.
 
-## First-Difference Switching Effect
+## Restricting Controls
 
-For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
+See [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the interaction-weighting approach with a clean "control" $C$ that is either never-treated or last-treated.
+
+This avoids forbidden comparisons.
+
+Their regression approach then implicitly weights by population share in each timing group.
+
+## Restricting Periods: First-Difference
+
+Another approach would only consider one switching effect. For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
 
 $$
 \widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} \sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) - \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
@@ -154,7 +148,17 @@ Average these across all time periods $t$, weighted by number of units or indivi
 
 See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
 
-## 2x2 Building Blocks
+## Restricting Periods: Last Pre-Treated
+
+[Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001) propose to estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme compared to the last pre-treatment period: suggested approaches are IPW, OR, and DR.
+
+Then summarize to an overall average effect weighted by $w_{g,t}$:
+
+$$
+\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t}.
+$$
+
+## Generalized 2x2 Building Blocks
 
 More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand.
 

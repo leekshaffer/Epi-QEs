@@ -467,12 +467,12 @@ Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it}
 <h2>Group-Time ATT</h2>
 <p>Let</p>
 <p><span class="math display">\[
-ATT(a,t) = E[Y_{it}(a) - Y_{it}(0)],
+ATT(g,t) = E[Y_{it}(g) - Y_{it}(0)],
 \]</span></p>
-<p>the group-time ATT in period <span class="math inline">\(t\)</span> for a unit first treated in period <span class="math inline">\(a\)</span>, compared to if it had never been treated (or not yet treated by period <span class="math inline">\(t\)</span>).</p>
+<p>the group-time ATT in period <span class="math inline">\(t\)</span> for a unit first treated in period <span class="math inline">\(g\)</span>, compared to if it had never been treated (or not yet treated by period <span class="math inline">\(t\)</span>).</p>
 <div class="fragment">
 <p>Many solutions boil down to considering which group-time ATTs should be included in the estimand, how they differ, and how to weight them.</p>
-<p>TWFE assumes $ATT(a,t) = $ for all <span class="math inline">\(a \le t\)</span>.</p>
+<p>TWFE assumes <span class="math inline">\(ATT(g,t) = \theta\)</span> for all <span class="math inline">\(g \le t\)</span>.</p>
 </div>
 </section>
 <section id="dynamic-specification" class="slide level2">
@@ -481,38 +481,43 @@ ATT(a,t) = E[Y_{it}(a) - Y_{it}(0)],
 Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq 0} \delta_{k} I(K_{it} = k)+\epsilon_{it},
 \]</span></p>
 <p>where <span class="math inline">\(K_{it}\)</span> is the lead/lag for unit <span class="math inline">\(i\)</span> in period <span class="math inline">\(t\)</span> (e.g., <span class="math inline">\(K_{it} = 1\)</span> in the first exposed period).</p>
-<p>See <a href="https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf">Borusyak and Jaravel (2018)</a> and <a href="https://doi.org/10.1093/restud/rdae007">Borusyak et al.&nbsp;(2024)</a>.</p>
+<p>See <a href="https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf">Borusyak and Jaravel (2018)</a> and <a href="https://doi.org/10.1093/restud/rdae007">Borusyak et al.&nbsp;(2024)</a>. Captures time-on-treatment heterogeneity.</p>
 </section>
-<section id="interaction-weighted-estimator" class="slide level2">
-<h2>Interaction-weighted estimator</h2>
-<p>Group units by adoption timing (<span class="math inline">\(G_i\)</span>), keep one group out as the “control” (<span class="math inline">\(C\)</span>, ideally never-treated) and fit the dynamic specification with the effect interacted by the timing group:</p>
+<section id="interaction-weighting" class="slide level2">
+<h2>Interaction-Weighting</h2>
+<p>We can account for timing cohort heterogeneity as well by further allowing the effect to vary by adoption timing group (<span class="math inline">\(G_i\)</span>):</p>
 <p><span class="math display">\[
-Y_{it} = \alpha_i + \gamma_t + \sum_{g \neq C} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) +\epsilon_{it}
+Y_{it} = \alpha_i + \gamma_t + \sum_{g \in \mathcal{G}} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
 \]</span></p>
-<p>The overall estimator <span class="math inline">\(\hat{\theta}\)</span> is a weighted average of the <span class="math inline">\(\hat{\delta}_{g,k}\)</span> estimators, with weights by share of population in each timing group.</p>
-<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a>.</p>
+<div class="fragment">
+<p>Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results.</p>
+</div>
 </section>
-<section id="aggregated-non-parametric-identification" class="slide level2">
-<h2>Aggregated Non-Parametric Identification</h2>
-<p>Estimate <span class="math inline">\(\widehat{ATT}_{g,t}\)</span> for each timing group <span class="math inline">\(g\)</span> and period <span class="math inline">\(t\)</span> using a non-parametric scheme: suggested approaches are IPW, OR, and DR.</p>
-<p>Summarize to an overall average effect:</p>
-<p><span class="math display">\[
-\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t},
-\]</span></p>
-<p>weighted by specified weights <span class="math inline">\(w_{g,t}\)</span>.</p>
-<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">Callaway and Sant’Anna (2021)</a>.</p>
+<section id="restricting-controls" class="slide level2">
+<h2>Restricting Controls</h2>
+<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a> use the interaction-weighting approach with a clean “control” <span class="math inline">\(C\)</span> that is either never-treated or last-treated.</p>
+<p>This avoids forbidden comparisons.</p>
+<p>Their regression approach then implicitly weights by population share in each timing group.</p>
 </section>
-<section id="first-difference-switching-effect" class="slide level2">
-<h2>First-Difference Switching Effect</h2>
-<p>For each time period <span class="math inline">\(t\)</span> with at least one unit untreated at <span class="math inline">\(t-1\)</span> and treated at <span class="math inline">\(t\)</span> and at least one unit untreated at both <span class="math inline">\(t-1\)</span> and <span class="math inline">\(t\)</span>, compute:</p>
+<section id="restricting-periods-first-difference" class="slide level2">
+<h2>Restricting Periods: First-Difference</h2>
+<p>Another approach would only consider one switching effect. For each time period <span class="math inline">\(t\)</span> with at least one unit untreated at <span class="math inline">\(t-1\)</span> and treated at <span class="math inline">\(t\)</span> and at least one unit untreated at both <span class="math inline">\(t-1\)</span> and <span class="math inline">\(t\)</span>, compute:</p>
 <p><span class="math display">\[
 \widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} \sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) - \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
 \]</span></p>
 <p>Average these across all time periods <span class="math inline">\(t\)</span>, weighted by number of units or individuals.</p>
 <p>See <a href="https://doi.org/10.1257/aer.20181169">de Chaisemartin and d’Haultfoeuille (2020)</a> and <a href="https://doi.org/10.1093/ectj/utac017">de Chaisemartin and d’Haultfoeuille (2023)</a>.</p>
 </section>
-<section id="x2-building-blocks" class="slide level2">
-<h2>2x2 Building Blocks</h2>
+<section id="restricting-periods-last-pre-treated" class="slide level2">
+<h2>Restricting Periods: Last Pre-Treated</h2>
+<p><a href="https://doi.org/10.1016/j.jeconom.2020.12.001">Callaway and Sant’Anna (2021)</a> propose to estimate <span class="math inline">\(\widehat{ATT}_{g,t}\)</span> for each timing group <span class="math inline">\(g\)</span> and period <span class="math inline">\(t\)</span> using a non-parametric scheme compared to the last pre-treatment period: suggested approaches are IPW, OR, and DR.</p>
+<p>Then summarize to an overall average effect weighted by <span class="math inline">\(w_{g,t}\)</span>:</p>
+<p><span class="math display">\[
+\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t}.
+\]</span></p>
+</section>
+<section id="generalized-2x2-building-blocks" class="slide level2">
+<h2>Generalized 2x2 Building Blocks</h2>
 <p>More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand.</p>
 <p><span class="math display">\[
 \hat{\theta} = \sum_{i,i',t,t'} \left[ \left( Y_{i,t'} - Y_{i,t} \right) - \left( Y_{i',t'} - Y_{i',t} \right) \right]

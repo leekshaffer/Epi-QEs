@@ -188,7 +188,7 @@ ggplot(data=bacon, mapping=aes(x=estimate,y=weight,shape=type,color=type)) +
 
 The decomposition indicates that the vast majority of the weight is on Treated vs Untreated comparisons (because of the large number of untreated units). One particular observation has a large negative estimate driving the overall estimate.
 
-## Dynamic Specification and IW Estimator
+## Dynamic Specification and Alternative Estimators
 
 The `event_study` function in the `did2s` package implements many proposed DID/staggered adoption methods. These can be chosen using the `estimator` option, or all can be fit by setting `estimator="all"`.
 
@@ -233,8 +233,8 @@ plot_event_study(ES %>%
 ```
 
 ```{r}
-## Plot the results for just the IW estimator:
-#| fig-cap: "Event-study results using the IW Estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+## Plot the results for just the Sun and Abraham estimator:
+#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Sun and Abraham (2020)"),
@@ -243,7 +243,7 @@ plot_event_study(ES %>%
 
 ```{r}
 ## Plot the results for just the Callaway abnd Sant'Anna estimator:
-#| fig-cap: "Event-study results using the IW Estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Callaway and Sant'Anna (2020)"),
@@ -318,7 +318,7 @@ ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
   theme_bw()
 ```
 
-If you install the `DIDmultiplegtDYN` package, a faster implementation of standard errors and more standard interface is available through the `did_multiplegtDYN` function. Note that this package requires Java and at least R 4.3.3, and may cause errors in other settings.
+If you install the `DIDmultiplegtDYN` package, a faster implementation of standard errors and more standard interface is available through the `did_multiplegtDYN` function. Note that this package requires Java and at least R 4.3.3, and may cause errors in other settings. It also limits the pre-treatment periods that can be considered and changes exactly how they are fit, leading to differences from the above implementation.
 
 ```{r}
 ## Run the above analysis with the DIDmultiplegtDYN package instead:

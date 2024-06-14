@@ -72,11 +72,15 @@ What might cause heterogeneity in the effect of a state employee COVID-19 vaccin
 
 ![Goodman-Bacon (2021), Figure 1.](images/Adv_DID/Goodman-Bacon%20Fig1.png){fig-alt="Line plot (schematic) of outcomes over time for two units treated at different times with different responses to intervention and one untreated unit." fig-align="center"}
 
+## Time-Varying Effects
+
+![Goodman-Bacon (2021), Figure 3.](images/Adv_DID/Goodman-Bacon%20Fig3.png){fig-alt="A line plot where two lines start coinciding in the first period, diverge in the second period as one grows faster than the other, and then become parallel in the third period." fig-align="center"}
+
 ## Goodman-Bacon Decomposition
 
 The TWFE model estimates a weighted average of all 2x2 comparisons.
 
-![Goodman-Bacon (2021), Figure 6.](images/Adv_DID/Goodman-Bacon%20Fig6.png){fig-alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2."}
+![Goodman-Bacon (2021), Figure 6.](images/Adv_DID/Goodman-Bacon%20Fig6.png){fig-alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2." fig-align="center"}
 
 ## Goodman-Bacon Decomposition
 
@@ -85,6 +89,22 @@ This is equivalent to a weighted average of all unit-period-specific treatment e
 ![Goodman-Bacon (2021), Figure 7.](images/Adv_DID/Goodman-Bacon%20Fig7.png){fig-alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." fig-align="center"}
 
 # Proposed Solutions
+
+## Group-Time ATT
+
+Let
+
+$$
+ATT(a,t) = E[Y_{it}(a) - Y_{it}(0)],
+$$
+
+the group-time ATT in period $t$ for a unit first treated in period $a$, compared to if it had never been treated (or not yet treated by period $t$).
+
+. . .
+
+Many solutions boil down to considering which group-time ATTs should be included in the estimand, how they differ, and how to weight them.
+
+TWFE assumes \$ATT(a,t) = \theta\$ for all $a \le t$.
 
 ## Dynamic Specification
 
@@ -186,4 +206,18 @@ All of these approaches change the precise specification of the estimand as well
 
 ::: callout-important
 It's easy to ignore the fundamentals when using the more advanced methods. Consider the validity of the data, the question being asked, and the feasibility of the effect.
+:::
+
+## Recommendations
+
+::: incremental
+-   Consider data source carefully
+
+-   Think about possible heterogeneities and desired estimand
+
+-   Use graphical displays and diagnostics to assess possible biases
+
+-   Consider multiple estimation methods for robustness
+
+-   Pre-specify, and explore with appropriate caveats
 :::

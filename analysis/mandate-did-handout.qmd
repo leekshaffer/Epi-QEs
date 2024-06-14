@@ -92,7 +92,7 @@ ggplot() +
   theme_bw()
 ```
 
-Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these two states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.
+Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these three states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.
 
 ```{r}
 ## Exclude New Hampshire, Pennsylvania, Washington:
@@ -227,7 +227,8 @@ For easier inspection, particular estimators can be plotted alone, and the lead/
 ## Plot the results for just the dynamic estimator:
 #| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
                  horizon=c(-10,8))
 ```
 
@@ -235,7 +236,17 @@ plot_event_study(ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (202
 ## Plot the results for just the IW estimator:
 #| fig-cap: "Event-study results using the IW Estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Sun and Abraham (2020)"),
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Sun and Abraham (2020)"),
+                 horizon=c(-10,8))
+```
+
+```{r}
+## Plot the results for just the Callaway abnd Sant'Anna estimator:
+#| fig-cap: "Event-study results using the IW Estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Callaway and Sant'Anna (2020)"),
                  horizon=c(-10,8))
 ```
 

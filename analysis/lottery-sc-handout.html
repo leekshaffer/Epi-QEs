@@ -197,12 +197,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>lang_avg,</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">linetype=</span>type,<span class="at">color=</span>type,<span class="at">alpha=</span>type,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">x=</span>last_day,<span class="at">y=</span>full_vax_avg)) <span class="sc">+</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery States (Mean)"</span>,<span class="st">"Non-Lottery States (Mean)"</span>),</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>Ohio_ann, <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">linetype=</span><span class="cn">NULL</span>,<span class="at">color=</span><span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth=</span><span class="fl">1.3</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_alpha_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery State"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery States (Mean)"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery States (Mean)"</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery State"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery States (Mean)"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery States (Mean)"</span>),</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">values=</span><span class="fu">c</span>(<span class="st">"solid"</span>,<span class="st">"dotted"</span>,<span class="st">"dashed"</span>)) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name=</span><span class="cn">NULL</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery State"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery State"</span>),</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Ohio"</span>,<span class="st">"Other Lottery States (Mean)"</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"Non-Lottery States (Mean)"</span>),</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"red"</span>,<span class="st">"forestgreen"</span>,<span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>Ohio_ann, <span class="at">linetype=</span><span class="st">"dotted"</span>) <span class="sc">+</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Day (2021)"</span>, <span class="at">y=</span><span class="st">"Percent Fully Vaccinated"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -672,13 +687,13 @@ Avg Estimated Bias: NA
 Inference type: Conformal inference
 
  Time Estimate 95% CI Lower Bound 95% CI Upper Bound p Value
-   19   -0.355             -2.498              1.788   0.542
-   20   -0.837             -2.980              1.306   0.475
-   21   -0.961             -3.104              1.182   0.494
-   22   -1.257             -3.400              0.887   0.508
-   23   -1.272             -3.415              0.871   0.727
-   24   -1.220             -3.363              0.923   0.714
-   25   -1.266             -3.409              0.878   0.795</code></pre>
+   19   -0.355             -2.498              1.701   0.562
+   20   -0.837             -2.980              1.306   0.506
+   21   -0.961             -3.104              1.182   0.498
+   22   -1.257             -3.400              0.887   0.498
+   23   -1.272             -3.415              0.871   0.729
+   24   -1.220             -3.363              0.923   0.719
+   25   -1.266             -3.409              0.878   0.771</code></pre>
 </div>
 </div>
 <p>We can then compare the original SC fit from the <code>tidysynth</code> package to the <code>augsynth</code> fit with SC on but outcome model and fixed effects off. Note that the <code>augsynth</code> plot calls can take a minute to run.</p>
@@ -1158,7 +1173,7 @@ Call:
 multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
     data = data)
 
-Average ATT Estimate (Std. Error): -0.170  (2.376)
+Average ATT Estimate (Std. Error): -0.170  (2.310)
 
 Global L2 Imbalance: 0.034
 Scaled Global L2 Imbalance: 0.042
@@ -1169,8 +1184,8 @@ Scaled Individual L2 Imbalance: 0.112
 Percent improvement from uniform individual weights: 88.8   
 
  Time Since Treatment   Level   Estimate Std.Error lower_bound upper_bound
-                    0 Average -0.1157730  2.291710   -4.194194    4.634949
-                    1 Average -0.2238981  2.463291   -4.473225    4.867071</code></pre>
+                    0 Average -0.1157730  2.233430   -4.053581    4.497529
+                    1 Average -0.2238981  2.389258   -4.445980    4.858593</code></pre>
 </div>
 </div>
 <p>The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:</p>

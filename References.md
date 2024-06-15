@@ -48,6 +48,8 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 -   Matthay EC, Hagan E, Gottlieb LM, et al. Alternative causal inference methods in population health research: evaluating tradeoffs and triangulating evidence. *SSM - Popul Health* 2020;**10**:100526. <https://doi.org/10.1016/j.ssmph.2019.100526>.
 
+-   Bonander C, Humphreys D, Esposti MD. Synthetic control methods for the evaluation of single-unit interventions in epidemiology: A tutorial. *Am J Epidemiol* 2021;**190**:2700-2711. <https://doi.org/10.1093/aje/kwab211>.
+
 -   Matthay EC, Glymour MM. Causal inference challenges and new directions for epidemiologic research on the health effects of social policies. *Curr Epidemiol Rep* 2022;**9**:22-37. <https://doi.org/10.1007/s40471-022-00288-7>.
 
 -   Nianogo RA, Benmarhina T, O'Neill S. A comparison of quasi-experimental methods with data before and after an intervention: an introduction for epidemiologists and a simulation study. *Int J Epidemiol* 2023;**52**:1522-1533. <https://doi.org/10.1093/ije/dyad032>.

@@ -15,7 +15,7 @@ Difference-in-differences requires some form of parallel trends: similar time tr
 . . .
 
 ::: callout-note
-Synthetic control can accommodate non-parallel trends
+Synthetic control can accommodate non-parallel trends without requiring explicit time trend modeling.
 :::
 
 [![](images/SC/Bouttell2018cite.png){fig-alt="Title for Bouttell et al. (2018)" fig-align="center" width="902"}](http://dx.doi.org/10.1136/jech-2017-210106)
@@ -101,7 +101,11 @@ Find a weighted average of the control units that **best approximates** the pre-
 
 ## Key Requirements
 
-[![](images/SC/Abadie2021cite.png){fig-alt="Title of Abadie (2021)" fig-align="center" width="500" height="150"}](https://doi.org/10.1257/jel.20191450)
+[![](images/SC/Abadie2021cite.png){fig-alt="Title of Abadie (2021)" fig-align="center" width="400" height="180"}](https://doi.org/10.1257/jel.20191450)
+
+[![](images/SC/Bonander2021cite.png){fig-alt="Title for Bonander et al. (2021)" fig-align="center" width="626"}](https://doi.org/10.1093/aje/kwab211)
+
+## Key Requirements
 
 ::: incremental
 -   No anticipation

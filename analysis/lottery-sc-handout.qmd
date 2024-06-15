@@ -98,12 +98,27 @@ lang_avg <- lang_0624 %>% group_by(type,week,last_day) %>%
 ggplot(data=lang_avg,
        mapping=aes(linetype=type,color=type,alpha=type,
                    x=last_day,y=full_vax_avg)) +
-  scale_alpha_manual(name=NULL, breaks=c("Ohio","Other Lottery States (Mean)","Non-Lottery States (Mean)"),
+  geom_line(linewidth=1.3) + theme_bw() +
+  scale_alpha_manual(name=NULL, 
+                     breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                     labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
                      values=c(1,0.8,0.5)) +
-  geom_line() + theme_bw() +
+  scale_linetype_manual(name=NULL,
+                        breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                        labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
+                        values=c("solid","dotted","dashed")) +
+  scale_color_manual(name=NULL,
+                     breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                     labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
+                     values=c("red","forestgreen","blue")) +
   geom_vline(xintercept=Ohio_ann, linetype="dotted") +
-  labs(x="Day (2021)", y="Percent Fully Vaccinated",
-       linetype=NULL,color=NULL)
+  labs(x="Day (2021)", y="Percent Fully Vaccinated")
 ```
 
 ## Discussion Questions
@@ -299,7 +314,7 @@ ggplot(data=by_time_res) +
 
 ## Additional Analysis: Incorporating Covariates
 
-We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average the pre-intervention outcomes into groups by four weeks, except the week immediately prior.
+We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average together every four weeks of pre-intervention outcome data as covariates, but optimize covariate weights on the full pre-treatment trajectory.
 
 ```{r}
 ## Create synthetic control fit with covariates:

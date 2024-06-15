@@ -45,12 +45,27 @@ lang_avg <- lang_0624 %>% group_by(type,week,last_day) %>%
 ggplot(data=lang_avg,
        mapping=aes(linetype=type,color=type,alpha=type,
                    x=last_day,y=full_vax_avg)) +
-  scale_alpha_manual(name=NULL, breaks=c("Ohio","Other Lottery States (Mean)","Non-Lottery States (Mean)"),
+  geom_line(linewidth=1.3) + theme_bw() +
+  scale_alpha_manual(name=NULL, 
+                     breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                     labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
                      values=c(1,0.8,0.5)) +
-  geom_line() + theme_bw() +
+  scale_linetype_manual(name=NULL,
+                        breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                        labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
+                        values=c("solid","dotted","dashed")) +
+  scale_color_manual(name=NULL,
+                     breaks=c("Ohio","Other Lottery State",
+                              "Non-Lottery State"),
+                     labels=c("Ohio","Other Lottery States (Mean)",
+                              "Non-Lottery States (Mean)"),
+                     values=c("red","forestgreen","blue")) +
   geom_vline(xintercept=Ohio_ann, linetype="dotted") +
-  labs(x="Day (2021)", y="Percent Fully Vaccinated",
-       linetype=NULL,color=NULL)
+  labs(x="Day (2021)", y="Percent Fully Vaccinated")
 
 ## Conduct SC analysis for Ohio, excluding other lottery states:
 synth_ohio <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%

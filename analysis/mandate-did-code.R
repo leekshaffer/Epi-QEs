@@ -1,5 +1,3 @@
-## This is the R code and comments only from mandate-did-handout.html.
-
 load(file="../data/mandate.Rda")
 
 ## If you have not installed these packages before,
@@ -138,13 +136,22 @@ plot_event_study(ES)
 ## Plot the results for just the dynamic estimator:
 #| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
                  horizon=c(-10,8))
 
-## Plot the results for just the IW estimator:
-#| fig-cap: "Event-study results using the IW Estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+## Plot the results for just the Sun and Abraham estimator:
+#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
-plot_event_study(ES %>% dplyr::filter(estimator=="Sun and Abraham (2020)"),
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Sun and Abraham (2020)"),
+                 horizon=c(-10,8))
+
+## Plot the results for just the Callaway abnd Sant'Anna estimator:
+#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="Callaway and Sant'Anna (2020)"),
                  horizon=c(-10,8))
 
 ## First, we prepare a data set with a variable with the First_Week of

@@ -1,5 +1,3 @@
-## This is the R code and comments only from zika-did-handout.html.
-
 load(file="../data/zika.Rda")
 
 ## If you have not installed these packages before,
@@ -128,6 +126,19 @@ confint(zika_log_lmer, level=0.95)
 ## Exponentiate estimates and CI to get RR estimates:
 exp(summary(zika_log_lmer)$coefficients["interaction","Estimate"])
 exp(confint(zika_log_lmer, level=0.95))
+
+## Add log-transformed DID estimate to placebo data set:
+zika_plac <- zika_plac %>% mutate(LogEstimate=log(P1/P0)-log(R1/R0))
+
+## Plot two-by-two log-transformed DID estimates for placebo years:
+#| fig-cap: "Plot of two-by-two log-transformed DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"
+#| fig-alt: "A scatter plot with points ranging from around 0 to -0.05 in the 2010 through 2015 years, with a point around -0.09 in 2016."
+ggplot(data=zika_plac) +
+  geom_point(mapping=aes(x=`Treated Year`, y=LogEstimate),
+             size=2) +
+  theme_bw() +
+  labs(x="Treated (Placebo) Year", y="Log-Transformed DID Estimate") +
+  scale_y_continuous(limits=c(-0.25,0.25), breaks=seq(-0.25,0.25,by=.125))
 
 ## # To execute this code into the document, change the previous line to true
 ## ## Fit Poisson GLM:

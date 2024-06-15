@@ -538,11 +538,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><p>How would you interpret these results?</p></li>
 <li><p>Would other specifications (outcomes, scales, etc.) be more convincing or conducive to answering the question?</p></li>
+<li><p>Do the key assumptions for SC seem reasonable here? Why or why not?</p></li>
 </ol>
 </section>
 <section id="additional-analysis-incorporating-covariates" class="level2">
 <h2 class="anchored" data-anchor-id="additional-analysis-incorporating-covariates">Additional Analysis: Incorporating Covariates</h2>
-<p>We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average the pre-intervention outcomes into groups by four weeks, except the week immediately prior.</p>
+<p>We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average together every four weeks of pre-intervention outcome data as covariates, but optimize covariate weights on the full pre-treatment trajectory.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create synthetic control fit with covariates:</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(type <span class="sc">!=</span> <span class="st">"Other Lottery State"</span>) <span class="sc">%&gt;%</span></span>
@@ -687,13 +688,13 @@ Avg Estimated Bias: NA
 Inference type: Conformal inference
 
  Time Estimate 95% CI Lower Bound 95% CI Upper Bound p Value
-   19   -0.355             -2.498              1.701   0.562
-   20   -0.837             -2.980              1.306   0.506
-   21   -0.961             -3.104              1.182   0.498
+   19   -0.355             -2.498              1.788   0.559
+   20   -0.837             -2.980              1.306   0.513
+   21   -0.961             -3.104              1.182   0.482
    22   -1.257             -3.400              0.887   0.498
-   23   -1.272             -3.415              0.871   0.729
-   24   -1.220             -3.363              0.923   0.719
-   25   -1.266             -3.409              0.878   0.771</code></pre>
+   23   -1.272             -3.415              0.871   0.709
+   24   -1.220             -3.363              0.923   0.728
+   25   -1.266             -3.409              0.878   0.798</code></pre>
 </div>
 </div>
 <p>We can then compare the original SC fit from the <code>tidysynth</code> package to the <code>augsynth</code> fit with SC on but outcome model and fixed effects off. Note that the <code>augsynth</code> plot calls can take a minute to run.</p>
@@ -1141,6 +1142,12 @@ Average ATT Estimate: -1.739</code></pre>
 <p>Again, different assumptions are being made here, and should be carefully considered. This appears more similar to the initial SC fit, however it has a larger effect estimate.</p>
 </section>
 </section>
+<section id="discussion-questions-2" class="level2">
+<h2 class="anchored" data-anchor-id="discussion-questions-2">Discussion Questions</h2>
+<ol type="1">
+<li>Are the trade-offs of ASCM worthwhile for these other states?</li>
+</ol>
+</section>
 <section id="staggered-adoption" class="level2">
 <h2 class="anchored" data-anchor-id="staggered-adoption">Staggered Adoption</h2>
 <p>Finally, we can consider the multi-period, multi-unit staggered adoption case with the augmented synthetic control. We first set up the full data set by adding a treatment indicator variable, and then fit it using <code>augsynth</code>. Note that this defaults to including two-way fixed effects, balancing all pre-intervention periods, and partially pools the average and individual SC fits using the heuristic given by <a href="https://doi.org/10.1111/rssb.12448">Ben-Michael et al.&nbsp;(2022)</a>.</p>
@@ -1173,7 +1180,7 @@ Call:
 multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
     data = data)
 
-Average ATT Estimate (Std. Error): -0.170  (2.310)
+Average ATT Estimate (Std. Error): -0.170  (2.446)
 
 Global L2 Imbalance: 0.034
 Scaled Global L2 Imbalance: 0.042
@@ -1184,8 +1191,8 @@ Scaled Individual L2 Imbalance: 0.112
 Percent improvement from uniform individual weights: 88.8   
 
  Time Since Treatment   Level   Estimate Std.Error lower_bound upper_bound
-                    0 Average -0.1157730  2.233430   -4.053581    4.497529
-                    1 Average -0.2238981  2.389258   -4.445980    4.858593</code></pre>
+                    0 Average -0.1157730  2.358658   -4.054095    5.016333
+                    1 Average -0.2238981  2.537288   -4.296212    5.289427</code></pre>
 </div>
 </div>
 <p>The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:</p>

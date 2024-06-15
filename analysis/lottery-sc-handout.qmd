@@ -312,6 +312,8 @@ ggplot(data=by_time_res) +
 
 2.  Would other specifications (outcomes, scales, etc.) be more convincing or conducive to answering the question?
 
+3.  Do the key assumptions for SC seem reasonable here? Why or why not?
+
 ## Additional Analysis: Incorporating Covariates
 
 We can try another specification that incorporates some covariates other than the pre-intervention outcome itself. We will incorporate total COVID-19 cases and deaths and average daily vaccinations (per million population) in the week prior to the announcement, as well as the average weekly case and death rates in the prior month. To avoid overfitting, we will average together every four weeks of pre-intervention outcome data as covariates, but optimize covariate weights on the full pre-treatment trajectory.
@@ -681,6 +683,10 @@ plot(ME_gsynth,
 ```
 
 Again, different assumptions are being made here, and should be carefully considered. This appears more similar to the initial SC fit, however it has a larger effect estimate.
+
+## Discussion Questions
+
+1.  Are the trade-offs of ASCM worthwhile for these other states?
 
 ## Staggered Adoption
 

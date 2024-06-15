@@ -117,11 +117,11 @@ editor: visual
 :::
 
 ::: {.fragment .fade-in-then-semi-out}
-[11:30--12:00]{style="color: purple"} Advanced SC methods
+[11:30--11:55]{style="color: purple"} Advanced SC methods
 :::
 
 ::: {.fragment .fade-in-then-semi-out}
-[12:00--12:20]{style="color: purple"} Analysis 4: Advanced SC of multiple states' COVID-19 vaccine lotteries
+[11:55--12:20]{style="color: purple"} Analysis 4: Advanced SC of multiple states' COVID-19 vaccine lotteries
 :::
 
 ::: {.fragment .fade-in-then-semi-out}

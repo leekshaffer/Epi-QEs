@@ -343,7 +343,7 @@ This may not be generalizable to other units, including the untreated units in t
 
 -   Generally conducted with limited, carefully-selected units: low bias but high variance
 
-. .
+. . .
 
 ::: callout-note
 ## Examples
@@ -355,4 +355,4 @@ This may not be generalizable to other units, including the untreated units in t
 -   Incorporating more recent time periods
 :::
 
-.
+## Questions

@@ -104,11 +104,11 @@ Find a weighted average of the control units that **best approximates** the pre-
 [![](images/SC/Abadie2021cite.png){fig-alt="Title of Abadie (2021)" fig-align="center" width="500" height="150"}](https://doi.org/10.1257/jel.20191450)
 
 ::: incremental
--   Effect size larger than routine fluctuations
 -   No anticipation
 -   No spillover
 -   Suitable control units: "stable weights"
 -   Convex hull: non-extreme treated unit(s)
+-   Effect size larger than routine fluctuations
 -   Reasonable time horizon
 :::
 
@@ -170,6 +170,10 @@ The estimand is again the **average treatment effect on the treated (ATT)**: the
 
 The choice of time and scale for the comparison can be made by the investigator based on subject-matter knowledge.
 
+## Gap Plot
+
+[![Abadie et al. (2010), Figure 3](images/SC/Abadie2010Fig3.png){fig-align="center"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
+
 # Robustness and Inference
 
 ## Specification Tests
@@ -186,6 +190,10 @@ To test robustness of results, can change:
 
 -   Covariates used
 
+## Assessing Fit
+
+[![Abadie et al. (2010), Table 1](images/SC/Abadie2010Tbl1.png){fig-align="center"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
+
 ## Placebo Test In-Space
 
 Conduct the SC analysis with the **same specifications** for each control unit, excluding the treated unit. This gives a **null distribution of estimates**.
@@ -195,6 +203,10 @@ Can exclude those with much higher pre-intervention MSPEs.
 ## Placebo Test In-Space
 
 [![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="662"}](https://doi.org/10.1198/jasa.2009.ap08746)
+
+## Placebo Test In-Space
+
+[![Abadie et al. (2010), Figure 6](images/SC/Abadie2010Fig6.png)](http://dx.doi.org/10.1198/jasa.2009.ap08746)
 
 ## Placebo Test In-Time
 
@@ -209,3 +221,21 @@ This is related to the cross-validation approach for covariate weight selection,
 In some cases, non-affected outcomes or populations may be available. These can be used as a null control or distribution.
 
 [![](images/SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="center"}](https://doi.org/10.1073/pnas.1612833114)
+
+# Recommendations
+
+## Recommendations
+
+::: incremental
+-   Ensure ATT is appropriate
+
+-   Consider trade-offs: more vs. fewer units, more vs. fewer time periods, etc.
+
+-   Pre-specify analyses: control units, covariates, years, placebo tests, MSPE restrictions, etc.
+
+-   Run robustness checks wherever possible
+
+-   Interpret results in context
+:::
+
+## Questions?

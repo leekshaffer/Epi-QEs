@@ -342,9 +342,12 @@ Lee Kennedy-Shaffer, PhD
 <section id="key-ideas" class="slide level2">
 <h2>Key Ideas</h2>
 <div>
-<p>Allow for staggered adoption</p>
-<p>Account for exposed series outside of the convex hull</p>
-<p>Incorporate control series on different outcomes/scales from exposed series</p>
+<ul>
+<li class="fragment"><p>Allow for staggered adoption</p></li>
+<li class="fragment"><p>Reduce interpolation</p></li>
+<li class="fragment"><p>Account for exposed series outside of the convex hull</p></li>
+<li class="fragment"><p>Incorporate control series on different outcomes/scales from treated series</p></li>
+</ul>
 </div>
 </section>
 <section id="motivating-example" class="slide level2">
@@ -357,23 +360,36 @@ Lee Kennedy-Shaffer, PhD
 <h1>Methods</h1>
 
 </section>
+<section id="general-penalized-scm" class="slide level2">
+<h2>General: Penalized SCM</h2>
+<p>The standard SCM had weights <span class="math inline">\(w_i\)</span> that minimized:</p>
+<p><span class="math display">\[
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
+\]</span></p>
+<p>for covariates <span class="math inline">\(k=1,\ldots,K\)</span>.</p>
+<div class="fragment">
+<p>This can be extended with a penalty term <span class="math inline">\(\xi\)</span> on a function <span class="math inline">\(f(w_i)\)</span> to minimize:</p>
+<p><span class="math display">\[
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2 + \xi \sum_{i=1}^n f(w_i).
+\]</span></p>
+<p>The penalty can reduce interpolation (force closer matches to specific units) or reduce discrepancy from an outcome model.</p>
+</div>
+</section>
 <section id="de-meaned-scm" class="slide level2">
 <h2>De-Meaned SCM</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-left">
+<div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="http://www.nber.org/papers/w22791"><img data-src="images/Adv_SC/Doudchenko2016cite.png" class="quarto-figure quarto-figure-left" alt="Title for Doudchenko and Imbens (2016)" width="1914"></a></p>
+<p><a href="http://www.nber.org/papers/w22791"><img data-src="images/Adv_SC/Doudchenko2016cite.png" class="quarto-figure quarto-figure-center" alt="Title for Doudchenko and Imbens (2016)" width="1914"></a></p>
 </figure>
 </div>
-</div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-right">
+<div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="https://doi.org/10.3982/QE1596"><img data-src="images/Adv_SC/Ferman2021cite.png" class="quarto-figure quarto-figure-right" alt="Title for Ferman and Pinto (2021)" width="817"></a></p>
+<p><a href="https://doi.org/10.3982/QE1596"><img data-src="images/Adv_SC/Ferman2021cite.png" class="quarto-figure quarto-figure-center" alt="Title for Ferman and Pinto (2021)" width="817"></a></p>
 </figure>
 </div>
-</div>
-</div>
+</section>
+<section id="de-meaned-scm-1" class="slide level2">
+<h2>De-Meaned SCM</h2>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -384,6 +400,23 @@ Lee Kennedy-Shaffer, PhD
 </div>
 <div class="callout-content">
 <p>De-mean the pre-treatment data, fit SC to the de-meaned observations, and apply the weights to both the post-treatment time trends and levels.</p>
+<p>Incorporates idea of diff-in-diff of focusing on matching trends instead of levels.</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Warning</strong></p>
+</div>
+<div class="callout-content">
+<p>Matching pre-treatment trends may not lead to stable weights going forward.</p>
+<p>Different interpretation of weights.</p>
+</div>
 </div>
 </div>
 </div>
@@ -472,18 +505,25 @@ Lee Kennedy-Shaffer, PhD
 <h2>SDID and ASCM: Summary</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="https://doi.org/10.1177/09622802231224638"><img data-src="images/Adv_SC/Krajewski2024cite.png" class="quarto-figure quarto-figure-center" alt="Title for Krajewski and Hudgens (2024)" width="399"></a></p>
+<p><a href="https://doi.org/10.1177/09622802231224638"><img data-src="images/Adv_SC/Krajewski2024cite.png" class="quarto-figure quarto-figure-center" alt="Title for Krajewski and Hudgens (2024)" width="798"></a></p>
 </figure>
 </div>
-<div class="columns">
-<div class="column" style="width:50%;">
+<div class="fragment">
 <p>Advantages:</p>
 <ul>
 <li>Allows intercept shift</li>
 <li>Allow negative weights with sparsity</li>
 <li>Improved performance in settings with poor SC fit</li>
 </ul>
-</div><div class="column" style="width:50%;">
+</div>
+</section>
+<section id="sdid-and-ascm-summary-1" class="slide level2">
+<h2>SDID and ASCM: Summary</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://doi.org/10.1177/09622802231224638"><img data-src="images/Adv_SC/Krajewski2024cite.png" class="quarto-figure quarto-figure-center" alt="Title for Krajewski and Hudgens (2024)" width="798"></a></p>
+</figure>
+</div>
 <p>Disadvantages:</p>
 <ul>
 <li>Allows extrapolation</li>
@@ -491,8 +531,6 @@ Lee Kennedy-Shaffer, PhD
 <li>More user degrees of freedom</li>
 <li>Challenging inference</li>
 </ul>
-</div>
-</div>
 </section>
 <section id="generalized-synthetic-control" class="slide level2">
 <h2>Generalized Synthetic Control</h2>
@@ -507,7 +545,7 @@ Lee Kennedy-Shaffer, PhD
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>Idea</strong></p>
+<p><strong>Idea: “Interactive Fixed Effects”</strong></p>
 </div>
 <div class="callout-content">
 <p>Use control unit data to estimate unit fixed effects and time-varying coefficients. Use these coefficients to estimate treated unit fixed effects and then counterfactuals.</p>
@@ -550,22 +588,24 @@ Lee Kennedy-Shaffer, PhD
 <h2>BSTS: Summary</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
+<ul>
+<li><p>Allows extrapolation: weights don’t sum to 1</p></li>
+<li><p>Incorporates prior information</p></li>
+<li><p>Explicit time series modeling</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
 <div class="quarto-figure quarto-figure-left">
 <figure>
-<p><a href="https://doi.org/10.1073/pnas.1612833114"><img data-src="images/Adv_SC/Bruhn2017cite.png" class="quarto-figure quarto-figure-left" alt="Title for Bruhn et al. (2017)" width="914"></a></p>
+<p><a href="https://doi.org/10.1073/pnas.1612833114"><img data-src="images/Adv_SC/Bruhn2017cite.png" class="quarto-figure quarto-figure-left" alt="Title for Bruhn et al. (2017)" width="1212"></a></p>
 </figure>
 </div>
-</div><div class="column" style="width:50%;">
 <div class="quarto-figure quarto-figure-right">
 <figure>
-<p><a href="https://doi.org/10.1093/aje/kwab266"><img data-src="images/Adv_SC/Prunas2021cite.png" class="quarto-figure quarto-figure-right" alt="Title for Prunas et al. (2021)" width="781"></a></p>
+<p><a href="https://doi.org/10.1093/aje/kwab266"><img data-src="images/Adv_SC/Prunas2021cite.png" class="quarto-figure quarto-figure-right" alt="Title for Prunas et al. (2021)" width="1042"></a></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Allows extrapolation: weights don’t sum to 1</p>
-<p>Incorporates prior information</p>
-<p>Explicit time series modeling</p>
 </section></section>
 <section>
 <section id="tradeoffs-and-interpretations" class="title-slide slide level1 center">
@@ -574,18 +614,25 @@ Lee Kennedy-Shaffer, PhD
 </section>
 <section id="validity-generalizability-and-assumptions" class="slide level2">
 <h2>Validity, Generalizability, and Assumptions</h2>
+<div>
 <ul>
-<li><p>Pooling across units enables better fit, but loses unit-specific information</p></li>
-<li><p>Extrapolation allows better pre-treatment fit, but may over-fit or rely on additional assumptions</p></li>
-<li><p>Advanced methods allow use of more control series: reduces variance but may introduce bias</p></li>
+<li class="fragment"><p>Pooling across units enables better fit, but loses unit-specific information</p></li>
+<li class="fragment"><p>Extrapolation allows better pre-treatment fit, but may over-fit or rely on additional assumptions</p></li>
+<li class="fragment"><p>Reducing interpolation is crucial for some settings (non-linear outcomes)</p></li>
+<li class="fragment"><p>Advanced methods allow use of more control series: reduces variance but may introduce bias</p></li>
 </ul>
+</div>
 </section>
 <section id="interpretability-of-weights" class="slide level2">
 <h2>Interpretability of Weights</h2>
 <ul>
 <li><p>A key benefit of SC is its interpretability</p></li>
 <li><p>This is somewhat lost in more advanced approaches</p></li>
+<li><p>The interpretability is tied to justifying the assumptions as well</p></li>
 </ul>
+</section>
+<section id="questions" class="slide level2">
+<h2>Questions?</h2>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 

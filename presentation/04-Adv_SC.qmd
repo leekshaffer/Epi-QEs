@@ -9,11 +9,13 @@ editor: visual
 ## Key Ideas
 
 ::: incremental
-Allow for staggered adoption
+-   Allow for staggered adoption
 
-Account for exposed series outside of the convex hull
+-   Reduce interpolation
 
-Incorporate control series on different outcomes/scales from exposed series
+-   Account for exposed series outside of the convex hull
+
+-   Incorporate control series on different outcomes/scales from treated series
 :::
 
 ## Motivating Example
@@ -52,22 +54,48 @@ ggplot(data=lang_0624,
 
 # Methods
 
+## General: Penalized SCM
+
+The standard SCM had weights $w_i$ that minimized:
+
+$$
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
+$$
+
+for covariates $k=1,\ldots,K$.
+
+. . .
+
+This can be extended with a penalty term $\xi$ on a function $f(w_i)$ to minimize:
+
+$$
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2 + \xi \sum_{i=1}^n f(w_i).
+$$
+
+The penalty can reduce interpolation (force closer matches to specific units) or reduce discrepancy from an outcome model.
+
 ## De-Meaned SCM
 
-::: columns
-::: {.column width="50%"}
-[![](images/Adv_SC/Doudchenko2016cite.png){fig-alt="Title for Doudchenko and Imbens (2016)" fig-align="left" width="1914"}](http://www.nber.org/papers/w22791)
-:::
+[![](images/Adv_SC/Doudchenko2016cite.png){fig-alt="Title for Doudchenko and Imbens (2016)" fig-align="center" width="1914"}](http://www.nber.org/papers/w22791)
 
-::: {.column width="50%"}
-[![](images/Adv_SC/Ferman2021cite.png){fig-alt="Title for Ferman and Pinto (2021)" fig-align="right" width="817"}](https://doi.org/10.3982/QE1596)
-:::
-:::
+[![](images/Adv_SC/Ferman2021cite.png){fig-alt="Title for Ferman and Pinto (2021)" fig-align="center" width="817"}](https://doi.org/10.3982/QE1596)
+
+## De-Meaned SCM
 
 ::: callout-note
 ## Idea
 
 De-mean the pre-treatment data, fit SC to the de-meaned observations, and apply the weights to both the post-treatment time trends and levels.
+
+Incorporates idea of diff-in-diff of focusing on matching trends instead of levels.
+:::
+
+. . .
+
+::: callout-warning
+Matching pre-treatment trends may not lead to stable weights going forward.
+
+Different interpretation of weights.
 :::
 
 ## Synthetic DID
@@ -125,33 +153,33 @@ Options:
 
 ## SDID and ASCM: Summary
 
-[![](images/Adv_SC/Krajewski2024cite.png){fig-alt="Title for Krajewski and Hudgens (2024)" fig-align="center" width="399"}](https://doi.org/10.1177/09622802231224638)
+[![](images/Adv_SC/Krajewski2024cite.png){fig-alt="Title for Krajewski and Hudgens (2024)" fig-align="center" width="798"}](https://doi.org/10.1177/09622802231224638)
 
-::: columns
-::: {.column width="50%"}
+. . .
+
 Advantages:
 
 -   Allows intercept shift
 -   Allow negative weights with sparsity
 -   Improved performance in settings with poor SC fit
-:::
 
-::: {.column width="50%"}
+## SDID and ASCM: Summary
+
+[![](images/Adv_SC/Krajewski2024cite.png){fig-alt="Title for Krajewski and Hudgens (2024)" fig-align="center" width="798"}](https://doi.org/10.1177/09622802231224638)
+
 Disadvantages:
 
 -   Allows extrapolation
 -   Loss of interpretation of weights
 -   More user degrees of freedom
 -   Challenging inference
-:::
-:::
 
 ## Generalized Synthetic Control
 
 [![](images/Adv_SC/Xu2017cite.png){fig-alt="Title for Xu (2017)" fig-align="center" width="799"}](https://doi.org/10.1017/pan.2016.2)
 
 ::: callout-note
-## Idea
+## Idea: "Interactive Fixed Effects"
 
 Use control unit data to estimate unit fixed effects and time-varying coefficients. Use these coefficients to estimate treated unit fixed effects and then counterfactuals.
 :::
@@ -180,32 +208,40 @@ Combine three information sources in state-time model:
 
 ::: columns
 ::: {.column width="50%"}
-[![](images/Adv_SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="left" width="914"}](https://doi.org/10.1073/pnas.1612833114)
+-   Allows extrapolation: weights don't sum to 1
+
+-   Incorporates prior information
+
+-   Explicit time series modeling
 :::
 
 ::: {.column width="50%"}
-[![](images/Adv_SC/Prunas2021cite.png){fig-alt="Title for Prunas et al. (2021)" fig-align="right" width="781"}](https://doi.org/10.1093/aje/kwab266)
+[![](images/Adv_SC/Bruhn2017cite.png){fig-alt="Title for Bruhn et al. (2017)" fig-align="left" width="1212"}](https://doi.org/10.1073/pnas.1612833114)
+
+[![](images/Adv_SC/Prunas2021cite.png){fig-alt="Title for Prunas et al. (2021)" fig-align="right" width="1042"}](https://doi.org/10.1093/aje/kwab266)
 :::
 :::
-
-Allows extrapolation: weights don't sum to 1
-
-Incorporates prior information
-
-Explicit time series modeling
 
 # Tradeoffs and Interpretations
 
 ## Validity, Generalizability, and Assumptions
 
+::: incremental
 -   Pooling across units enables better fit, but loses unit-specific information
 
 -   Extrapolation allows better pre-treatment fit, but may over-fit or rely on additional assumptions
 
+-   Reducing interpolation is crucial for some settings (non-linear outcomes)
+
 -   Advanced methods allow use of more control series: reduces variance but may introduce bias
+:::
 
 ## Interpretability of Weights
 
 -   A key benefit of SC is its interpretability
 
 -   This is somewhat lost in more advanced approaches
+
+-   The interpretability is tied to justifying the assumptions as well
+
+## Questions?

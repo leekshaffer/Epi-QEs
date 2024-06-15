@@ -143,7 +143,7 @@ where $T-1$ is the last period for which the treated unit is pre-intervention.
 Covariates can be incorporated in the weight minimization. For covariates (including pre-treatment outcomes) labelled $k=1,\ldots,K$, choose a weight vector $w$ that minimizes:
 
 $$
-\sum_{k=1}^K v_k (X_{1k} - X_{0k} w)^2,
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
 $$
 
 where $v_k$ are weights on the importance of each covariate, which can themselves be chosen to minimize the pre-intervention difference or by cross-validation on a split sample of pre-intervention times.
@@ -212,6 +212,19 @@ Can exclude those with much higher pre-intervention MSPEs.
 
 [![Abadie et al. (2010), Figure 6](images/SC/Abadie2010Fig6.png)](http://dx.doi.org/10.1198/jasa.2009.ap08746)
 
+## Placebo Test Estimators
+
+Visual inspection of the observed result compared to the null distribution can follow. Or a specific estimator can be used to conduct a hypothesis test.
+
+. . .
+
+Common choices are:
+
+-   First-period effect
+-   Average effect over all included post-treatment periods
+-   Post-treatment root mean square prediction error (RMSPE)
+-   Post-treatment RMSPE/Pre-treatment RMSPE
+
 ## Placebo Test In-Time
 
 Can also run the analysis on dummy intervention time points.
@@ -233,7 +246,7 @@ In some cases, non-affected outcomes or populations may be available. These can 
 ::: incremental
 -   Ensure ATT is appropriate
 
--   Consider trade-offs: more vs. fewer units, more vs. fewer time periods, etc.
+-   Consider trade-offs: more vs. fewer units, more vs. fewer time periods, interpolation vs. extrapolation, etc.
 
 -   Pre-specify analyses: control units, covariates, years, placebo tests, MSPE restrictions, etc.
 

@@ -540,7 +540,7 @@ Lee Kennedy-Shaffer, PhD
 <h2>Incorporating Covariates</h2>
 <p>Covariates can be incorporated in the weight minimization. For covariates (including pre-treatment outcomes) labelled <span class="math inline">\(k=1,\ldots,K\)</span>, choose a weight vector <span class="math inline">\(w\)</span> that minimizes:</p>
 <p><span class="math display">\[
-\sum_{k=1}^K v_k (X_{1k} - X_{0k} w)^2,
+\sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
 \]</span></p>
 <p>where <span class="math inline">\(v_k\)</span> are weights on the importance of each covariate, which can themselves be chosen to minimize the pre-intervention difference or by cross-validation on a split sample of pre-intervention times.</p>
 </section>
@@ -655,6 +655,19 @@ Lee Kennedy-Shaffer, PhD
 </figure>
 </div>
 </section>
+<section id="placebo-test-estimators" class="slide level2">
+<h2>Placebo Test Estimators</h2>
+<p>Visual inspection of the observed result compared to the null distribution can follow. Or a specific estimator can be used to conduct a hypothesis test.</p>
+<div class="fragment">
+<p>Common choices are:</p>
+<ul>
+<li>First-period effect</li>
+<li>Average effect over all included post-treatment periods</li>
+<li>Post-treatment root mean square prediction error (RMSPE)</li>
+<li>Post-treatment RMSPE/Pre-treatment RMSPE</li>
+</ul>
+</div>
+</section>
 <section id="placebo-test-in-time" class="slide level2">
 <h2>Placebo Test In-Time</h2>
 <p>Can also run the analysis on dummy intervention time points.</p>
@@ -691,7 +704,7 @@ Lee Kennedy-Shaffer, PhD
 <div>
 <ul>
 <li class="fragment"><p>Ensure ATT is appropriate</p></li>
-<li class="fragment"><p>Consider trade-offs: more vs.&nbsp;fewer units, more vs.&nbsp;fewer time periods, etc.</p></li>
+<li class="fragment"><p>Consider trade-offs: more vs.&nbsp;fewer units, more vs.&nbsp;fewer time periods, interpolation vs.&nbsp;extrapolation, etc.</p></li>
 <li class="fragment"><p>Pre-specify analyses: control units, covariates, years, placebo tests, MSPE restrictions, etc.</p></li>
 <li class="fragment"><p>Run robustness checks wherever possible</p></li>
 <li class="fragment"><p>Interpret results in context</p></li>

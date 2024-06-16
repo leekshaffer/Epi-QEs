@@ -119,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><p><code>bacondecomp</code> implements the decomposition from <a href="https://doi.org/10.1016/j.jeconom.2021.03.014">Goodman-Bacon (2021)</a>;</p></li>
 <li><p><code>did2s</code>, described in <a href="https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf">Butts and Gardner (2022)</a>, implements the two-stage DID approach of <a href="https://doi.org/10.48550/arXiv.2207.05943">Gardner (2021)</a>, as well as many other proposed methods including the dynamic specification of <a href="https://doi.org/10.1093/restud/rdae007">Borusyak et al.&nbsp;(2024)</a>, the IW estimator of <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a>, and the aggregated approach of <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">Callaway and Sant’Anna (2021)</a>; and</p></li>
-<li><p><code>DIDmultiplegt</code> implements the first-difference approach of <a href="https://doi.org/10.1257/aer.20181169">de Chaisemartin and d’Haultfoeuille (2020)</a>. Versions of this approach that can handle a wider array of settings, laid out in <a href="https://doi.org/10.1093/ectj/utac017">de Chaisemartin and d’Haultfoeuille (2023)</a> and <a href="https://doi.org/10.1162/rest_a_01414">de Chaisemartin and d’Haultfoeiulle (2024)</a>, along with sped-up analytic standard errors are implement in the <code>DIDmultiplegtDYN</code>, which requires Java for installation.</p></li>
+<li><p><code>DIDmultiplegt</code> implements the first-difference approach of <a href="https://doi.org/10.1257/aer.20181169">de Chaisemartin and d’Haultfoeuille (2020)</a>. Versions of this approach that can handle a wider array of settings, laid out in <a href="https://doi.org/10.1093/ectj/utac017">de Chaisemartin and d’Haultfoeuille (2023)</a> and <a href="https://doi.org/10.1162/rest_a_01414">de Chaisemartin and d’Haultfoeiulle (2024)</a>, along with sped-up analytic standard errors are implemented in the <code>DIDmultiplegtDYN</code>, which requires Java for installation.</p></li>
 </ol>
 <p>We now load the required libraries.</p>
 <div class="cell">
@@ -142,11 +142,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot time series of mandates themselves:</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>Vax_weekly, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date,<span class="at">y=</span>State, <span class="at">fill=</span>mandate)) <span class="sc">+</span> <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"4 weeks"</span>, <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-06-05"</span>),<span class="fu">as.Date</span>(<span class="st">"2022-03-05"</span>)),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill=</span><span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>Vax_weekly, </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date,<span class="at">y=</span>State, <span class="at">fill=</span>mandate)) <span class="sc">+</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"4 weeks"</span>, <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-06-05"</span>),<span class="fu">as.Date</span>(<span class="st">"2022-03-05"</span>)),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill=</span><span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 4250 rows containing missing values or values outside the scale range
 (`geom_tile()`).</code></pre>
@@ -171,22 +173,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, June 2021–February 2022"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with lines for each state for dates from June 2021 to February 2022, and first-dose percentages generally increasing from a range around 45–80 at the beginning to a range around 70–90 at the end."</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> mandate_states)),</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State),</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">color=</span><span class="st">"grey50"</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(State <span class="sc">%in%</span> mandate_states),</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color=</span>mandate),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">linetype=</span><span class="st">"solid"</span>) <span class="sc">+</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name=</span><span class="st">"Mandate"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">breaks=</span><span class="fu">c</span>(<span class="cn">TRUE</span>,<span class="cn">FALSE</span>),</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"grey50"</span>),</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Post-Mandate"</span>,<span class="st">"Pre-/No Mandate"</span>)) <span class="sc">+</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"First-Dose Percentage"</span>,<span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"6 weeks"</span>, <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-06-05"</span>),<span class="fu">as.Date</span>(<span class="st">"2022-03-05"</span>)),</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> mandate_states)),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">color=</span><span class="st">"grey50"</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(State <span class="sc">%in%</span> mandate_states),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color=</span>mandate),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">linetype=</span><span class="st">"solid"</span>) <span class="sc">+</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name=</span><span class="st">"Mandate"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">c</span>(<span class="cn">TRUE</span>,<span class="cn">FALSE</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"grey50"</span>),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Post-Mandate"</span>,<span class="st">"Pre-/No Mandate"</span>)) <span class="sc">+</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"First-Dose Percentage"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"6 weeks"</span>, </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>               <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-06-05"</span>),<span class="fu">as.Date</span>(<span class="st">"2022-03-05"</span>)),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 2490 rows containing missing values or values outside the scale range
 (`geom_line()`).</code></pre>
@@ -206,9 +212,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g.&nbsp;<a href="https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate">New Hampshire</a>, <a href="https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania">Pennsylvania</a>, and <a href="https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/">Washington</a>. We will exclude these three states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Exclude New Hampshire, Pennsylvania, Washington:</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Vax_adj <span class="ot">&lt;-</span> Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"NH"</span>,<span class="st">"PA"</span>,<span class="st">"WA"</span>)))</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Select weeks for analysis:</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>Yr_Wk_Sel <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"2021_"</span>,(<span class="dv">25</span><span class="sc">:</span><span class="dv">42</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Vax_adj <span class="ot">&lt;-</span> Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"NH"</span>,<span class="st">"PA"</span>,<span class="st">"WA"</span>)))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Select weeks for analysis:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>Yr_Wk_Sel <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"2021_"</span>,(<span class="dv">25</span><span class="sc">:</span><span class="dv">42</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We re-plot on this adjusted group of states and weeks.</p>
 <div class="cell">
@@ -216,22 +223,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> mandate_states), Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State),</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">color=</span><span class="st">"grey50"</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(State <span class="sc">%in%</span> mandate_states, Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color=</span>mandate),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">linetype=</span><span class="st">"solid"</span>) <span class="sc">+</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name=</span><span class="st">"Mandate"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">c</span>(<span class="cn">TRUE</span>,<span class="cn">FALSE</span>),</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"grey50"</span>),</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Post-Mandate"</span>,<span class="st">"Pre-/No Mandate"</span>)) <span class="sc">+</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Full Vaccination Percentage"</span>,<span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"3 weeks"</span>, <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-07-03"</span>),<span class="fu">as.Date</span>(<span class="st">"2021-10-24"</span>)),</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span>(State <span class="sc">%in%</span> mandate_states), </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                            Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">color=</span><span class="st">"grey50"</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(State <span class="sc">%in%</span> mandate_states, </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                            Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>End_Date, <span class="at">y=</span>D1P, <span class="at">group=</span>State,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">color=</span>mandate),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">linetype=</span><span class="st">"solid"</span>) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name=</span><span class="st">"Mandate"</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks=</span><span class="fu">c</span>(<span class="cn">TRUE</span>,<span class="cn">FALSE</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"grey50"</span>),</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"Post-Mandate"</span>,<span class="st">"Pre-/No Mandate"</span>)) <span class="sc">+</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name=</span><span class="st">"Full Vaccination Percentage"</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                     <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>), <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">name=</span><span class="st">"Date"</span>, <span class="at">date_breaks=</span><span class="st">"3 weeks"</span>, <span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits=</span><span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2021-07-03"</span>),<span class="fu">as.Date</span>(<span class="st">"2021-10-24"</span>)),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span><span class="st">"%m/%d/%y"</span>) <span class="sc">+</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 29 rows containing missing values or values outside the scale range
 (`geom_line()`).</code></pre>
@@ -253,7 +265,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="discussion-questions" class="level2">
 <h2 class="anchored" data-anchor-id="discussion-questions">Discussion Questions</h2>
 <ol type="1">
-<li><p>Is one outcome better suited to answering the question of interest than the other?</p></li>
+<li><p>Is one outcome (first-dose vs.&nbsp;full vaccination percentage) better suited to answering the question of interest than the other? Which is more likely to have a noticeable effect?</p></li>
+<li><p>Does parallel trends seem like a reasonable assumption here? What might cause non-parallel trends?</p></li>
+<li><p>Is checking parallel pre-trends a good justification for parallel trends post-intervention here? What might change the relationship between trends over time?</p></li>
 <li><p>What forms of effect heterogeneity may be present in this staggered adoption setting?</p></li>
 </ol>
 </section>
@@ -263,16 +277,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with no covariates:</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>TWFE_D1P <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span>mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Get 95% CI:</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P, <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Get 95% CI:</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P, <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Computing profile confidence intervals ...</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with prior-week as covariate:</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span>D1P_prior<span class="sc">+</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span>mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P_ctrl, <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span>D1P_prior<span class="sc">+</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P_ctrl, </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Computing profile confidence intervals ...</code></pre>
 </div>
@@ -286,10 +304,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Print the formatted table:</span></span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(TWFE_results,</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption=</span><span class="st">"Table of results from TWFE models"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption=</span><span class="st">"Table 1. Results from TWFE models on first-dose percentage."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
-<caption>Table of results from TWFE models</caption>
+<caption>Table 1. Results from TWFE models on first-dose percentage.</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Model</th>
@@ -312,7 +330,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
-<p>The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well giving the changing circumstances of the states involved.</p>
+<p>The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.</p>
 </section>
 <section id="goodman-bacon-decomposition" class="level2">
 <h2 class="anchored" data-anchor-id="goodman-bacon-decomposition">Goodman-Bacon Decomposition</h2>
@@ -320,9 +338,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Conduct the decomposition and print summary:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>bacon <span class="ot">&lt;-</span> <span class="fu">bacon</span>(D1P<span class="sc">~</span>mandate,</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">id_var=</span><span class="st">"State"</span>,</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">time_var=</span><span class="st">"MMWR_week"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                 dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">id_var=</span><span class="st">"State"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">time_var=</span><span class="st">"MMWR_week"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                      type  weight  avg_est
 1 Earlier vs Later Treated 0.14186  0.03461
@@ -402,9 +421,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot decomposition results:</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Goodman-Bacon decomposition plot for TWFE model with no covariates"</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Scatter plot of weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>bacon, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>estimate,<span class="at">y=</span>weight,<span class="at">shape=</span>type,<span class="at">color=</span>type)) <span class="sc">+</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Scatter plot of 2x2 DID weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>bacon, </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>estimate,<span class="at">y=</span>weight,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">shape=</span>type,<span class="at">color=</span>type)) <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"2x2 DID Estimate"</span>, <span class="at">y=</span><span class="st">"Weight"</span>,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape=</span><span class="st">"Comparison Type"</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">color=</span><span class="st">"Comparison Type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -414,26 +438,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The decomposition indicates that the vast majority of the weight is on Treated vs Untreated comparisons (because of the large number of untreated units). One particular observation has a large negative estimate driving the overall estimate.</p>
+<p>We can also get the overall weights associated with each timing group, by taking their total weight when used as a treated group minus their total weight when used as a control group.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get total weight as a treated group:</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Ov_Wt <span class="ot">&lt;-</span> bacon <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(treated) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">PosWeight=</span><span class="fu">sum</span>(weight)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Treatment Time (Week)</span><span class="st">`</span><span class="ot">=</span>treated) <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Add a column with total weight as control group:</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(bacon <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(untreated) <span class="sc">%&gt;%</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">NegWeight=</span><span class="fu">sum</span>(weight)),</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(<span class="st">`</span><span class="at">Treatment Time (Week)</span><span class="st">`</span><span class="sc">==</span>untreated)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Subtract to get overall weight</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Weight=</span>PosWeight<span class="sc">-</span>NegWeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot decomposition results:</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Goodman-Bacon decomposition plot of overall weights on each timing group for TWFE model with no covariates"</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Scatter plot of weight vs. treatment time for each timing group. The values are positive, between 0.05 and 0.20, for all treatment weeks from 31 to 39 (with no points for 34 or 37). The value is around -0.02 for week 42."</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>Ov_Wt, </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treatment Time (Week)</span><span class="st">`</span>,<span class="at">y=</span>Weight)) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="dv">30</span>,<span class="dv">42</span>),<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">30</span>,<span class="dv">42</span>,<span class="at">by=</span><span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="fl">2.5</span>, <span class="at">shape=</span><span class="st">"triangle"</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The final switching group receives a negative overall weight, as it is used as a control group for the earlier-switching groups. Because there are so many control states compared to treated states, however, other timing groups do not get negative total weights. This does not mean that none of their (potentially heterogeneous) effects are given a negative weight in the estimand however.</p>
 </section>
 <section id="dynamic-specification-and-alternative-estimators" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-specification-and-alternative-estimators">Dynamic Specification and Alternative Estimators</h2>
 <p>The <code>event_study</code> function in the <code>did2s</code> package implements many proposed DID/staggered adoption methods. These can be chosen using the <code>estimator</code> option, or all can be fit by setting <code>estimator="all"</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run event_study function with estimator="all":</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>ES <span class="ot">&lt;-</span> <span class="fu">event_study</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                                dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)),</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">yname=</span><span class="st">"SCP"</span>,</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gname=</span><span class="st">"First_Week"</span>,</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tname=</span><span class="st">"MMWR_week"</span>,</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimator=</span><span class="st">"all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run event_study function with estimator="all":</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>ES <span class="ot">&lt;-</span> <span class="fu">event_study</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)),</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">yname=</span><span class="st">"SCP"</span>,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gname=</span><span class="st">"First_Week"</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tname=</span><span class="st">"MMWR_week"</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimator=</span><span class="st">"all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Note these estimators rely on different underlying assumptions. See Table 2 of `https://arxiv.org/abs/2109.05913` for an overview.</code></pre>
 </div>
@@ -485,8 +540,8 @@ var_conservative is less than adjustmentFactor
 Warning in compute_se_Thetahat_beta(beta = beta, Ybar_g_list, A_theta_list, :
 var_conservative is less than adjustmentFactor</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## List all results:</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>ES</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="do">## List all results:</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>ES</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            estimator  term   estimate std.error
                                &lt;char&gt; &lt;num&gt;      &lt;num&gt;     &lt;num&gt;
@@ -502,8 +557,8 @@ var_conservative is less than adjustmentFactor</code></pre>
 167: Borusyak, Jaravel, Spiess (2021)    11 -1.2019869 0.4521723
 168: Borusyak, Jaravel, Spiess (2021)    12  0.6096405 0.4369625</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pick out a specific method:</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>ES <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pick out a specific method:</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>ES <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                           estimator  term    estimate  std.error
                               &lt;char&gt; &lt;num&gt;       &lt;num&gt;      &lt;num&gt;
@@ -539,41 +594,10 @@ var_conservative is less than adjustmentFactor</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of the various estimators:</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the dynamic estimator:</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>),</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Sun and Abraham estimator:</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Sun and Abraham (2020)"</span>),</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of the various estimators:</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -582,12 +606,13 @@ var_conservative is less than adjustmentFactor</code></pre>
 </div>
 </div>
 </div>
+<p>For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Callaway abnd Sant'Anna estimator:</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the dynamic estimator:</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Callaway and Sant'Anna (2020)"</span>),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>),</span>
 <span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -597,34 +622,64 @@ var_conservative is less than adjustmentFactor</code></pre>
 </div>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Sun and Abraham estimator:</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Sun and Abraham (2020)"</span>),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Callaway abnd Sant'Anna estimator:</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Callaway and Sant'Anna (2020)"</span>),</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="first-difference-switching-effect" class="level2">
 <h2 class="anchored" data-anchor-id="first-difference-switching-effect">First-Difference Switching Effect</h2>
 <p>Using the <code>did_multiplegt</code> function from the <code>DIDmultiplegt</code> package, we can fit the de Chaisemartin and d’Haultfoeuille (2020) method to estimate the average treatment effect of the first period after adoption. Standard errors can be derived using the <code>brep</code> and <code>cluster</code> options, but we set it to 0 here to speed up the analysis.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="do">## First, we prepare a data set with a variable with the First_Week of</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  mandate for each mandate state and a unique state ID number.</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>Vax_firstWeek <span class="ot">&lt;-</span> Vax_adj <span class="sc">%&gt;%</span> </span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vax_adj <span class="sc">%&gt;%</span> </span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>              <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State))</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Run analysis method:</span></span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>dCdH <span class="ot">&lt;-</span> <span class="fu">did_multiplegt</span>(<span class="at">df=</span>Vax_firstWeek,</span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Y=</span><span class="st">"D1P"</span>,</span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">G=</span><span class="st">"StateID"</span>,</span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">T=</span><span class="st">"MMWR_week"</span>,</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">D=</span><span class="st">"mandate"</span>,</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">placebo=</span><span class="dv">10</span>,</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">dynamic=</span><span class="dv">7</span>,</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">brep=</span><span class="dv">0</span>,</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cluster=</span><span class="st">"StateID"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="do">## First, we prepare a data set with a variable with the First_Week of</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  mandate for each mandate state and a unique state ID number.</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>Vax_firstWeek <span class="ot">&lt;-</span> Vax_adj <span class="sc">%&gt;%</span> </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vax_adj <span class="sc">%&gt;%</span> </span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>              <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State))</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Run analysis method:</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>dCdH <span class="ot">&lt;-</span> <span class="fu">did_multiplegt</span>(<span class="at">df=</span>Vax_firstWeek,</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Y=</span><span class="st">"D1P"</span>,</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">G=</span><span class="st">"StateID"</span>,</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">T=</span><span class="st">"MMWR_week"</span>,</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">D=</span><span class="st">"mandate"</span>,</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">placebo=</span><span class="dv">10</span>,</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">dynamic=</span><span class="dv">7</span>,</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>                       <span class="at">brep=</span><span class="dv">0</span>,</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cluster=</span><span class="st">"StateID"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: There was 1 warning in `summarize()`.
 ℹ In argument: `Tgroup = group_indices()`.
@@ -635,8 +690,8 @@ Caused by warning:
 ℹ The deprecated feature was likely used in the DIDmultiplegt package.
   Please report the issue to the authors.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="do">## See full results:</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>dCdH</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## See full results:</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>dCdH</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$effect
    treatment 
@@ -774,28 +829,28 @@ $N_placebo_10
 </div>
 <p>The treatment effect estimate is -0.00994. We can also pull the dynamic and placebo effect estimates from the output.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of placebo (in-time) effects. Note the time is negated to match usual event time notation.</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>placebo <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dCdH) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"placebo"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"Lead"</span>,</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix=</span><span class="st">"placebo_"</span>,</span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"Estimate"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="sc">-</span><span class="dv">1</span><span class="sc">*</span><span class="fu">as.numeric</span>(Lead))</span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of single first-switch estimate.</span></span>
-<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>estimate <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="dv">1</span>,</span>
-<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Estimate=</span>dCdH<span class="sc">$</span>effect[<span class="st">"treatment"</span>])</span>
-<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of dynamic effects. Note the time is incremented by 1 to match usual event time notation where 1 is the first period on treatment.</span></span>
-<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>dynamic <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dCdH) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"dynamic"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
-<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"Lag"</span>,</span>
-<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix=</span><span class="st">"dynamic_"</span>,</span>
-<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"Estimate"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="fu">as.numeric</span>(Lag)<span class="sc">+</span><span class="dv">1</span>)</span>
-<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Combined event time data set from this method:</span></span>
-<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>dCdH_comb <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(placebo <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Lead),</span>
-<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>                       estimate,</span>
-<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>                       dynamic <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Lag))</span>
-<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>dCdH_comb <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of placebo (in-time) effects. Note the time is negated to match usual event time notation.</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>placebo <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dCdH) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"placebo"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"Lead"</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix=</span><span class="st">"placebo_"</span>,</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"Estimate"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="sc">-</span><span class="dv">1</span><span class="sc">*</span><span class="fu">as.numeric</span>(Lead))</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of single first-switch estimate.</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>estimate <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="dv">1</span>,</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Estimate=</span>dCdH<span class="sc">$</span>effect[<span class="st">"treatment"</span>])</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Creating data set of dynamic effects. Note the time is incremented by 1 to match usual event time notation where 1 is the first period on treatment.</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>dynamic <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dCdH) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"dynamic"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"Lag"</span>,</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_prefix=</span><span class="st">"dynamic_"</span>,</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"Estimate"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span><span class="ot">=</span><span class="fu">as.numeric</span>(Lag)<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Combined event time data set from this method:</span></span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>dCdH_comb <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(placebo <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Lead),</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>                       estimate,</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>                       dynamic <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>Lag))</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a>dCdH_comb <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Event Time</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 18 × 2
    Estimate `Event Time`
@@ -821,45 +876,50 @@ $N_placebo_10
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of first-switching analysis:</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the First-Switching Estimator from de Chaisemartin and d'Haultfoeuille (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates at each lead/lag time from -10 to 8. The event times less than 0 tend to have small negative estimates (between 0 and -0.125), except for time -9 which has an estimate of nearly 0.25. The event time of 1 has an estimate slightly below 0 as well. The estimates from event times 2 through 4 are around -0.15, from event times 5 to 7 are around -0.40, and from event time 8 is around -0.3."</span></span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dCdH_comb) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Event Time</span><span class="st">`</span>, <span class="at">y=</span>Estimate)) <span class="sc">+</span></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of first-switching analysis:</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the First-Switching Estimator from de Chaisemartin and d'Haultfoeuille (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates at each lead/lag time from -10 to 8. The event times less than 0 tend to have small negative estimates (between 0 and -0.125), except for time -9 which has an estimate of nearly 0.25. The event time of 1 has an estimate slightly below 0 as well. The estimates from event times 2 through 4 are around -0.15, from event times 5 to 7 are around -0.40, and from event time 8 is around -0.3."</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dCdH_comb) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Event Time</span><span class="st">`</span>, <span class="at">y=</span>Estimate)) <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>If you install the <code>DIDmultiplegtDYN</code> package, a faster implementation of standard errors and more standard interface is available through the <code>did_multiplegtDYN</code> function. Note that this package requires Java and at least R 4.3.3, and may cause errors in other settings. It also limits the pre-treatment periods that can be considered and changes exactly how they are fit, leading to differences from the above implementation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run the above analysis with the DIDmultiplegtDYN package instead:</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("DIDmultiplegtDYN")</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(DIDmultiplegtDYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run the following code only if you are able to install the </span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="do">###  DIDmultiplegtDYN package. Otherwise, delete or turn eval to false</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="do">###  to avoid errors.</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Run the above analysis with the DIDmultiplegtDYN package instead:</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("DIDmultiplegtDYN")</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(DIDmultiplegtDYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: DIDmultiplegtDYN</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn <span class="ot">&lt;-</span> <span class="fu">did_multiplegt_dyn</span>(<span class="at">df=</span>Vax_firstWeek,</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">outcome=</span><span class="st">"D1P"</span>,</span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">group=</span><span class="st">"StateID"</span>,</span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">time=</span><span class="st">"MMWR_week"</span>,</span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">treatment=</span><span class="st">"mandate"</span>,</span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">effects=</span><span class="dv">8</span>,</span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">placebo=</span><span class="dv">8</span>,</span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">cluster=</span><span class="st">"StateID"</span>,</span>
-<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">graph_off=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn <span class="ot">&lt;-</span> <span class="fu">did_multiplegt_dyn</span>(<span class="at">df=</span>Vax_firstWeek,</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">outcome=</span><span class="st">"D1P"</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">group=</span><span class="st">"StateID"</span>,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">time=</span><span class="st">"MMWR_week"</span>,</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">treatment=</span><span class="st">"mandate"</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">effects=</span><span class="dv">8</span>,</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">placebo=</span><span class="dv">8</span>,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">cluster=</span><span class="st">"StateID"</span>,</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">graph_off=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>dCdH_dyn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 ----------------------------------------------------------------------

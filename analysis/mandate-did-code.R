@@ -14,7 +14,9 @@ require(DIDmultiplegt)
 ## Plot time series of mandates themselves:
 #| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"
 #| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
-ggplot(data=Vax_weekly, mapping=aes(x=End_Date,y=State, fill=mandate)) + geom_tile() +
+ggplot(data=Vax_weekly, 
+       mapping=aes(x=End_Date,y=State, fill=mandate)) + 
+  geom_tile() +
   scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
                limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
                date_labels="%m/%d/%y") +
@@ -29,36 +31,12 @@ mandate_states <- unique(Vax_weekly %>%
 #| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, June 2021–February 2022"
 #| fig-alt: "A line plot with lines for each state for dates from June 2021 to February 2022, and first-dose percentages generally increasing from a range around 45–80 at the beginning to a range around 70–90 at the end."
 ggplot() +
-  geom_line(data=Vax_weekly %>% dplyr::filter(!(State %in% mandate_states)),
+  geom_line(data=Vax_weekly %>% 
+              dplyr::filter(!(State %in% mandate_states)),
             mapping=aes(x=End_Date, y=D1P, group=State),
             color="grey50", linetype="dashed") +
-  geom_line(data=Vax_weekly %>% dplyr::filter(State %in% mandate_states),
-            mapping=aes(x=End_Date, y=D1P, group=State,
-                        color=mandate),
-            linetype="solid") +
-  scale_color_manual(name="Mandate",
-                       breaks=c(TRUE,FALSE),
-                     values=c("blue","grey50"),
-                       labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="First-Dose Percentage",limits=c(0,100), expand=c(0,0)) +
-  scale_x_date(name="Date", date_breaks="6 weeks", expand=c(0,0),
-               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
-               date_labels="%m/%d/%y") +
-  theme_bw()
-
-## Exclude New Hampshire, Pennsylvania, Washington:
-Vax_adj <- Vax_weekly %>% dplyr::filter(!(State %in% c("NH","PA","WA")))
-## Select weeks for analysis:
-Yr_Wk_Sel <- paste0("2021_",(25:42))
-
-## Plot time series of first-dose proportion by state in smaller time window:
-#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"
-#| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."
-ggplot() +
-  geom_line(data=Vax_adj %>% dplyr::filter(!(State %in% mandate_states), Yr_Wk %in% Yr_Wk_Sel),
-            mapping=aes(x=End_Date, y=D1P, group=State),
-            color="grey50", linetype="dashed") +
-  geom_line(data=Vax_adj %>% dplyr::filter(State %in% mandate_states, Yr_Wk %in% Yr_Wk_Sel),
+  geom_line(data=Vax_weekly %>% 
+              dplyr::filter(State %in% mandate_states),
             mapping=aes(x=End_Date, y=D1P, group=State,
                         color=mandate),
             linetype="solid") +
@@ -66,7 +44,41 @@ ggplot() +
                      breaks=c(TRUE,FALSE),
                      values=c("blue","grey50"),
                      labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="Full Vaccination Percentage",limits=c(0,100), expand=c(0,0)) +
+  scale_y_continuous(name="First-Dose Percentage",
+                     limits=c(0,100), expand=c(0,0)) +
+  scale_x_date(name="Date", date_breaks="6 weeks", 
+               expand=c(0,0),
+               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
+               date_labels="%m/%d/%y") +
+  theme_bw()
+
+## Exclude New Hampshire, Pennsylvania, Washington:
+Vax_adj <- Vax_weekly %>% 
+  dplyr::filter(!(State %in% c("NH","PA","WA")))
+## Select weeks for analysis:
+Yr_Wk_Sel <- paste0("2021_",(25:42))
+
+## Plot time series of first-dose proportion by state in smaller time window:
+#| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"
+#| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."
+ggplot() +
+  geom_line(data=Vax_adj %>% 
+              dplyr::filter(!(State %in% mandate_states), 
+                            Yr_Wk %in% Yr_Wk_Sel),
+            mapping=aes(x=End_Date, y=D1P, group=State),
+            color="grey50", linetype="dashed") +
+  geom_line(data=Vax_adj %>% 
+              dplyr::filter(State %in% mandate_states, 
+                            Yr_Wk %in% Yr_Wk_Sel),
+            mapping=aes(x=End_Date, y=D1P, group=State,
+                        color=mandate),
+            linetype="solid") +
+  scale_color_manual(name="Mandate",
+                     breaks=c(TRUE,FALSE),
+                     values=c("blue","grey50"),
+                     labels=c("Post-Mandate","Pre-/No Mandate")) +
+  scale_y_continuous(name="Full Vaccination Percentage",
+                     limits=c(0,100), expand=c(0,0)) +
   scale_x_date(name="Date", date_breaks="3 weeks", expand=c(0,0),
                limits=c(as.Date("2021-07-03"),as.Date("2021-10-24")),
                date_labels="%m/%d/%y") +
@@ -74,13 +86,17 @@ ggplot() +
 
 ## Fit TWFE model with no covariates:
 TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+                 data=Vax_weekly %>% 
+                   dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 ## Get 95% CI:
 TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
 ## Fit TWFE model with prior-week as covariate:
-TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
-TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, parm="mandateTRUE", level=0.95)
+TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+
+                        mandate+(1|State),
+                      data=Vax_weekly %>% 
+                        dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, 
+                            parm="mandateTRUE", level=0.95)
 
 ## Summarize results from the two models:
 TWFE_results <- tibble(Model=c("Fixed Effects Only",
@@ -92,11 +108,12 @@ TWFE_results <- tibble(Model=c("Fixed Effects Only",
 
 ## Print the formatted table:
 knitr::kable(TWFE_results,
-             caption="Table of results from TWFE models")
+             caption="Table 1. Results from TWFE models on first-dose percentage.")
 
 ## Conduct the decomposition and print summary:
 bacon <- bacon(D1P~mandate,
-               data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
+               data=Vax_adj %>% 
+                 dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
                id_var="State",
                time_var="MMWR_week")
 ## Full decomposition:
@@ -104,9 +121,34 @@ bacon
 
 ## Plot decomposition results:
 #| fig-cap: "Goodman-Bacon decomposition plot for TWFE model with no covariates"
-#| fig-alt: "Scatter plot of weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
-ggplot(data=bacon, mapping=aes(x=estimate,y=weight,shape=type,color=type)) +
-  geom_point() + theme_bw()
+#| fig-alt: "Scatter plot of 2x2 DID weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
+ggplot(data=bacon, 
+       mapping=aes(x=estimate,y=weight,
+                   shape=type,color=type)) +
+  geom_point() + theme_bw() +
+  labs(x="2x2 DID Estimate", y="Weight",
+       shape="Comparison Type",
+       color="Comparison Type")
+
+## Get total weight as a treated group:
+Ov_Wt <- bacon %>% group_by(treated) %>%
+  dplyr::summarize(PosWeight=sum(weight)) %>%
+  rename(`Treatment Time (Week)`=treated) %>%
+  ungroup() %>%
+## Add a column with total weight as control group:
+  left_join(bacon %>% group_by(untreated) %>%
+              dplyr::summarize(NegWeight=sum(weight)),
+            by=join_by(`Treatment Time (Week)`==untreated)) %>%
+## Subtract to get overall weight
+  mutate(Weight=PosWeight-NegWeight)
+
+## Plot decomposition results:
+#| fig-cap: "Goodman-Bacon decomposition plot of overall weights on each timing group for TWFE model with no covariates"
+#| fig-alt: "Scatter plot of weight vs. treatment time for each timing group. The values are positive, between 0.05 and 0.20, for all treatment weeks from 31 to 39 (with no points for 34 or 37). The value is around -0.02 for week 42."
+ggplot(data=Ov_Wt, 
+       mapping=aes(x=`Treatment Time (Week)`,y=Weight)) +
+  scale_x_continuous(limits=c(30,42),breaks=seq(30,42,by=2)) +
+  geom_point(size=2.5, shape="triangle") + theme_bw()
 
 ## Run event_study function with estimator="all":
 ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
@@ -209,6 +251,11 @@ dCdH_comb %>% arrange(`Event Time`)
 
 ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
   theme_bw()
+
+## Run the following code only if you are able to install the 
+###  DIDmultiplegtDYN package. Otherwise, delete or turn eval to false
+###  to avoid errors.
+#| eval: true
 
 ## Run the above analysis with the DIDmultiplegtDYN package instead:
 # install.packages("DIDmultiplegtDYN")

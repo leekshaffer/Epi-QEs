@@ -27,7 +27,7 @@ Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clu
 
 2.  `did2s`, described in [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf), implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
 
-3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169). Versions of this approach that can handle a wider array of settings, laid out in [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017) and [de Chaisemartin and d'Haultfoeiulle (2024)](https://doi.org/10.1162/rest_a_01414), along with sped-up analytic standard errors are implement in the `DIDmultiplegtDYN`, which requires Java for installation.
+3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169). Versions of this approach that can handle a wider array of settings, laid out in [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017) and [de Chaisemartin and d'Haultfoeiulle (2024)](https://doi.org/10.1162/rest_a_01414), along with sped-up analytic standard errors are implemented in the `DIDmultiplegtDYN`, which requires Java for installation.
 
 We now load the required libraries.
 
@@ -53,7 +53,9 @@ We begin by plotting the time series for visual inspection. First, we plot a tim
 ## Plot time series of mandates themselves:
 #| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"
 #| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
-ggplot(data=Vax_weekly, mapping=aes(x=End_Date,y=State, fill=mandate)) + geom_tile() +
+ggplot(data=Vax_weekly, 
+       mapping=aes(x=End_Date,y=State, fill=mandate)) + 
+  geom_tile() +
   scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
                limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
                date_labels="%m/%d/%y") +
@@ -74,19 +76,23 @@ mandate_states <- unique(Vax_weekly %>%
 #| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, June 2021–February 2022"
 #| fig-alt: "A line plot with lines for each state for dates from June 2021 to February 2022, and first-dose percentages generally increasing from a range around 45–80 at the beginning to a range around 70–90 at the end."
 ggplot() +
-  geom_line(data=Vax_weekly %>% dplyr::filter(!(State %in% mandate_states)),
+  geom_line(data=Vax_weekly %>% 
+              dplyr::filter(!(State %in% mandate_states)),
             mapping=aes(x=End_Date, y=D1P, group=State),
             color="grey50", linetype="dashed") +
-  geom_line(data=Vax_weekly %>% dplyr::filter(State %in% mandate_states),
+  geom_line(data=Vax_weekly %>% 
+              dplyr::filter(State %in% mandate_states),
             mapping=aes(x=End_Date, y=D1P, group=State,
                         color=mandate),
             linetype="solid") +
   scale_color_manual(name="Mandate",
-                       breaks=c(TRUE,FALSE),
+                     breaks=c(TRUE,FALSE),
                      values=c("blue","grey50"),
-                       labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="First-Dose Percentage",limits=c(0,100), expand=c(0,0)) +
-  scale_x_date(name="Date", date_breaks="6 weeks", expand=c(0,0),
+                     labels=c("Post-Mandate","Pre-/No Mandate")) +
+  scale_y_continuous(name="First-Dose Percentage",
+                     limits=c(0,100), expand=c(0,0)) +
+  scale_x_date(name="Date", date_breaks="6 weeks", 
+               expand=c(0,0),
                limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
                date_labels="%m/%d/%y") +
   theme_bw()
@@ -96,7 +102,8 @@ Several states appear to have implausible declines or rates at 100. We can ident
 
 ```{r}
 ## Exclude New Hampshire, Pennsylvania, Washington:
-Vax_adj <- Vax_weekly %>% dplyr::filter(!(State %in% c("NH","PA","WA")))
+Vax_adj <- Vax_weekly %>% 
+  dplyr::filter(!(State %in% c("NH","PA","WA")))
 ## Select weeks for analysis:
 Yr_Wk_Sel <- paste0("2021_",(25:42))
 ```
@@ -108,10 +115,14 @@ We re-plot on this adjusted group of states and weeks.
 #| fig-cap: "Plot of the proportion of U.S. adults with at least one COVID-19 vaccine dose, by state and state vaccine mandate status, July 2021–October 2021"
 #| fig-alt: "A line plot with lines for each state for dates from July 2021 to October 2021, and first-dose percentages generally increasing from a range around 45–85 at the beginning to a range around 60–90 at the end."
 ggplot() +
-  geom_line(data=Vax_adj %>% dplyr::filter(!(State %in% mandate_states), Yr_Wk %in% Yr_Wk_Sel),
+  geom_line(data=Vax_adj %>% 
+              dplyr::filter(!(State %in% mandate_states), 
+                            Yr_Wk %in% Yr_Wk_Sel),
             mapping=aes(x=End_Date, y=D1P, group=State),
             color="grey50", linetype="dashed") +
-  geom_line(data=Vax_adj %>% dplyr::filter(State %in% mandate_states, Yr_Wk %in% Yr_Wk_Sel),
+  geom_line(data=Vax_adj %>% 
+              dplyr::filter(State %in% mandate_states, 
+                            Yr_Wk %in% Yr_Wk_Sel),
             mapping=aes(x=End_Date, y=D1P, group=State,
                         color=mandate),
             linetype="solid") +
@@ -119,7 +130,8 @@ ggplot() +
                      breaks=c(TRUE,FALSE),
                      values=c("blue","grey50"),
                      labels=c("Post-Mandate","Pre-/No Mandate")) +
-  scale_y_continuous(name="Full Vaccination Percentage",limits=c(0,100), expand=c(0,0)) +
+  scale_y_continuous(name="Full Vaccination Percentage",
+                     limits=c(0,100), expand=c(0,0)) +
   scale_x_date(name="Date", date_breaks="3 weeks", expand=c(0,0),
                limits=c(as.Date("2021-07-03"),as.Date("2021-10-24")),
                date_labels="%m/%d/%y") +
@@ -130,9 +142,13 @@ Similar plotting and analyses could be done on the complete series percentage by
 
 ## Discussion Questions
 
-1.  Is one outcome better suited to answering the question of interest than the other?
+1.  Is one outcome (first-dose vs. full vaccination percentage) better suited to answering the question of interest than the other? Which is more likely to have a noticeable effect?
 
-2.  What forms of effect heterogeneity may be present in this staggered adoption setting?
+2.  Does parallel trends seem like a reasonable assumption here? What might cause non-parallel trends?
+
+3.  Is checking parallel pre-trends a good justification for parallel trends post-intervention here? What might change the relationship between trends over time?
+
+4.  What forms of effect heterogeneity may be present in this staggered adoption setting?
 
 ## TWFE Models
 
@@ -141,13 +157,17 @@ First, we fit TWFE models (using `lmer` to get clustered confidence intervals), 
 ```{r}
 ## Fit TWFE model with no covariates:
 TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+                 data=Vax_weekly %>% 
+                   dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 ## Get 95% CI:
 TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
 ## Fit TWFE model with prior-week as covariate:
-TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+mandate+(1|State),
-                      data=Vax_weekly %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
-TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, parm="mandateTRUE", level=0.95)
+TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+
+                        mandate+(1|State),
+                      data=Vax_weekly %>% 
+                        dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, 
+                            parm="mandateTRUE", level=0.95)
 
 ## Summarize results from the two models:
 TWFE_results <- tibble(Model=c("Fixed Effects Only",
@@ -159,10 +179,10 @@ TWFE_results <- tibble(Model=c("Fixed Effects Only",
 
 ## Print the formatted table:
 knitr::kable(TWFE_results,
-             caption="Table of results from TWFE models")
+             caption="Table 1. Results from TWFE models on first-dose percentage.")
 ```
 
-The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well giving the changing circumstances of the states involved.
+The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.
 
 ## Goodman-Bacon Decomposition
 
@@ -171,7 +191,8 @@ We can conduct the Goodman-Bacon decomposition of the TWFE model to identify the
 ```{r}
 ## Conduct the decomposition and print summary:
 bacon <- bacon(D1P~mandate,
-               data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
+               data=Vax_adj %>% 
+                 dplyr::filter(Yr_Wk %in% Yr_Wk_Sel),
                id_var="State",
                time_var="MMWR_week")
 ## Full decomposition:
@@ -181,12 +202,45 @@ bacon
 ```{r}
 ## Plot decomposition results:
 #| fig-cap: "Goodman-Bacon decomposition plot for TWFE model with no covariates"
-#| fig-alt: "Scatter plot of weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
-ggplot(data=bacon, mapping=aes(x=estimate,y=weight,shape=type,color=type)) +
-  geom_point() + theme_bw()
+#| fig-alt: "Scatter plot of 2x2 DID weight vs estimate with three types of points: Earlier vs Later Treated, with estimate values from -4.5 to 2 and weights from 0 to 0.025; Later vs Earlier Treated, with estimate values from -4 to 3 and weights from 0 to 0.02; and Treated vs Untreated, with estimate values from -5.5 to 1 and weights from 0.04 to 0.21."
+ggplot(data=bacon, 
+       mapping=aes(x=estimate,y=weight,
+                   shape=type,color=type)) +
+  geom_point() + theme_bw() +
+  labs(x="2x2 DID Estimate", y="Weight",
+       shape="Comparison Type",
+       color="Comparison Type")
 ```
 
 The decomposition indicates that the vast majority of the weight is on Treated vs Untreated comparisons (because of the large number of untreated units). One particular observation has a large negative estimate driving the overall estimate.
+
+We can also get the overall weights associated with each timing group, by taking their total weight when used as a treated group minus their total weight when used as a control group.
+
+```{r}
+## Get total weight as a treated group:
+Ov_Wt <- bacon %>% group_by(treated) %>%
+  dplyr::summarize(PosWeight=sum(weight)) %>%
+  rename(`Treatment Time (Week)`=treated) %>%
+  ungroup() %>%
+## Add a column with total weight as control group:
+  left_join(bacon %>% group_by(untreated) %>%
+              dplyr::summarize(NegWeight=sum(weight)),
+            by=join_by(`Treatment Time (Week)`==untreated)) %>%
+## Subtract to get overall weight
+  mutate(Weight=PosWeight-NegWeight)
+```
+
+```{r}
+## Plot decomposition results:
+#| fig-cap: "Goodman-Bacon decomposition plot of overall weights on each timing group for TWFE model with no covariates"
+#| fig-alt: "Scatter plot of weight vs. treatment time for each timing group. The values are positive, between 0.05 and 0.20, for all treatment weeks from 31 to 39 (with no points for 34 or 37). The value is around -0.02 for week 42."
+ggplot(data=Ov_Wt, 
+       mapping=aes(x=`Treatment Time (Week)`,y=Weight)) +
+  scale_x_continuous(limits=c(30,42),breaks=seq(30,42,by=2)) +
+  geom_point(size=2.5, shape="triangle") + theme_bw()
+```
+
+The final switching group receives a negative overall weight, as it is used as a control group for the earlier-switching groups. Because there are so many control states compared to treated states, however, other timing groups do not get negative total weights. This does not mean that none of their (potentially heterogeneous) effects are given a negative weight in the estimand however.
 
 ## Dynamic Specification and Alternative Estimators
 
@@ -321,6 +375,11 @@ ggplot(dCdH_comb) + geom_point(mapping=aes(x=`Event Time`, y=Estimate)) +
 If you install the `DIDmultiplegtDYN` package, a faster implementation of standard errors and more standard interface is available through the `did_multiplegtDYN` function. Note that this package requires Java and at least R 4.3.3, and may cause errors in other settings. It also limits the pre-treatment periods that can be considered and changes exactly how they are fit, leading to differences from the above implementation.
 
 ```{r}
+## Run the following code only if you are able to install the 
+###  DIDmultiplegtDYN package. Otherwise, delete or turn eval to false
+###  to avoid errors.
+#| eval: true
+
 ## Run the above analysis with the DIDmultiplegtDYN package instead:
 # install.packages("DIDmultiplegtDYN")
 require(DIDmultiplegtDYN)

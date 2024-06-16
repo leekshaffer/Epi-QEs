@@ -78,13 +78,13 @@ What might cause heterogeneity in the effect of a state employee COVID-19 vaccin
 
 ## Goodman-Bacon Decomposition
 
-The TWFE model estimates a weighted average of all 2x2 comparisons.
+The TWFE model estimates a weighted average of all 2x2 DID comparisons.
 
 ![Goodman-Bacon (2021), Figure 6.](images/Adv_DID/Goodman-Bacon%20Fig6.png){fig-alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2." fig-align="center"}
 
 ## Goodman-Bacon Decomposition
 
-This is equivalent to a weighted average of all unit-period-specific treatment effects, with some having negative weights.
+We can also observe the overall weight given to each treatment timing group, which may be negative if it is more often used as a control than a treated group.
 
 ![Goodman-Bacon (2021), Figure 7.](images/Adv_DID/Goodman-Bacon%20Fig7.png){fig-alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." fig-align="center"}
 

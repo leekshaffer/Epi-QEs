@@ -116,14 +116,11 @@ yr_diffs <- did_2x2 %>%
 did_2x2_f <- did_2x2 %>% 
   add_row(bind_cols(State="Diff, Treated–Untreated",
                     yr_diffs))
-```
 
-Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014
-
-```{r}
 ## Print formatted table of two-by-two analysis:
 knitr::kable(did_2x2_f,
-             digits=1)
+             digits=1,
+             caption="Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014")
 ```
 
 ## Linear TWFE Model

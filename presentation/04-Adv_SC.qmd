@@ -119,7 +119,9 @@ Incorporate unit weighting of SC with unit fixed effects of DID and time weighti
 
 ## Augmented Synthetic Control
 
-[![](images/Adv_SC/BM2021-1cite.png){fig-alt="Title of Ben-Michael et al. (2021)" fig-align="center"}](https://doi.org/10.1080/01621459.2021.1929245)
+[![](images/Adv_SC/BM2021-1cite.png){fig-alt="Title of Ben-Michael et al. (2021)" fig-align="center" width="836"}](https://doi.org/10.1080/01621459.2021.1929245)
+
+. . .
 
 ::: callout-note
 ## Idea
@@ -131,10 +133,20 @@ De-bias SC estimate using an outcome model for the time series.
 
 ::: incremental
 1.  Compute SC weights
-2.  Fit outcome model (e.g., ridge regression) to control units
-3.  Get model estimates for all units
-4.  Find difference between model estimate for treated unit and SC-weighted model estimates for control units
+2.  Fit outcome model (e.g., ridge regression) to control data
+3.  Get model estimates for all units post-treatment outcomes
+4.  Find discrepancy between model estimate for treated unit and model estimate for synthetic unit
 5.  Add this difference to SC estimator
+:::
+
+## ASCM: Additional Details
+
+::: incremental
+-   If pre-treatment fit is good, discrepancy will be small and adjustment will have little effect
+
+-   Allows for level shift by capturing a consistent discrepancy
+
+-   Can still express as weights of control units, but negative weights now allowed; generally less sparse
 :::
 
 ## ASCM: Multiple Periods
@@ -149,7 +161,7 @@ Options:
 
 -   Partially pooled SCM: mix of both
 
--   With intercepts, akin to weighted DID approaches
+-   With intercepts, similar trade-offs to weighted DID approaches
 
 ## SDID and ASCM: Summary
 
@@ -160,7 +172,7 @@ Options:
 Advantages:
 
 -   Allows intercept shift
--   Allow negative weights with sparsity
+-   Allow negative weights with some sparsity
 -   Improved performance in settings with poor SC fit
 
 ## SDID and ASCM: Summary
@@ -208,7 +220,7 @@ Combine three information sources in state-time model:
 
 ::: columns
 ::: {.column width="50%"}
--   Allows extrapolation: weights don't sum to 1
+-   Allows extrapolation: weights do not sum to 1
 
 -   Incorporates prior information
 

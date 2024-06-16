@@ -457,9 +457,10 @@ Lee Kennedy-Shaffer, PhD
 <h2>Augmented Synthetic Control</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="https://doi.org/10.1080/01621459.2021.1929245"><img data-src="images/Adv_SC/BM2021-1cite.png" class="quarto-figure quarto-figure-center" alt="Title of Ben-Michael et al. (2021)"></a></p>
+<p><a href="https://doi.org/10.1080/01621459.2021.1929245"><img data-src="images/Adv_SC/BM2021-1cite.png" class="quarto-figure quarto-figure-center" alt="Title of Ben-Michael et al. (2021)" width="836"></a></p>
 </figure>
 </div>
+<div class="fragment">
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -473,17 +474,28 @@ Lee Kennedy-Shaffer, PhD
 </div>
 </div>
 </div>
+</div>
 </section>
 <section id="ascm-procedure" class="slide level2">
 <h2>ASCM: Procedure</h2>
 <div>
 <ol type="1">
 <li class="fragment">Compute SC weights</li>
-<li class="fragment">Fit outcome model (e.g., ridge regression) to control units</li>
-<li class="fragment">Get model estimates for all units</li>
-<li class="fragment">Find difference between model estimate for treated unit and SC-weighted model estimates for control units</li>
+<li class="fragment">Fit outcome model (e.g., ridge regression) to control data</li>
+<li class="fragment">Get model estimates for all units post-treatment outcomes</li>
+<li class="fragment">Find discrepancy between model estimate for treated unit and model estimate for synthetic unit</li>
 <li class="fragment">Add this difference to SC estimator</li>
 </ol>
+</div>
+</section>
+<section id="ascm-additional-details" class="slide level2">
+<h2>ASCM: Additional Details</h2>
+<div>
+<ul>
+<li class="fragment"><p>If pre-treatment fit is good, discrepancy will be small and adjustment will have little effect</p></li>
+<li class="fragment"><p>Allows for level shift by capturing a consistent discrepancy</p></li>
+<li class="fragment"><p>Can still express as weights of control units, but negative weights now allowed; generally less sparse</p></li>
+</ul>
 </div>
 </section>
 <section id="ascm-multiple-periods" class="slide level2">
@@ -498,7 +510,7 @@ Lee Kennedy-Shaffer, PhD
 <li><p>Fit separate SCM for each unit</p></li>
 <li><p>Fit SCM on average of treated units</p></li>
 <li><p>Partially pooled SCM: mix of both</p></li>
-<li><p>With intercepts, akin to weighted DID approaches</p></li>
+<li><p>With intercepts, similar trade-offs to weighted DID approaches</p></li>
 </ul>
 </section>
 <section id="sdid-and-ascm-summary" class="slide level2">
@@ -512,7 +524,7 @@ Lee Kennedy-Shaffer, PhD
 <p>Advantages:</p>
 <ul>
 <li>Allows intercept shift</li>
-<li>Allow negative weights with sparsity</li>
+<li>Allow negative weights with some sparsity</li>
 <li>Improved performance in settings with poor SC fit</li>
 </ul>
 </div>
@@ -589,7 +601,7 @@ Lee Kennedy-Shaffer, PhD
 <div class="columns">
 <div class="column" style="width:50%;">
 <ul>
-<li><p>Allows extrapolation: weights don’t sum to 1</p></li>
+<li><p>Allows extrapolation: weights do not sum to 1</p></li>
 <li><p>Incorporates prior information</p></li>
 <li><p>Explicit time series modeling</p></li>
 </ul>

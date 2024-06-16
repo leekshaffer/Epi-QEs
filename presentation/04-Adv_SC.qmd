@@ -129,13 +129,13 @@ Incorporate unit weighting of SC with unit fixed effects of DID and time weighti
 De-bias SC estimate using an outcome model for the time series.
 :::
 
-## ASCM: Procedure
+## Ridge-Adjusted ASCM: Procedure
 
 ::: incremental
 1.  Compute SC weights
-2.  Fit outcome model (e.g., ridge regression) to control data
-3.  Get model estimates for all units post-treatment outcomes
-4.  Find discrepancy between model estimate for treated unit and model estimate for synthetic unit
+2.  Fit outcome model (i.e., ridge regression) to control data (post-treatment outcomes \~ pre-treatment outcomes)
+3.  Get model estimates for all units' post-treatment outcomes
+4.  Find discrepancy between model estimate for treated unit and model estimate for synthetic unit (weighted avg of model estimates for control units)
 5.  Add this difference to SC estimator
 :::
 
@@ -146,7 +146,7 @@ De-bias SC estimate using an outcome model for the time series.
 
 -   Allows for level shift by capturing a consistent discrepancy
 
--   Can still express as weights of control units, but negative weights now allowed; generally less sparse
+-   Can still express as weights of control units, but negative weights now allowed; penalizes discrepancy from SC weights
 :::
 
 ## ASCM: Multiple Periods

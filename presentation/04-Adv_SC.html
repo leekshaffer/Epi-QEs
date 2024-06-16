@@ -476,14 +476,14 @@ Lee Kennedy-Shaffer, PhD
 </div>
 </div>
 </section>
-<section id="ascm-procedure" class="slide level2">
-<h2>ASCM: Procedure</h2>
+<section id="ridge-adjusted-ascm-procedure" class="slide level2">
+<h2>Ridge-Adjusted ASCM: Procedure</h2>
 <div>
 <ol type="1">
 <li class="fragment">Compute SC weights</li>
-<li class="fragment">Fit outcome model (e.g., ridge regression) to control data</li>
-<li class="fragment">Get model estimates for all units post-treatment outcomes</li>
-<li class="fragment">Find discrepancy between model estimate for treated unit and model estimate for synthetic unit</li>
+<li class="fragment">Fit outcome model (i.e., ridge regression) to control data (post-treatment outcomes ~ pre-treatment outcomes)</li>
+<li class="fragment">Get model estimates for all units’ post-treatment outcomes</li>
+<li class="fragment">Find discrepancy between model estimate for treated unit and model estimate for synthetic unit (weighted avg of model estimates for control units)</li>
 <li class="fragment">Add this difference to SC estimator</li>
 </ol>
 </div>
@@ -494,7 +494,7 @@ Lee Kennedy-Shaffer, PhD
 <ul>
 <li class="fragment"><p>If pre-treatment fit is good, discrepancy will be small and adjustment will have little effect</p></li>
 <li class="fragment"><p>Allows for level shift by capturing a consistent discrepancy</p></li>
-<li class="fragment"><p>Can still express as weights of control units, but negative weights now allowed; generally less sparse</p></li>
+<li class="fragment"><p>Can still express as weights of control units, but negative weights now allowed; penalizes discrepancy from SC weights</p></li>
 </ul>
 </div>
 </section>

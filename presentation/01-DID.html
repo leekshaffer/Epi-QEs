@@ -646,6 +646,7 @@ E[\color{purple}{Y_{11}(0) - Y_{10}(0)}] = E[\color{darkgreen}{Y_{01}(0) - Y_{00
 <h2>Improving Assumptions: Re-scale</h2>
 <p>Changing the scale of the outcome changes the parallel trends assumption. The most common transformation is to use the <strong>natural log</strong>.</p>
 <p>E.g., <span class="math inline">\(\log(Y_{it}) = \alpha_i + \gamma_t + \theta I(X_{it}=1) + \epsilon_{it}\)</span></p>
+<div class="fragment">
 <p>Changes parallel trends assumption to:</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -653,6 +654,7 @@ E[\color{purple}{\log Y_{11}(0) - \log Y_{10}(0)}] &amp;= E[\color{darkgreen}{\l
 E \left[ \log \left( \color{purple}{\frac{Y_{11}(0)}{Y_{10}(0)}} \right) \right] &amp;= E \left[ \log \left( \color{darkgreen}{\frac{Y_{01}(0)}{Y_{00}(0)}} \right) \right]
 \end{aligned}
 \]</span></p>
+</div>
 </section>
 <section id="improving-assumptions-re-scale-1" class="slide level2">
 <h2>Improving Assumptions: Re-scale</h2>
@@ -755,6 +757,28 @@ E[\color{purple}{Y_{11}(0) - Y_{10}(0)} ~ | ~ Z_1] = E[\color{darkgreen}{Y_{01}(
 </ul>
 </div>
 </div>
+</div>
+</div>
+</section>
+<section id="summary-did-for-epidemiology" class="slide level2">
+<h2>Summary: DID for Epidemiology</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Advantages:</p>
+<ul>
+<li><p>Simple to implement</p></li>
+<li><p>Uses summary data</p></li>
+<li><p>No need to model time trends or collect covariates</p></li>
+<li><p>Straightforward interpretation</p></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p>Disadvantages/Limitations:</p>
+<ul>
+<li><p>Targets ATT not ATE</p></li>
+<li><p>Need to justify key assumptions</p></li>
+<li><p>Requires careful selection of controls</p></li>
+<li><p>Limited inference with few units/periods</p></li>
+</ul>
 </div>
 </div>
 </section>

@@ -121,7 +121,7 @@ See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/fil
 We can account for timing cohort heterogeneity as well by further allowing the effect to vary by adoption timing group ($G_i$):
 
 $$
-Y_{it} = \alpha_i + \gamma_t + \sum_{g \in \mathcal{G}} \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
+Y_{it} = \alpha_i + \gamma_t + \sum_g \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
 $$
 
 . . .
@@ -141,10 +141,15 @@ Their regression approach then implicitly weights by population share in each ti
 Another approach would only consider one switching effect. For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
 
 $$
-\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} \sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) - \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
+\begin{align*}
+\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} &\sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) \\
+&- \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
+\end{align*}
 $$
 
-Average these across all time periods $t$, weighted by number of units or individuals.
+## Restricting Periods: First-Difference
+
+Average these switcher estimates across all time periods $t$, weighted by number of units or individuals.
 
 See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
 
@@ -155,15 +160,15 @@ See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.201
 Then summarize to an overall average effect weighted by $w_{g,t}$:
 
 $$
-\theta = \sum_{g \in \mathcal{G}} \sum_{t=2}^T w_{g,t} ATT_{g,t}.
+\theta = \sum_g \sum_{t=2}^T w_{g,t} ATT_{g,t}.
 $$
 
 ## Generalized 2x2 Building Blocks
 
-More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand.
+More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand and then minimize variance.
 
 $$
-\hat{\theta} = \sum_{i,i',t,t'} \left[ \left( Y_{i,t'} - Y_{i,t} \right) - \left( Y_{i',t'} - Y_{i',t} \right) \right]
+\hat{\theta} = \sum_{i,i',t,t'} w_{i,i',t,t'} \left[ \left( Y_{i,t'} - Y_{i,t} \right) - \left( Y_{i',t'} - Y_{i',t} \right) \right]
 $$
 
 See [Kennedy-Shaffer (2024)](https://doi.org/10.48550/arXiv.2405.08730).
@@ -212,7 +217,7 @@ All of these approaches change the precise specification of the estimand as well
 It's easy to ignore the fundamentals when using the more advanced methods. Consider the validity of the data, the question being asked, and the feasibility of the effect.
 :::
 
-## Recommendations
+## Recommendations for Staggered Adoption
 
 ::: incremental
 -   Consider data source carefully

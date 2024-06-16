@@ -116,6 +116,8 @@ where $K_{it}$ is the lead/lag for unit $i$ in period $t$ (e.g., $K_{it} = 1$ in
 
 See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007). Captures time-on-treatment heterogeneity.
 
+Also useful to test for "pre-trends" in single intervention time setting.
+
 ## Interaction-Weighting
 
 We can account for timing cohort heterogeneity as well by further allowing the effect to vary by adoption timing group ($G_i$):

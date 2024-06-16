@@ -10,5 +10,5 @@ First presented at the Society for Epidemiologic Research Annual Meeting, June 2
 
 -   [data-raw](https://github.com/leekshaffer/Epi-QEs/tree/main/data-raw): contains original files of replication data and data accessed by LKS for the workshop analyses. See [data-raw ReadMe](https://github.com/leekshaffer/Epi-QEs/tree/main/data-raw/README.md) for more information.
 -   [data](https://github.com/leekshaffer/Epi-QEs/tree/main/data): contains cleaned data files used in the analysis
--   [analysis](https://github.com/leekshaffer/Epi-QEs/tree/main/analysis): contains analysis files for workshop analyses
--   [presentation](https://github.com/leekshaffer/Epi-QEs/tree/main/presentation): contains working (.qmd) and finished (.html) presentation files for workshop slides and handouts
+-   [analysis](https://github.com/leekshaffer/Epi-QEs/tree/main/analysis): contains working (.qmd) and finished (.html) handouts of analyses conducted in the workshop. The corresponding .R files contain only the code for the analyses, without additional explanation.
+-   [presentation](https://github.com/leekshaffer/Epi-QEs/tree/main/presentation): contains working (.qmd) and finished (.html) presentation files for workshop slides.

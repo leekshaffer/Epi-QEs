@@ -29,5 +29,5 @@ Clean versions of the data required for the workshop analyses are imported, re-n
 
 ## pcv
 Replication data for Bruhn et al. 2017 (https://doi.org/10.1073/pnas.1612833114), downloaded from https://github.com/weinbergerlab/InterventionEvaluatR on May 24, 2024.
-The raw data and cleaning files are not published by LKS to this reporsitory, but are available directly from the InterventionEvaluatR GitHub repository, along with replication analysis code.
-Clean versions of the data required for the workshop analyses are imported, re-named, and stored in the Clean Data folder of this repository.
+The raw data and cleaning files are not published by LKS to this repository, but are available directly from the InterventionEvaluatR GitHub repository, along with replication analysis code.
+Clean versions of the data required for potential analyses are imported, re-named, and stored in the Clean Data folder of this repository.

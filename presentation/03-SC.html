@@ -419,8 +419,8 @@ Lee Kennedy-Shaffer, PhD
 <h1>Synthetic Control Method</h1>
 
 </section>
-<section id="panel-datacomparative-case-study-setting" class="slide level2">
-<h2>Panel Data/Comparative Case Study Setting</h2>
+<section id="panel-datacomparative-case-study" class="slide level2">
+<h2>Panel Data/Comparative Case Study</h2>
 <p>Generally requires:</p>
 <div>
 <ul>
@@ -433,7 +433,10 @@ Lee Kennedy-Shaffer, PhD
 </section>
 <section id="idea" class="slide level2">
 <h2>Idea</h2>
-<p>Find a weighted average of the control units that <strong>best approximates</strong> the pre-treatment history of the treated unit(s). This is the <strong>synthetic control</strong> unit, which is then compared to the treated unit’s outcomes in the post-treatment period.</p>
+<p>Find a weighted average of the control units that <strong>best approximates</strong> the pre-treatment history of the treated unit(s).</p>
+<div class="fragment">
+<p>This is the <strong>synthetic control</strong> unit, which is then compared to the treated unit’s outcomes in the post-treatment period.</p>
+</div>
 </section>
 <section id="example-of-idea" class="slide level2">
 <h2>Example of Idea</h2>
@@ -514,7 +517,7 @@ Lee Kennedy-Shaffer, PhD
 <li class="fragment">Suitable control units: “stable weights”</li>
 <li class="fragment">Convex hull: non-extreme treated unit(s)</li>
 <li class="fragment">Effect size larger than routine fluctuations</li>
-<li class="fragment">Reasonable time horizon</li>
+<li class="fragment">Appropriate time horizon</li>
 </ul>
 </div>
 </section>
@@ -542,7 +545,9 @@ Lee Kennedy-Shaffer, PhD
 <p><span class="math display">\[
 \sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
 \]</span></p>
+<div class="fragment">
 <p>where <span class="math inline">\(v_k\)</span> are weights on the importance of each covariate, which can themselves be chosen to minimize the pre-intervention difference or by cross-validation on a split sample of pre-intervention times.</p>
+</div>
 </section>
 <section id="weights" class="slide level2">
 <h2>Weights</h2>
@@ -591,7 +596,7 @@ Lee Kennedy-Shaffer, PhD
 <figure>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig3.png" class="quarto-figure quarto-figure-center" alt="Abadie et al.&nbsp;(2010), Figure 3"></a></p>
+<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig3.png" class="quarto-figure quarto-figure-center" width="650" height="520" alt="Abadie et al.&nbsp;(2010), Figure 3"></a></p>
 </figure>
 </div>
 <figcaption>Abadie et al.&nbsp;(2010), Figure 3</figcaption>
@@ -621,7 +626,7 @@ Lee Kennedy-Shaffer, PhD
 <figure>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Tbl1.png" class="quarto-figure quarto-figure-center" alt="Abadie et al.&nbsp;(2010), Table 1"></a></p>
+<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Tbl1.png" class="quarto-figure quarto-figure-center" width="942" height="520" alt="Abadie et al.&nbsp;(2010), Table 1"></a></p>
 </figure>
 </div>
 <figcaption>Abadie et al.&nbsp;(2010), Table 1</figcaption>
@@ -639,7 +644,7 @@ Lee Kennedy-Shaffer, PhD
 <figure>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="https://doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig4.png" class="quarto-figure quarto-figure-center" alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." width="662"></a></p>
+<p><a href="https://doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig4.png" class="quarto-figure quarto-figure-center" alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." width="600" height="500"></a></p>
 </figure>
 </div>
 <figcaption>Abadie et al.&nbsp;(2010), Figure 4</figcaption>
@@ -650,7 +655,7 @@ Lee Kennedy-Shaffer, PhD
 <h2>Placebo Test In-Space</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig6.png" alt="Abadie et al.&nbsp;(2010), Figure 6"></a></p>
+<p><a href="http://dx.doi.org/10.1198/jasa.2009.ap08746"><img data-src="images/SC/Abadie2010Fig6.png" width="600" height="500" alt="Abadie et al.&nbsp;(2010), Figure 6"></a></p>
 <figcaption>Abadie et al.&nbsp;(2010), Figure 6</figcaption>
 </figure>
 </div>
@@ -680,7 +685,8 @@ Lee Kennedy-Shaffer, PhD
 <p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p>This is related to the cross-validation approach for covariate weight selection, and both should not be used without caution.</p>
+<p>This is similar to the cross-validation approach sometimes used to select covariate weights.</p>
+<p>If using both, interpret with caution.</p>
 </div>
 </div>
 </div>

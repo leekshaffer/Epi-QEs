@@ -54,7 +54,7 @@ What is the effect of these policies on cigarette sales and vaccine uptake, resp
 
 # Synthetic Control Method
 
-## Panel Data/Comparative Case Study Setting
+## Panel Data/Comparative Case Study
 
 Generally requires:
 
@@ -70,7 +70,11 @@ Generally requires:
 
 ## Idea
 
-Find a weighted average of the control units that **best approximates** the pre-treatment history of the treated unit(s). This is the **synthetic control** unit, which is then compared to the treated unit's outcomes in the post-treatment period.
+Find a weighted average of the control units that **best approximates** the pre-treatment history of the treated unit(s).
+
+. . .
+
+This is the **synthetic control** unit, which is then compared to the treated unit's outcomes in the post-treatment period.
 
 ## Example of Idea
 
@@ -113,7 +117,7 @@ Find a weighted average of the control units that **best approximates** the pre-
 -   Suitable control units: "stable weights"
 -   Convex hull: non-extreme treated unit(s)
 -   Effect size larger than routine fluctuations
--   Reasonable time horizon
+-   Appropriate time horizon
 :::
 
 ## Formal Specification
@@ -146,6 +150,8 @@ $$
 \sum_{k=1}^K v_k \left( X_{1k} - \left(\sum_{i=1}^n X_{0ik} w_i \right) \right)^2,
 $$
 
+. . .
+
 where $v_k$ are weights on the importance of each covariate, which can themselves be chosen to minimize the pre-intervention difference or by cross-validation on a split sample of pre-intervention times.
 
 ## Weights
@@ -176,7 +182,7 @@ The choice of time and scale for the comparison can be made by the investigator 
 
 ## Gap Plot
 
-[![Abadie et al. (2010), Figure 3](images/SC/Abadie2010Fig3.png){fig-align="center"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Figure 3](images/SC/Abadie2010Fig3.png){fig-align="center" width="650" height="520"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
 
 # Robustness and Inference
 
@@ -196,7 +202,7 @@ To test robustness of results, can change:
 
 ## Assessing Fit
 
-[![Abadie et al. (2010), Table 1](images/SC/Abadie2010Tbl1.png){fig-align="center"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Table 1](images/SC/Abadie2010Tbl1.png){fig-align="center" width="942" height="520"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
 
 ## Placebo Test In-Space
 
@@ -206,11 +212,11 @@ Can exclude those with much higher pre-intervention MSPEs.
 
 ## Placebo Test In-Space
 
-[![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="662"}](https://doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Figure 4](images/SC/Abadie2010Fig4.png){fig-alt="Plot of the gap between actual values and synthetic control values for California and 38 placebo test states. The California gap is near the extreme low end of the distribution for all post-intervention time points." fig-align="center" width="600" height="500"}](https://doi.org/10.1198/jasa.2009.ap08746)
 
 ## Placebo Test In-Space
 
-[![Abadie et al. (2010), Figure 6](images/SC/Abadie2010Fig6.png)](http://dx.doi.org/10.1198/jasa.2009.ap08746)
+[![Abadie et al. (2010), Figure 6](images/SC/Abadie2010Fig6.png){width="600" height="500"}](http://dx.doi.org/10.1198/jasa.2009.ap08746)
 
 ## Placebo Test Estimators
 
@@ -230,7 +236,9 @@ Common choices are:
 Can also run the analysis on dummy intervention time points.
 
 ::: callout-note
-This is related to the cross-validation approach for covariate weight selection, and both should not be used without caution.
+This is similar to the cross-validation approach sometimes used to select covariate weights.
+
+If using both, interpret with caution.
 :::
 
 ## Placebo Test In-Outcome/Population

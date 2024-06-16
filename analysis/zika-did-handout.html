@@ -117,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
 <p>Throughout the workshop, we will use the <code>tidyverse</code> environment for data cleaning and plotting, but the operations for the methods we are learning can be conducted in base R as well. The <code>knitr</code> package is used for formatting table output into the document.</p>
 <p>To get clustered standard errors for the regression-based DID analyses, we use linear mixed effects models fit using the <code>lme4</code> package, although other options are available.</p>
-<p>We now load the two required libraries.</p>
+<p>We now load the required libraries.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## If you have not installed these packages before,</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  run the following line:</span></span>
@@ -205,23 +205,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We can start by examining just two time periods: 2014, prior to the outbreak, and 2016, the first year where the outbreak could have affected live birth rates throughout the year. Note that we exclude 2015, which may have been partially affected. We continue to use the <code>zika_summ</code> data set here, looking at the two states as a whole.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Get differences within-units:</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>did_2x2 <span class="ot">&lt;-</span> zika_summ <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2014</span>,<span class="dv">2016</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols=</span>State,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from=</span>Year,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from=</span>Rate) <span class="sc">%&gt;%</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Diff, 2016–2014</span><span class="st">`</span><span class="ot">=</span><span class="st">`</span><span class="at">2016</span><span class="st">`</span><span class="sc">-</span><span class="st">`</span><span class="at">2014</span><span class="st">`</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Get differences within years:</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>yr_diffs <span class="ot">&lt;-</span> did_2x2 <span class="sc">%&gt;%</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(State<span class="sc">==</span><span class="st">"Pernambuco"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(State)) <span class="sc">-</span> </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  did_2x2 <span class="sc">%&gt;%</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(State<span class="sc">==</span><span class="st">"Rio Grande do Sul"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(State))</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Combine into presentation table:</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>did_2x2_f <span class="ot">&lt;-</span> did_2x2 <span class="sc">%&gt;%</span> <span class="fu">add_row</span>(<span class="fu">bind_cols</span>(<span class="at">State=</span><span class="st">"Diff, Treated–Untreated"</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                                 yr_diffs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>did_2x2 <span class="ot">&lt;-</span> zika_summ <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2014</span>,<span class="dv">2016</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols=</span>State,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from=</span>Year,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from=</span>Rate) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Diff, 2016–2014</span><span class="st">`</span><span class="ot">=</span><span class="st">`</span><span class="at">2016</span><span class="st">`</span><span class="sc">-</span><span class="st">`</span><span class="at">2014</span><span class="st">`</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Get differences within years:</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>yr_diffs <span class="ot">&lt;-</span> did_2x2 <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(State<span class="sc">==</span><span class="st">"Pernambuco"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(State)) <span class="sc">-</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  did_2x2 <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(State<span class="sc">==</span><span class="st">"Rio Grande do Sul"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(State))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Combine into presentation table:</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>did_2x2_f <span class="ot">&lt;-</span> did_2x2 <span class="sc">%&gt;%</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_row</span>(<span class="fu">bind_cols</span>(<span class="at">State=</span><span class="st">"Diff, Treated–Untreated"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                    yr_diffs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Table. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs.&nbsp;2014</p>
+<p>Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs.&nbsp;2014</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Print formatted table of two-by-two analysis:</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(did_2x2_f,</span>
@@ -265,8 +267,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the <code>zika_full</code> data set, which has columns for our outcome (<code>Rate</code>), unit identifier (<code>State</code>), time identifier (<code>year</code>, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (<code>interaction</code>, coded as 0 for unexposed and 1 for exposed).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit linear TWFE model and extract estimate and 95% CI:</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>zika_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction, <span class="at">data=</span>zika_full)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>zika_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data=</span>zika_full)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -299,8 +302,9 @@ F-statistic: 195.9 on 3 and 1360 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>To correct the standard errors, we can cluster by the municipality using a linear mixed effects model with a random effect for municipality.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit a linear mixed effects model to account for clustering by municipality:</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), <span class="at">data=</span>zika_full)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>zika_full)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
 Formula: Rate ~ State + year + interaction + (1 | Code)
@@ -374,7 +378,7 @@ interaction -0.319  0.374 -0.521</code></pre>
 </section>
 <section id="placebo-test-in-time" class="level2">
 <h2 class="anchored" data-anchor-id="placebo-test-in-time">Placebo Test in Time</h2>
-<p>We can use the <code>zika_summ</code> data set to run the two-by-two DID analysis on all pairs of years that are two years apart, starting with 2010 vs.&nbsp;2008. Since there were no Zika outbreaks in those prior years, if the parallel trends assumption holds true, the estimates should be around 0.</p>
+<p>We can use the <code>zika_summ</code> data set to run the two-by-two DID analysis on all pairs of years that are two years apart, starting with 2010 vs.&nbsp;2008. Since there were no Zika outbreaks in those prior years, if the parallel trends assumption holds true, the estimates should be distributed around 0.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a data set with a row for each pair of years</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>zika_plac <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span><span class="ot">=</span><span class="fu">unique</span>(zika_summ<span class="sc">$</span>Year),</span>
@@ -390,18 +394,24 @@ interaction -0.319  0.374 -0.521</code></pre>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">P0=</span>Pernambuco, <span class="at">R0=</span><span class="st">`</span><span class="at">Rio Grande do Sul</span><span class="st">`</span>)</span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Get the estimate for each pair of years</span></span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>zika_plac <span class="ot">&lt;-</span> zika_plac <span class="sc">%&gt;%</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Estimate=</span>(P1<span class="sc">-</span>P0)<span class="sc">-</span>(R1<span class="sc">-</span>R0))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Estimate=</span>(P1<span class="sc">-</span>P0)<span class="sc">-</span>(R1<span class="sc">-</span>R0),</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">Type=</span><span class="fu">factor</span>(<span class="fu">if_else</span>(<span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span><span class="sc">==</span><span class="dv">2016</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"Estimate"</span>,<span class="st">"Placebo"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot two-by-two DID estimates for placebo years:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of two-by-two DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A scatter plot with points ranging from around -0.868 to -0.135 in the 2010 through 2015 years, with a point around -1.3 in 2016."</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_plac) <span class="sc">+</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>Estimate),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"DID Estimate"</span>) <span class="sc">+</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>,<span class="at">by=</span>.<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>Estimate,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">color=</span>Type, <span class="at">shape=</span>Type),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"DID Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">0</span>,<span class="at">by=</span>.<span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Estimate"</span>,<span class="st">"Placebo"</span>),</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"purple"</span>,<span class="st">"forestgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="dv">0</span>, <span class="at">color=</span><span class="st">"red"</span>, <span class="at">linetype=</span><span class="st">"dotted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -491,11 +501,15 @@ interaction             0.8978948  0.9668531</code></pre>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Plot of two-by-two log-transformed DID estimates for placebo treatment years (2010–2015) and actual treated year (2016)"</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A scatter plot with points ranging from around 0 to -0.05 in the 2010 through 2015 years, with a point around -0.09 in 2016."</span></span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>zika_plac) <span class="sc">+</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>LogEstimate),</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"Log-Transformed DID Estimate"</span>) <span class="sc">+</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.25</span>,<span class="fl">0.25</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.25</span>,<span class="fl">0.25</span>,<span class="at">by=</span>.<span class="dv">125</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span><span class="st">`</span><span class="at">Treated Year</span><span class="st">`</span>, <span class="at">y=</span>LogEstimate,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">color=</span>Type, <span class="at">shape=</span>Type),</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Treated (Placebo) Year"</span>, <span class="at">y=</span><span class="st">"Log-Transformed DID Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>,<span class="fl">0.1</span>), <span class="at">breaks=</span><span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.1</span>,<span class="fl">0.1</span>,<span class="at">by=</span>.<span class="dv">025</span>)) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">breaks=</span><span class="fu">c</span>(<span class="st">"Estimate"</span>,<span class="st">"Placebo"</span>),</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">values=</span><span class="fu">c</span>(<span class="st">"purple"</span>,<span class="st">"forestgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="dv">0</span>, <span class="at">color=</span><span class="st">"red"</span>, <span class="at">linetype=</span><span class="st">"dotted"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -504,6 +518,13 @@ interaction             0.8978948  0.9668531</code></pre>
 </div>
 </div>
 </div>
+</section>
+<section id="discussion-questions-1" class="level2">
+<h2 class="anchored" data-anchor-id="discussion-questions-1">Discussion Questions</h2>
+<ol type="1">
+<li><p>Do the placebo tests support the observed effect being a true causal effect?</p></li>
+<li><p>Do they indicate potential bias in one direction or another?</p></li>
+</ol>
 </section>
 <section id="additional-options" class="level2">
 <h2 class="anchored" data-anchor-id="additional-options">Additional Options</h2>
@@ -538,7 +559,7 @@ interaction             0.8978948  0.9668531</code></pre>
 </section>
 <section id="discussion-question-1" class="level2">
 <h2 class="anchored" data-anchor-id="discussion-question-1">Discussion Question</h2>
-<p>How does the transformation of the outcome change the interpretation of the estimate and of the assumptions required?</p>
+<p>How do transformations of the outcome change the interpretation of the estimate and of the assumptions required?</p>
 </section>
 
 </main>

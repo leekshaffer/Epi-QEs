@@ -72,8 +72,6 @@ Other quasi-experimental methods include:
 
 All materials: <https://github.com/leekshaffer/Epi-QEs/>
 
-[![](images/QR.png){fig-alt="QR code for above link" fig-align="center" width="2in"}](https://github.com/leekshaffer/Epi-QEs)
-
 References list in main folder
 
 Contact me: [lee.kennedy-shaffer\@yale.edu](mailto:lee.kennedy-shaffer@yale.edu)

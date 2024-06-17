@@ -280,8 +280,10 @@ summary(zika_glm)
 ## Compute bootstrap 95% CI for Poisson GLM:
 set.seed(4008335)
 glm_boot <- replicate(n=1000,
-                      expr=glm(Births~State+year+interaction+offset(log(Pop)), data=boot_data(),
-                               family=poisson(link="log"))$coefficients["interaction"])
+                      expr=glm(Births~State+year+interaction+offset(log(Pop)),
+                               data=boot_data(),
+                               family=poisson(link="log"))$
+                        coefficients["interaction"])
 glm_boot_res <- quantile(glm_boot, probs=c(0.5,0.025,0.975))
 ## Exponentiate results:
 exp(c(Estimate=unname(coef(zika_glm)["interaction"]),

@@ -1,7 +1,7 @@
 ---
 title: "Staggered Adoption DID Analysis: COVID-19 Vaccine Mandates"
 author: "Lee Kennedy-Shaffer, PhD"
-format: html
+format: pdf
 editor: visual
 ---
 

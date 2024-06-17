@@ -89,7 +89,8 @@ We can also plot Ohio versus the average outcome of the other states, grouped by
 ```{r}
 ## Create data set that averages across states within each group:
 lang_avg <- lang_0624 %>% group_by(type,week,last_day) %>%
-  dplyr::summarize(full_vax_avg=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE))
+  dplyr::summarize(full_vax_avg=mean(people_fully_vaccinated_per_hundred, 
+                                     na.rm=TRUE))
 ```
 
 ```{r}
@@ -331,10 +332,14 @@ synth_oh_cov <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
                     generate_placebos=T) %>%
   ## create predictors for SC model:
   ### four-week groups for outcome:
-  generate_predictor(time_window=-17:-14,lag17_14=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
-  generate_predictor(time_window=-13:-10,lag13_10=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
-  generate_predictor(time_window=-9:-6,lag9_6=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
-  generate_predictor(time_window=-5:-2,lag5_2=mean(people_fully_vaccinated_per_hundred, na.rm=TRUE)) %>%
+  generate_predictor(time_window=-17:-14,lag17_14=mean(people_fully_vaccinated_per_hundred, 
+                                                       na.rm=TRUE)) %>%
+  generate_predictor(time_window=-13:-10,lag13_10=mean(people_fully_vaccinated_per_hundred, 
+                                                       na.rm=TRUE)) %>%
+  generate_predictor(time_window=-9:-6,lag9_6=mean(people_fully_vaccinated_per_hundred, 
+                                                   na.rm=TRUE)) %>%
+  generate_predictor(time_window=-5:-2,lag5_2=mean(people_fully_vaccinated_per_hundred, 
+                                                   na.rm=TRUE)) %>%
   ### outcome, case rate, death rate, and vaccination rate in week prior:
   generate_predictor(time_window=-1,
                      lag01=people_fully_vaccinated_per_hundred,
@@ -343,8 +348,10 @@ synth_oh_cov <- lang_0624 %>% dplyr::filter(type != "Other Lottery State") %>%
                      vax_rate=daily_vaccinations_per_million) %>%
   ### four previous week average for cases and deaths:
   generate_predictor(time_window=-5:-2,
-                     recent_cases=mean(new_case_per_million, na.rm=TRUE),
-                     recent_deaths=mean(new_death_per_million, na.rm=TRUE)) %>%
+                     recent_cases=mean(new_case_per_million, 
+                                       na.rm=TRUE),
+                     recent_deaths=mean(new_death_per_million, 
+                                        na.rm=TRUE)) %>%
   ## generate SC weights on same optimization window:
   generate_weights(optimization_window=-17:-1,
                    margin_ipop = .02,sigf_ipop = 7,bound_ipop = 6) %>%

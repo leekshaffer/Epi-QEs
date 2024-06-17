@@ -679,7 +679,7 @@ single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time),
     t_int = t_int, data = data, progfunc = "None", scm = TRUE, 
     fixedeff = FALSE)
 
-Average ATT Estimate (p Value for Joint Null):  -1.02   ( 0.71 )
+Average ATT Estimate (p Value for Joint Null):  -1.02   ( 0.69 )
 L2 Imbalance: 0.868
 Percent improvement from uniform weights: 72%
 
@@ -688,13 +688,13 @@ Avg Estimated Bias: NA
 Inference type: Conformal inference
 
  Time Estimate 95% CI Lower Bound 95% CI Upper Bound p Value
-   19   -0.355             -2.498              1.788   0.559
-   20   -0.837             -2.980              1.306   0.513
-   21   -0.961             -3.104              1.182   0.482
-   22   -1.257             -3.400              0.887   0.498
-   23   -1.272             -3.415              0.871   0.709
-   24   -1.220             -3.363              0.923   0.728
-   25   -1.266             -3.409              0.878   0.798</code></pre>
+   19   -0.355             -2.498              1.788   0.563
+   20   -0.837             -2.980              1.306   0.475
+   21   -0.961             -3.104              1.182   0.490
+   22   -1.257             -3.400              0.887   0.535
+   23   -1.272             -3.415              0.871   0.689
+   24   -1.220             -3.363              0.923   0.746
+   25   -1.266             -3.409              0.878   0.799</code></pre>
 </div>
 </div>
 <p>We can then compare the original SC fit from the <code>tidysynth</code> package to the <code>augsynth</code> fit with SC on but outcome model and fixed effects off. Note that the <code>augsynth</code> plot calls can take a minute to run.</p>
@@ -1180,7 +1180,7 @@ Call:
 multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
     data = data)
 
-Average ATT Estimate (Std. Error): -0.170  (2.446)
+Average ATT Estimate (Std. Error): -0.170  (2.400)
 
 Global L2 Imbalance: 0.034
 Scaled Global L2 Imbalance: 0.042
@@ -1191,8 +1191,8 @@ Scaled Individual L2 Imbalance: 0.112
 Percent improvement from uniform individual weights: 88.8   
 
  Time Since Treatment   Level   Estimate Std.Error lower_bound upper_bound
-                    0 Average -0.1157730  2.358658   -4.054095    5.016333
-                    1 Average -0.2238981  2.537288   -4.296212    5.289427</code></pre>
+                    0 Average -0.1157730  2.316238   -4.195018    4.718623
+                    1 Average -0.2238981  2.487911   -4.500307    4.995915</code></pre>
 </div>
 </div>
 <p>The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:</p>

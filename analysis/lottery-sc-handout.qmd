@@ -533,7 +533,7 @@ NM_as_w <- tibble(State=rownames(NM_as$weights),
 NM_as_w
 ```
 
-Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true value because New Mexico had very high vaccination rates even before the intervention. Note that some weights appear negative but essentially round to 0.
+Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true outcome value because New Mexico had very high vaccination rates even before the intervention. Note that some weights appear negative but essentially round to 0.
 
 Adding a fixed effects term will be able to center the pre-treatment fit closer to zero.
 

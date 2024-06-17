@@ -76,6 +76,16 @@ What might cause heterogeneity in the effect of a state employee COVID-19 vaccin
 
 ![Goodman-Bacon (2021), Figure 3.](images/Adv_DID/Goodman-Bacon%20Fig3.png){fig-alt="A line plot where two lines start coinciding in the first period, diverge in the second period as one grows faster than the other, and then become parallel in the third period." fig-align="center"}
 
+## Forbidden Comparisons
+
+The weights on treatment effects can be non-convex (i.e., negative) if either of the following are true:
+
+-   There are time-varying treatment effects
+
+-   There are heterogeneous treatment effects across timing groups
+
+This gives an uninterpretable estimand, and can even switch the sign of the estimate.
+
 ## Goodman-Bacon Decomposition
 
 The TWFE model estimates a weighted average of all 2x2 DID comparisons.
@@ -128,15 +138,17 @@ $$
 
 . . .
 
-Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results.
+Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results. This implies different assumptions and bias-variance tradeoffs.
 
-## Restricting Controls
+## Restricting Observations
 
-See [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the interaction-weighting approach with a clean "control" $C$ that is either never-treated or last-treated.
+One approach to avoiding forbidden comparisons is restricting the observations used to fit the model.
 
-This avoids forbidden comparisons.
+[Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007) fit this model using only the not-yet-treated observations. They then use that to derive counterfactual outcomes for comparison.
 
-Their regression approach then implicitly weights by population share in each timing group.
+. . .
+
+[Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the approach with a clean "control" $C$ that is either never-treated or last-treated. Their regression approach then implicitly weights by population share in each timing group.
 
 ## Restricting Periods: First-Difference
 
@@ -226,9 +238,9 @@ It's easy to ignore the fundamentals when using the more advanced methods. Consi
 
 -   Think about possible heterogeneities and desired estimand
 
--   Use graphical displays and diagnostics to assess possible biases
+-   Use graphical displays and diagnostics to assess possible biases and trade-offs
 
--   Consider multiple estimation methods for robustness
+-   Consider multiple estimation methods for robustness to different assumptions
 
 -   Pre-specify, and explore with appropriate caveats
 :::

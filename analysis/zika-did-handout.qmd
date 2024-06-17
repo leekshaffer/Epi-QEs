@@ -125,14 +125,14 @@ knitr::kable(did_2x2_f,
 
 ## Linear TWFE Model
 
-The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the `zika_full` data set, which has columns for our outcome (`Rate`), unit identifier (`State`), time identifier (`year`, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (`interaction`, coded as 0 for unexposed and 1 for exposed).
+The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the `zika_full` data set, which has columns for our outcome (`Rate`), unit identifier (`State`, as a factor variable), time identifier (`year`, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (`interaction`, coded as 0 for unexposed and 1 for exposed).
 
 ```{r}
 ## Fit linear TWFE model and extract estimate and 95% CI:
 zika_lm <- lm(Rate~State+year+interaction, 
               data=zika_full)
-summary(zika_lm)
-confint(zika_lm, level=0.95)["interaction",]
+coef(zika_lm)[c("(Intercept)","year","interaction")]
+confint(zika_lm, parm="interaction", level=0.95)
 ```
 
 This gives an effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, suggesting a negative effect of the outbreak on birth rates in Pernambuco. The standard errors and confidence intervals should be treated with suspicion, however, as they ignore the correlation between observations in the same municipality in different years.
@@ -141,13 +141,14 @@ To correct the standard errors, we can cluster by the municipality using a linea
 
 ```{r}
 ## Fit a linear mixed effects model to account for clustering by municipality:
-zika_lmer <- lmer(Rate~State+year+interaction+(1|Code),
+zika_lmer <- lmer(Rate~State+year+interaction+
+                    (1|Code),
                   data=zika_full)
-summary(zika_lmer)
-confint(zika_lmer, level=0.95)["interaction",]
+fixef(zika_lmer)[c("(Intercept)","year","interaction")]
+confint(zika_lmer, parm="interaction", level=0.95)
 ```
 
-This gives the same effect estimate of `r format(coef(zika_lm)["interaction"], digits=2, nsmall=2)` births per 1,000 population, with a 95% confidence interval of \[`r format(confint(zika_lmer, level=0.95)["interaction",1], digits=3, nsmall=3)`, `r format(confint(zika_lmer, level=0.95)["interaction",2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect.
+This gives the same effect estimate of `r format(fixef(zika_lmer)["interaction"], digits=2, nsmall=2)` births per 1,000 population, with a 95% confidence interval of \[`r format(confint(zika_lmer, parm="interaction", level=0.95)[1], digits=3, nsmall=3)`, `r format(confint(zika_lmer, parm="interaction", level=0.95)[2], digits=3, nsmall=3)`\], indicating a statistically significant negative effect.
 
 Another approach to clustered inference is the block-bootstrap method.
 

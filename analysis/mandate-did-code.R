@@ -130,25 +130,44 @@ ggplot(data=bacon,
        shape="Comparison Type",
        color="Comparison Type")
 
-## Get total weight as a treated group:
-Ov_Wt <- bacon %>% group_by(treated) %>%
+## Get total weight as a treated group for all comparisons:
+Ov_Wt <- bacon %>%
+  group_by(treated) %>%
   dplyr::summarize(PosWeight=sum(weight)) %>%
   rename(`Treatment Time (Week)`=treated) %>%
   ungroup() %>%
+## Add a column with total weight as treated group for only
+  # timing comparisons
+  left_join(bacon %>% dplyr::filter(untreated != 99999) %>% 
+              group_by(treated) %>%
+              dplyr::summarize(PosWeightTiming=sum(weight)),
+            by=join_by(`Treatment Time (Week)`==treated)) %>%
 ## Add a column with total weight as control group:
   left_join(bacon %>% group_by(untreated) %>%
               dplyr::summarize(NegWeight=sum(weight)),
             by=join_by(`Treatment Time (Week)`==untreated)) %>%
 ## Subtract to get overall weight
-  mutate(Weight=PosWeight-NegWeight)
+  mutate(Weight=PosWeight-NegWeight,
+         WeightTiming=PosWeightTiming-NegWeight) %>%
+## Pivot longer for plotting:
+  pivot_longer(cols=starts_with("Weight"),
+               names_to="Type", values_to="Weight")
 
 ## Plot decomposition results:
-#| fig-cap: "Goodman-Bacon decomposition plot of overall weights on each timing group for TWFE model with no covariates"
-#| fig-alt: "Scatter plot of weight vs. treatment time for each timing group. The values are positive, between 0.05 and 0.20, for all treatment weeks from 31 to 39 (with no points for 34 or 37). The value is around -0.02 for week 42."
+#| fig-cap: "Goodman-Bacon decomposition plot of overall weights on each timing group for TWFE model with no covariates. Black triangles indicate weights calculated on all comparisons, gray circles indicate weights calculated on timing-only comparisons."
+#| fig-alt: "Scatter plot of weight vs. treatment time for each timing group. The black triangle values are positive, between 0.05 and 0.20, for all treatment weeks from 31 to 39 (with no points for 34, 37, 40, or 41). The value is around -0.02 for week 42. The gray circle values are lower, around 0 to 0.02 for weeks 31 to 39, slightly negative in week 39 and around -0.05 in week 42."
 ggplot(data=Ov_Wt, 
-       mapping=aes(x=`Treatment Time (Week)`,y=Weight)) +
+       mapping=aes(x=`Treatment Time (Week)`,y=Weight,
+                   shape=Type, color=Type)) +
+  geom_point(size=2.5) + 
   scale_x_continuous(limits=c(30,42),breaks=seq(30,42,by=2)) +
-  geom_point(size=2.5, shape="triangle") + theme_bw()
+  scale_shape_manual(breaks=c("Weight","WeightTiming"),
+                     labels=c("All Comparisons","Timing-Only"),
+                     values=c("triangle","circle")) +
+  scale_color_manual(breaks=c("Weight","WeightTiming"),
+                     labels=c("All Comparisons","Timing-Only"),
+                     values=c("black","grey50")) +
+  theme_bw()
 
 ## Run event_study function with estimator="all":
 ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
@@ -176,7 +195,14 @@ ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")
 plot_event_study(ES)
 
 ## Plot the results for just the dynamic estimator:
-#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2021/2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-cap: "Event-study results using the dynamic specification of the TWFE model on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+plot_event_study(ES %>% 
+                   dplyr::filter(estimator=="TWFE"),
+                 horizon=c(-10,8))
+
+## Plot the results for just the dynamic estimator:
+#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),

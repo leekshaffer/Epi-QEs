@@ -264,84 +264,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="linear-twfe-model" class="level2">
 <h2 class="anchored" data-anchor-id="linear-twfe-model">Linear TWFE Model</h2>
-<p>The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the <code>zika_full</code> data set, which has columns for our outcome (<code>Rate</code>), unit identifier (<code>State</code>), time identifier (<code>year</code>, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (<code>interaction</code>, coded as 0 for unexposed and 1 for exposed).</p>
+<p>The two-by-two DID that summarizes to the exposed/unexposed level is the most straightforward, but ignores a lot of the information we have on variability of the outcome. We can incorporate all of the information on the municipalities using the TWFE regression analysis. We start with the linear form. Note that we are now using the <code>zika_full</code> data set, which has columns for our outcome (<code>Rate</code>), unit identifier (<code>State</code>, as a factor variable), time identifier (<code>year</code>, coded as 0 for 2014 and 1 for 2016), and whether the exposure was in effect for that observation (<code>interaction</code>, coded as 0 for unexposed and 1 for exposed).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit linear TWFE model and extract estimate and 95% CI:</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>zika_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction, </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">data=</span>zika_full)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(zika_lm)[<span class="fu">c</span>(<span class="st">"(Intercept)"</span>,<span class="st">"year"</span>,<span class="st">"interaction"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = Rate ~ State + year + interaction, data = zika_full)
-
-Residuals:
-   Min     1Q Median     3Q    Max 
--8.492 -1.890 -0.038  1.839 13.205 
-
-Coefficients:
-                       Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)             15.1237     0.2046  73.933  &lt; 2e-16 ***
-StateRio Grande do Sul  -4.6376     0.2396 -19.354  &lt; 2e-16 ***
-year                    -0.1014     0.1765  -0.574 0.565894    
-interaction             -1.2069     0.3389  -3.562 0.000381 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 2.782 on 1360 degrees of freedom
-Multiple R-squared:  0.3017,    Adjusted R-squared:  0.3002 
-F-statistic: 195.9 on 3 and 1360 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>(Intercept)        year interaction 
+ 15.1236895  -0.1013549  -1.2069394 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(zika_lm, <span class="at">level=</span><span class="fl">0.95</span>)[<span class="st">"interaction"</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(zika_lm, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     2.5 %     97.5 % 
--1.8717302 -0.5421485 </code></pre>
+<pre><code>               2.5 %     97.5 %
+interaction -1.87173 -0.5421485</code></pre>
 </div>
 </div>
 <p>This gives an effect estimate of -1.21 births per 1,000 population, suggesting a negative effect of the outbreak on birth rates in Pernambuco. The standard errors and confidence intervals should be treated with suspicion, however, as they ignore the correlation between observations in the same municipality in different years.</p>
 <p>To correct the standard errors, we can cluster by the municipality using a linear mixed effects model with a random effect for municipality.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit a linear mixed effects model to account for clustering by municipality:</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>zika_full)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(zika_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>zika_lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Rate<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">1</span><span class="sc">|</span>Code),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>zika_full)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fixef</span>(zika_lmer)[<span class="fu">c</span>(<span class="st">"(Intercept)"</span>,<span class="st">"year"</span>,<span class="st">"interaction"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: Rate ~ State + year + interaction + (1 | Code)
-   Data: zika_full
-
-REML criterion at convergence: 6168.6
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--3.1420 -0.4326  0.0154  0.4308  3.5147 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- Code     (Intercept) 5.575    2.361   
- Residual             2.167    1.472   
-Number of obs: 1364, groups:  Code, 682
-
-Fixed effects:
-                       Estimate Std. Error t value
-(Intercept)            15.12369    0.20456  73.933
-StateRio Grande do Sul -4.63764    0.23963 -19.354
-year                   -0.10135    0.09338  -1.085
-interaction            -1.20694    0.17928  -6.732
-
-Correlation of Fixed Effects:
-            (Intr) StRGdS year  
-SttRGrnddSl -0.854              
-year         0.000 -0.195       
-interaction -0.319  0.374 -0.521</code></pre>
+<pre><code>(Intercept)        year interaction 
+ 15.1236895  -0.1013549  -1.2069394 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(zika_lmer, <span class="at">level=</span><span class="fl">0.95</span>)[<span class="st">"interaction"</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(zika_lmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Computing profile confidence intervals ...</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     2.5 %     97.5 % 
--1.5583050 -0.8555737 </code></pre>
+<pre><code>                2.5 %     97.5 %
+interaction -1.558305 -0.8555737</code></pre>
 </div>
 </div>
 <p>This gives the same effect estimate of -1.21 births per 1,000 population, with a 95% confidence interval of [-1.558, -0.856], indicating a statistically significant negative effect.</p>

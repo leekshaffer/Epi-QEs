@@ -448,14 +448,23 @@ Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it}
 <h2>Time-Varying Effects</h2>
 
 <img data-src="images/Adv_DID/Goodman-Bacon%20Fig3.png" alt="A line plot where two lines start coinciding in the first period, diverge in the second period as one grows faster than the other, and then become parallel in the third period." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 3.</p></section>
+<section id="forbidden-comparisons" class="slide level2">
+<h2>Forbidden Comparisons</h2>
+<p>The weights on treatment effects can be non-convex (i.e., negative) if either of the following are true:</p>
+<ul>
+<li><p>There are time-varying treatment effects</p></li>
+<li><p>There are heterogeneous treatment effects across timing groups</p></li>
+</ul>
+<p>This gives an uninterpretable estimand, and can even switch the sign of the estimate.</p>
+</section>
 <section id="goodman-bacon-decomposition" class="slide level2">
 <h2>Goodman-Bacon Decomposition</h2>
-<p>The TWFE model estimates a weighted average of all 2x2 comparisons.</p>
+<p>The TWFE model estimates a weighted average of all 2x2 DID comparisons.</p>
 
 <img data-src="images/Adv_DID/Goodman-Bacon%20Fig6.png" alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 6.</p></section>
 <section id="goodman-bacon-decomposition-1" class="slide level2">
 <h2>Goodman-Bacon Decomposition</h2>
-<p>This is equivalent to a weighted average of all unit-period-specific treatment effects, with some having negative weights.</p>
+<p>We can also observe the overall weight given to each treatment timing group, which may be negative if it is more often used as a control than a treated group.</p>
 
 <img data-src="images/Adv_DID/Goodman-Bacon%20Fig7.png" alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon (2021), Figure 7.</p></section></section>
 <section>
@@ -491,14 +500,16 @@ Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq 0} \delta_{k} I(K_{it} = k)+\epsilon
 Y_{it} = \alpha_i + \gamma_t + \sum_g \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
 \]</span></p>
 <div class="fragment">
-<p>Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results.</p>
+<p>Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results. This implies different assumptions and bias-variance tradeoffs.</p>
 </div>
 </section>
-<section id="restricting-controls" class="slide level2">
-<h2>Restricting Controls</h2>
-<p>See <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a> use the interaction-weighting approach with a clean “control” <span class="math inline">\(C\)</span> that is either never-treated or last-treated.</p>
-<p>This avoids forbidden comparisons.</p>
-<p>Their regression approach then implicitly weights by population share in each timing group.</p>
+<section id="restricting-observations" class="slide level2">
+<h2>Restricting Observations</h2>
+<p>One approach to avoiding forbidden comparisons is restricting the observations used to fit the model.</p>
+<p><a href="https://doi.org/10.1093/restud/rdae007">Borusyak et al.&nbsp;(2024)</a> fit this model using only the not-yet-treated observations. They then use that to derive counterfactual outcomes for comparison.</p>
+<div class="fragment">
+<p><a href="https://doi.org/10.1016/j.jeconom.2020.09.006">Sun and Abraham (2021)</a> use the approach with a clean “control” <span class="math inline">\(C\)</span> that is either never-treated or last-treated. Their regression approach then implicitly weights by population share in each timing group.</p>
+</div>
 </section>
 <section id="restricting-periods-first-difference" class="slide level2">
 <h2>Restricting Periods: First-Difference</h2>
@@ -592,8 +603,8 @@ Y_{it} = \alpha_i + \gamma_t + \sum_g \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(
 <ul>
 <li class="fragment"><p>Consider data source carefully</p></li>
 <li class="fragment"><p>Think about possible heterogeneities and desired estimand</p></li>
-<li class="fragment"><p>Use graphical displays and diagnostics to assess possible biases</p></li>
-<li class="fragment"><p>Consider multiple estimation methods for robustness</p></li>
+<li class="fragment"><p>Use graphical displays and diagnostics to assess possible biases and trade-offs</p></li>
+<li class="fragment"><p>Consider multiple estimation methods for robustness to different assumptions</p></li>
 <li class="fragment"><p>Pre-specify, and explore with appropriate caveats</p></li>
 </ul>
 </div>

@@ -68,19 +68,21 @@ did_2x2_f <- did_2x2 %>%
 
 ## Print formatted table of two-by-two analysis:
 knitr::kable(did_2x2_f,
-             digits=1)
+             digits=1,
+             caption="Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014")
 
 ## Fit linear TWFE model and extract estimate and 95% CI:
 zika_lm <- lm(Rate~State+year+interaction, 
               data=zika_full)
-summary(zika_lm)
-confint(zika_lm, level=0.95)["interaction",]
+coef(zika_lm)[c("(Intercept)","year","interaction")]
+confint(zika_lm, parm="interaction", level=0.95)
 
 ## Fit a linear mixed effects model to account for clustering by municipality:
-zika_lmer <- lmer(Rate~State+year+interaction+(1|Code),
+zika_lmer <- lmer(Rate~State+year+interaction+
+                    (1|Code),
                   data=zika_full)
-summary(zika_lmer)
-confint(zika_lmer, level=0.95)["interaction",]
+fixef(zika_lmer)[c("(Intercept)","year","interaction")]
+confint(zika_lmer, parm="interaction", level=0.95)
 
 ## First, get a list of unique codes by state
 codes <- zika_full %>% dplyr::select(Code,State) %>% distinct()

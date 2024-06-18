@@ -3,6 +3,8 @@ title: "Quasi-experiments in epidemiology: DID, SC, and staggered adoption"
 author: "Lee Kennedy-Shaffer, PhD"
 date: "June 18, 2024"
 format: revealjs
+embed-resources: true
+self-contained: true
 editor: visual
 ---
 

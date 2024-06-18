@@ -187,7 +187,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set that averages across states within each group:</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>lang_avg <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(type,week,last_day) <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">full_vax_avg=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">full_vax_avg=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'type', 'week'. You can override using the
 `.groups` argument.</code></pre>
@@ -557,28 +558,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">generate_placebos=</span>T) <span class="sc">%&gt;%</span></span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create predictors for SC model:</span></span>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="do">### four-week groups for outcome:</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">14</span>,<span class="at">lag17_14=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">13</span><span class="sc">:-</span><span class="dv">10</span>,<span class="at">lag13_10=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">9</span><span class="sc">:-</span><span class="dv">6</span>,<span class="at">lag9_6=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,<span class="at">lag5_2=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="do">### outcome, case rate, death rate, and vaccination rate in week prior:</span></span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">1</span>,</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lag01=</span>people_fully_vaccinated_per_hundred,</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_cases=</span>tot_cases_per_million,</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_deaths=</span>tot_death_per_million,</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vax_rate=</span>daily_vaccinations_per_million) <span class="sc">%&gt;%</span></span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="do">### four previous week average for cases and deaths:</span></span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,</span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_cases=</span><span class="fu">mean</span>(new_case_per_million, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_deaths=</span><span class="fu">mean</span>(new_death_per_million, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="do">## generate SC weights on same optimization window:</span></span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_weights</span>(<span class="at">optimization_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">1</span>,</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>                   <span class="at">margin_ipop =</span> .<span class="dv">02</span>,<span class="at">sigf_ipop =</span> <span class="dv">7</span>,<span class="at">bound_ipop =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>  <span class="do">## run SC:</span></span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_control</span>()</span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a><span class="do">### Examine fit and results:</span></span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_weights</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">14</span>,<span class="at">lag17_14=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, </span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>                                                       <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">13</span><span class="sc">:-</span><span class="dv">10</span>,<span class="at">lag13_10=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, </span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>                                                       <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">9</span><span class="sc">:-</span><span class="dv">6</span>,<span class="at">lag9_6=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, </span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>                                                   <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,<span class="at">lag5_2=</span><span class="fu">mean</span>(people_fully_vaccinated_per_hundred, </span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                                                   <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">### outcome, case rate, death rate, and vaccination rate in week prior:</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lag01=</span>people_fully_vaccinated_per_hundred,</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_cases=</span>tot_cases_per_million,</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">total_deaths=</span>tot_death_per_million,</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vax_rate=</span>daily_vaccinations_per_million) <span class="sc">%&gt;%</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="do">### four previous week average for cases and deaths:</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_predictor</span>(<span class="at">time_window=</span><span class="sc">-</span><span class="dv">5</span><span class="sc">:-</span><span class="dv">2</span>,</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_cases=</span><span class="fu">mean</span>(new_case_per_million, </span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>                     <span class="at">recent_deaths=</span><span class="fu">mean</span>(new_death_per_million, </span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>  <span class="do">## generate SC weights on same optimization window:</span></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_weights</span>(<span class="at">optimization_window=</span><span class="sc">-</span><span class="dv">17</span><span class="sc">:-</span><span class="dv">1</span>,</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>                   <span class="at">margin_ipop =</span> .<span class="dv">02</span>,<span class="at">sigf_ipop =</span> <span class="dv">7</span>,<span class="at">bound_ipop =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">## run SC:</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_control</span>()</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="do">### Examine fit and results:</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>synth_oh_cov <span class="sc">%&gt;%</span> <span class="fu">plot_weights</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -679,7 +686,7 @@ single_augsynth(form = form, unit = !!enquo(unit), time = !!enquo(time),
     t_int = t_int, data = data, progfunc = "None", scm = TRUE, 
     fixedeff = FALSE)
 
-Average ATT Estimate (p Value for Joint Null):  -1.02   ( 0.69 )
+Average ATT Estimate (p Value for Joint Null):  -1.02   ( 0.7 )
 L2 Imbalance: 0.868
 Percent improvement from uniform weights: 72%
 
@@ -688,13 +695,13 @@ Avg Estimated Bias: NA
 Inference type: Conformal inference
 
  Time Estimate 95% CI Lower Bound 95% CI Upper Bound p Value
-   19   -0.355             -2.498              1.788   0.563
-   20   -0.837             -2.980              1.306   0.475
-   21   -0.961             -3.104              1.182   0.490
-   22   -1.257             -3.400              0.887   0.535
-   23   -1.272             -3.415              0.871   0.689
-   24   -1.220             -3.363              0.923   0.746
-   25   -1.266             -3.409              0.878   0.799</code></pre>
+   19   -0.355             -2.498              1.788   0.575
+   20   -0.837             -2.980              1.306   0.493
+   21   -0.961             -3.104              1.182   0.494
+   22   -1.257             -3.400              0.887   0.519
+   23   -1.272             -3.415              0.871   0.721
+   24   -1.220             -3.363              0.923   0.737
+   25   -1.266             -3.409              0.878   0.787</code></pre>
 </div>
 </div>
 <p>We can then compare the original SC fit from the <code>tidysynth</code> package to the <code>augsynth</code> fit with SC on but outcome model and fixed effects off. Note that the <code>augsynth</code> plot calls can take a minute to run.</p>
@@ -910,7 +917,7 @@ Average ATT Estimate: -1.739</code></pre>
 # ℹ 22 more rows</code></pre>
 </div>
 </div>
-<p>Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true value because New Mexico had very high vaccination rates even before the intervention. Note that some weights appear negative but essentially round to 0.</p>
+<p>Clearly, the pre-treatment fit is poor here, and the synthetic control is underestimating the true outcome value because New Mexico had very high vaccination rates even before the intervention. Note that some weights appear negative but essentially round to 0.</p>
 <p>Adding a fixed effects term will be able to center the pre-treatment fit closer to zero.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit de-meaned SC using augsynth:</span></span>
@@ -1095,23 +1102,61 @@ Average ATT Estimate: -1.739</code></pre>
 </div>
 </div>
 </div>
-<p>Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model.</p>
+<p>Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model. We can look at the weights still to assess their reasonability, but they will not necessarily be interpretable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>ME_as_r_fe<span class="sc">$</span>weights</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]
+AK  0.039666425
+AL  0.001576101
+AZ  0.487095706
+CT  0.613535059
+DC  0.010734651
+FL -0.542294673
+GA -0.493500003
+HI -0.102509942
+IA -0.180786723
+ID -0.347788756
+IN -0.089471107
+KS -0.124123003
+MN  0.208748177
+MO  0.133386519
+MS -0.623625547
+MT -0.139686874
+ND -0.364959067
+NE  0.451779343
+NH -0.067190685
+NJ -0.160950511
+OK  0.744581550
+PA  0.933039201
+RI  0.015997051
+SC  1.096833147
+SD -0.584293622
+TN  0.337447651
+TX -1.070170055
+UT  0.086918669
+VA -0.179894024
+VT  0.267111606
+WI  0.192469496
+WY  0.450324242</code></pre>
+</div>
+</div>
 <p>Another option is to fit the generalized SCM using the <code>gsynth</code> package. We first need to install and load the package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("gsynth") # Run once if not yet installed</span></span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsynth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("gsynth") # Run once if not yet installed</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsynth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>## Syntax has been updated since v.1.2.0.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>## Comments and suggestions -&gt; yiqingxu@stanford.edu.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Then we can fit the model using the GSYN option for progfunc:</span></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>ME_gsynth <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
-<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
-<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
-<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"GSYN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Then we can fit the model using the GSYN option for progfunc:</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>ME_gsynth <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">unit=</span>stateF,</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">time=</span>week,</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>ME_data,</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">progfunc=</span><span class="st">"GSYN"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>One outcome and one treatment time found. Running single_augsynth.</code></pre>
 </div>
@@ -1128,12 +1173,12 @@ Average ATT Estimate: -1.739</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_gsynth, </span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ME_gsynth, </span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">inf=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -2 to 1, until a vertical line at Week 24, and then is around -1.5 and -1.2 at Weeks 24 and 25, respectively." width="672"></p>
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" alt="Line plot that fluctuates greatly, from around -2 to 1, until a vertical line at Week 24, and then is around -1.5 and -1.2 at Weeks 24 and 25, respectively." width="672"></p>
 <figcaption>Time series of the difference, Observed – Generalized Synthetic Maine, in percent fully vaccinated rate by week, starting from the week ending 1/17/21.</figcaption>
 </figure>
 </div>
@@ -1152,19 +1197,19 @@ Average ATT Estimate: -1.739</code></pre>
 <h2 class="anchored" data-anchor-id="staggered-adoption">Staggered Adoption</h2>
 <p>Finally, we can consider the multi-period, multi-unit staggered adoption case with the augmented synthetic control. We first set up the full data set by adding a treatment indicator variable, and then fit it using <code>augsynth</code>. Note that this defaults to including two-way fixed effects, balancing all pre-intervention periods, and partially pools the average and individual SC fits using the heuristic given by <a href="https://doi.org/10.1111/rssb.12448">Ben-Michael et al.&nbsp;(2022)</a>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set with indicator for treatment</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>Mult_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
-<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(<span class="sc">!</span>lottery,<span class="dv">0</span>,<span class="fu">if_else</span>(rel_week<span class="sc">&gt;=</span><span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>)))</span>
-<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit augmented SC on full data set:</span></span>
-<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>Mult_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
-<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">unit=</span>stateF,</span>
-<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time=</span>week,</span>
-<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>Mult_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create data set with indicator for treatment</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>Mult_data <span class="ot">&lt;-</span> lang_0624 <span class="sc">%&gt;%</span> </span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">treated=</span><span class="fu">if_else</span>(<span class="sc">!</span>lottery,<span class="dv">0</span>,<span class="fu">if_else</span>(rel_week<span class="sc">&gt;=</span><span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>)))</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit augmented SC on full data set:</span></span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>Mult_as <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(<span class="at">form=</span>people_fully_vaccinated_per_hundred<span class="sc">~</span>treated,</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">unit=</span>stateF,</span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time=</span>week,</span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>Mult_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>More than one treatment time found. Running multisynth.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Print results and summary:</span></span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>Mult_as</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Print results and summary:</span></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>Mult_as</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1173,14 +1218,14 @@ multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time),
 
 Average ATT Estimate: -0.170</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
 multisynth(form = form, unit = !!enquo(unit), time = !!enquo(time), 
     data = data)
 
-Average ATT Estimate (Std. Error): -0.170  (2.400)
+Average ATT Estimate (Std. Error): -0.170  (2.486)
 
 Global L2 Imbalance: 0.034
 Scaled Global L2 Imbalance: 0.042
@@ -1191,13 +1236,13 @@ Scaled Individual L2 Imbalance: 0.112
 Percent improvement from uniform individual weights: 88.8   
 
  Time Since Treatment   Level   Estimate Std.Error lower_bound upper_bound
-                    0 Average -0.1157730  2.316238   -4.195018    4.718623
-                    1 Average -0.2238981  2.487911   -4.500307    4.995915</code></pre>
+                    0 Average -0.1157730  2.392558   -4.355125    5.027869
+                    1 Average -0.2238981  2.583381   -4.739704    5.206234</code></pre>
 </div>
 </div>
 <p>The average effect is estimated to be -0.170, increasing from -0.115 in the first treated period to -0.224 in the second, although there are large standard errors throughout. We can plot the fit, which defaults to plotting all individual fits and the average:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Mult_as)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Joining with `by = join_by(Level)`</code></pre>
 </div>
@@ -1222,7 +1267,7 @@ increasing max.overlaps</code></pre>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" alt="Line plot with lines for 15 states, generally fluctuating between -1.25 and 1.25 prior to Week 0, and then expanding outward to a range of around -3 (New York) to 2.4 (Oregon) in Week 1. A darker average line is fairly close to 0 throughout" width="672"></p>
+<p><img src="lottery-sc-handout_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" alt="Line plot with lines for 15 states, generally fluctuating between -1.25 and 1.25 prior to Week 0, and then expanding outward to a range of around -3 (New York) to 2.4 (Oregon) in Week 1. A darker average line is fairly close to 0 throughout" width="672"></p>
 <figcaption>Time series of the difference in fully vaccinated percentage using staggered adoption synthetic control estimates for treated states, by time relative to intervention.</figcaption>
 </figure>
 </div>

@@ -3,6 +3,8 @@ title: "Introduction to Synthetic Control"
 author: "Lee Kennedy-Shaffer, PhD"
 date: "June 18, 2024"
 format: revealjs
+embed-resources: true
+self-contained: true
 editor: visual
 ---
 

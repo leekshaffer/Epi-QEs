@@ -665,7 +665,12 @@ plot(ME_as_r_fe,
      inf=FALSE)
 ```
 
-Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model.
+Clearly, this achieves an excellent pre-treatment fit, but it may in fact be over-fitting the data. The assumptions should be carefully considered in this model. We can look at the weights still to assess their reasonability, but they will not necessarily be interpretable. As you can see, there are negative weights and weights above one in this fit, so substantial extrapolation is occurring.
+
+```{r}
+## Check the weights:
+ME_as_r_fe$weights
+```
 
 Another option is to fit the generalized SCM using the `gsynth` package. We first need to install and load the package.
 

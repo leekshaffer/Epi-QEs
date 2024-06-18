@@ -404,6 +404,9 @@ ME_as_r_fe <- augsynth(form=people_fully_vaccinated_per_hundred~treated,
 plot(ME_as_r_fe, 
      inf=FALSE)
 
+## Check the weights:
+ME_as_r_fe$weights
+
 # install.packages("gsynth") # Run once if not yet installed
 library(gsynth)
 

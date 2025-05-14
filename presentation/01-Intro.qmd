@@ -346,20 +346,6 @@ ggplot(chol_2x2_po) +
   labs(title="Two-by-Two Difference-in-Differences, South London Cholera")
 ```
 
-## Controlled ITS
-
-Compare to other possible estimates of $\hat{Y}_{11}(0)$:
-
-::: incremental
--   $Y_{10}$: assumes no time trends
-
--   $Y_{01}$: assumes no differences in units
-
--   Modeled trend for $Y_{1t}$ over time: requires time model and more data
-
--   Regress $Y_{1t}$ on $Y_{0t}$: requires covariates, additional control units, and/or specific model
-:::
-
 # Details and Assumptions
 
 ## Regression Formulation

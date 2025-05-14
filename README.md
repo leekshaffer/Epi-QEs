@@ -2,9 +2,9 @@
 
 Materials for a workshop on quasi-experimental methods (difference-in-differences and synthetic control) in epidemiology
 
-Created by Lee Kennedy-Shaffer, PhD in May–June 2024. See <https://leekshaffer.com> or email [lee.kennedy-shaffer\@yale.edu](mailto:lee.kennedy-shaffer@yale.edu) for information.
+Created by Lee Kennedy-Shaffer, PhD in May 2024. See <https://leekshaffer.com> or email [lee.kennedy-shaffer\@yale.edu](mailto:lee.kennedy-shaffer@yale.edu) for information.
 
-First presented at the Society for Epidemiologic Research Annual Meeting, June 2024.
+First presented at the Society for Epidemiologic Research Annual Meeting, June 2024. Updated for 2025.
 
 ## Description of Directories:
 

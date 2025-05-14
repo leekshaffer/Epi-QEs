@@ -10,7 +10,7 @@ editor: visual
 
 ## Motivating Example: Cholera, London, 1850s
 
-::: columns
+::::: columns
 ::: {.column width="50%"}
 [![](images/DID/Coleman_Map.png){fig-alt="Map of water service areas in 1850s London" fig-align="center" width="536"}](https://dx.doi.org/10.2139/ssrn.3262234)
 :::
@@ -20,7 +20,7 @@ editor: visual
 
 [![](images/DID/Caniglia%20and%20Murray%202020.png){fig-alt="Title of Caniglia and Murray (2020)" fig-align="center" width="1022"}](https://doi.org/10.1007/s40471-020-00245-2)
 :::
-:::
+:::::
 
 # Formal Development
 
@@ -369,7 +369,7 @@ This may not be generalizable to other units, including the untreated units in t
 
 ## Summary: DID for Epidemiology
 
-::: columns
+::::: columns
 ::: {.column width="50%"}
 Advantages:
 
@@ -393,6 +393,6 @@ Disadvantages/Limitations:
 
 -   Limited inference with few units/periods
 :::
-:::
+:::::
 
 ## Questions

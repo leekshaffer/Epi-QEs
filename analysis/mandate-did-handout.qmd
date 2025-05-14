@@ -55,7 +55,7 @@ We begin by plotting the time series for visual inspection. First, we plot a tim
 #| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
 ggplot(data=Vax_weekly, 
        mapping=aes(x=End_Date,y=State, fill=mandate)) + 
-  geom_tile() +
+  geom_tile(width=8) +
   scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
                limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
                date_labels="%m/%d/%y") +

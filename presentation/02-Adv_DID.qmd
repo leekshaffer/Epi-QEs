@@ -1,7 +1,7 @@
 ---
 title: "DID with Staggered Adoption"
 author: "Lee Kennedy-Shaffer, PhD"
-date: "June 18, 2024"
+date: "June 10, 2025"
 format: revealjs
 embed-resources: true
 self-contained: true
@@ -21,8 +21,24 @@ What happens when multiple units adopt the intervention at different times?
 ::: callout-note
 ## Example
 
-Different states adopted COVID-19 vaccine mandates for state employees at different times.
+Twenty states adopted COVID-19 vaccine mandates for state employees at different times.
 :::
+
+## COVID-19 Vaccine Mandate Timing
+
+```{r}
+#| fig-cap: "Plot of state employee vaccination mandate timings, U.S. states, June 2021–February 2022"
+#| fig-alt: "A bar plot with bars for each state over the time range specified, with twenty states switching from red to blue sometime between August 2021 and October 2021, and the rest remaining red throughout."
+library(tidyverse)
+load(file="../data/mandate.Rda")
+ggplot(data=Vax_weekly, 
+       mapping=aes(x=End_Date,y=State, fill=mandate)) + 
+  geom_tile(width=8) +
+  scale_x_date(name="Date", date_breaks="4 weeks", expand=c(0,0),
+               limits=c(as.Date("2021-06-05"),as.Date("2022-03-05")),
+               date_labels="%m/%d/%y") +
+  theme_bw() + guides(fill="none")
+```
 
 # Staggered Adoption
 
@@ -30,28 +46,44 @@ Different states adopted COVID-19 vaccine mandates for state employees at differ
 
 -   Multiple units, treated at different time points
 
--   Multiple time points
+-   Multiple time points of observations
 
 ![](images/Adv_DID/stagger_plain.png){fig-alt="Schematic of multiple units observed over time, with transition from white squares (representing control) to green squares (representing intervention) over time" fig-align="center"}
 
-## Variety of 2x2 Comparisons
+## Types of 2x2s: Always Control vs. Always Control
 
-![](images/Adv_DID/stagger_simple2x2.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of a late vs. early treatment adopter highlighted" fig-align="center"}
+![](images/Adv_DID/Type1.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter always on control vs. late adopter always on control highlighted" fig-align="center"}
 
-## Variety of 2x2 Comparisons
+## Types of 2x2s: Switch vs. Always Control
 
-![](images/Adv_DID/stagger_earlyvslate.png){fig-alt="Staggered treatment adoption schematic with 2x2 comparison of early vs. late treatment adopter"}
+![](images/Adv_DID/Type2.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter switching vs. late adopter always on control highlighted" fig-align="center"}
+
+## Types of 2x2s: Always Treated vs. Always Control
+
+![](images/Adv_DID/Type3.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter always treated vs. late adopter always on control highlighted" fig-align="center"}
+
+## Types of 2x2s: Switch vs. Switch
+
+![](images/Adv_DID/Type4.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter switching vs. late adopter switching highlighted" fig-align="center"}
+
+## Types of 2x2s: Always Treated vs. Switch
+
+![](images/Adv_DID/Type5.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter always treated vs. late adopter switching highlighted" fig-align="center"}
+
+## Types of 2x2s: Always Treated vs. Always Treated
+
+![](images/Adv_DID/Type6.png){fig-alt="Staggered treatment adoption schematic with a 2x2 comparison of early adopter always treated vs. late adopter always treated highlighted" fig-align="center"}
 
 ## Two-Way Fixed Effects Model
 
 ::: callout-caution
-The TWFE model can accommodate this:
+The TWFE model can accommodate this *statistically*:
 
 $$
 Y_{it} = \alpha_i + \gamma_t + \theta I(X_{it} = 1)+\epsilon_{it}
 $$
 
-But as written it assumes **treatment effect homogeneity** across time periods, time-on-treatment, and units.
+But as written it assumes **treatment effect homogeneity** across time periods, time-on-treatment, and units: there is a single treatment effect $\theta$.
 :::
 
 # Challenge: Heterogeneity
@@ -74,33 +106,276 @@ What might cause heterogeneity in the effect of a state employee COVID-19 vaccin
 
 ![Goodman-Bacon (2021), Figure 1.](images/Adv_DID/Goodman-Bacon%20Fig1.png){fig-alt="Line plot (schematic) of outcomes over time for two units treated at different times with different responses to intervention and one untreated unit." fig-align="center"}
 
+## Weighted Average of Effects
+
+This complicates the interpretation of the estimand: it is still an **ATT**, but now that average is a weighted average that depends on the number of units at each switch point and the number of periods observed.
+
+## Weighed Average of Effects: Simplified Example
+
+```{r}
+#| fig-cap: "Plot of three-unit staggered adoption example with outcomes"
+#| fig-alt: "A line plot of an early adopter who gains 1 unit of outcome by treatment, a late adopter who gains 3 units of outcome by treatment, and a non-adopter."
+WAE <- tibble(Time=rep(c(1:5), 3),
+              Unit=factor(rep(c("Early","Late","None"), each=5),
+                          levels=c("None","Early","Late"),
+                          labels=c("U","k","l")),
+              X=factor(c(0,0,1,1,1,0,0,0,1,1,0,0,0,0,0)),
+              Y=c(4,5,7,8,9,1,2,3,7,8,0,1,2,3,4))
+
+ggplot(WAE, mapping=aes(x=Time, y=Y, group=Unit, color=Unit,
+                        shape=X)) + 
+  geom_point() + geom_line() + theme_bw() +
+  scale_y_continuous(breaks=seq(0,10,by=2), minor_breaks=0:10) +
+  coord_cartesian(ylim=c(0,10))
+```
+
+## Weighed Average of Effects: Simplified Example
+
+Using all periods:
+
+$$
+\theta = \frac{1+1+1+3+3}{5} = 1.8
+$$
+
+Using only the first four periods:
+
+$$
+\theta = \frac{1+1+3}{3} \approx 1.67
+$$
+
+## Weighted Average of Effects: Regression Estimates
+
+Using all periods:
+
+```{r}
+lm1 <- lm(Y~Time+Unit+X, data=WAE)
+coef(lm1)
+```
+
+Using only the first four periods:
+
+```{r}
+lm2 <- lm(Y~Time+Unit+X, 
+          data=WAE %>% filter(Time < 5))
+coef(lm2)
+```
+
+## Weightings
+
+If all units are of the same size/variance, per Goodman-Bacon (2021) Thm. 1:
+
+$$
+s_{kU} \propto \bar{D}_k (1-\bar{D}_k) \\
+s^k_{k \ell} \propto (\bar{D}_k -\bar{D}_\ell) (1-\bar{D}_k) \\
+s^\ell_{k \ell} \propto (\bar{D}_k -\bar{D}_\ell) (1-\bar{D}_\ell)
+$$
+
+where $\bar{D}$ is the proportion of periods treated.
+
+## Weighted Average of Effects: In Regression Estimator
+
+Using all periods:
+
+$$
+\bar{D}_k = 3/5, \quad \bar{D}_\ell = 2/5 \\
+s_{kU} \propto 6/25, \quad s_{\ell U} \propto 6/25 \\
+s^k_{k \ell} \propto 2/25, \quad s^\ell_{k \ell} \propto 2/25 \\
+\hat{\theta} = \frac{6 \cdot 1 + 6 \cdot 3 + 2 \cdot 1 + 2 \cdot 3}{6 + 6 + 2 +2} = 2
+$$
+
+## Weighted Average of Effects: In Regression Estimator
+
+Using only the first four periods:
+
+$$
+\bar{D}_k = 2/4, \quad \bar{D}_\ell = 1/4 \\
+s_{kU} \propto 2/16, \quad s_{\ell U} \propto 2/16 \\
+s^k_{k \ell} \propto 2/16, \quad s^\ell_{k \ell} \propto 1/16 \\
+\hat{\theta} = \frac{2 \cdot 1 + 2 \cdot 3 + 2 \cdot 1 + 1 \cdot 3}{2 + 2 + 2 + 1} \approx 1.857
+$$
+
 ## Time-Varying Effects
 
 ![Goodman-Bacon (2021), Figure 3.](images/Adv_DID/Goodman-Bacon%20Fig3.png){fig-alt="A line plot where two lines start coinciding in the first period, diverge in the second period as one grows faster than the other, and then become parallel in the third period." fig-align="center"}
 
 ## Forbidden Comparisons
 
-The weights on treatment effects can be non-convex (i.e., negative) if either of the following are true:
+The weights on treatment effects can be non-convex (i.e., negative) if there are **time-varying treatment effects**.
 
--   There are time-varying treatment effects
+This gives an uninterpretable TWFE estimand, and can even switch the sign of the estimate.
 
--   There are heterogeneous treatment effects across timing groups
+. . .
 
-This gives an uninterpretable estimand, and can even switch the sign of the estimate.
+Time-varying effects can be broadly categorized into:
 
-## Goodman-Bacon Decomposition
+-   **Dynamic treatment effects** that depend on how long a unit has been treated, and
+
+-   **Calendar time effects** that differ for all units based on the period of observation.
+
+Both can be problematic, although calendar time effects can be handled similarly to unit-varying effects.
+
+## Goodman-Bacon Decomposition: General
+
+::: callout-note
+## Goodman-Bacon (2021), Eqn 15
+
+$$
+plim_{N \to \infty} \hat{\theta} = \beta^{DD} = VWATT + VWCT - \Delta ATT,
+$$
+
+where:
+
+$VWATT$ is the variance-weighted ATT (as in computation above),
+
+$VWCT$ is the variance-weighted deviation from parallel trends, and
+
+$\Delta ATT$ is the weighted sum of changes in the treatment effect within timing groups.
+:::
+
+## Goodman-Bacon Decomposition: 2x2s
+
+::: callout-note
+## Goodman-Bacon (2021), Theorem 1
+
+$$
+\hat{\theta} = \sum_{k \neq U} \hat{\beta}^{2 \times 2}_{kU} + \sum_{k \neq U} \sum_{\ell > k} \left[ s^k_{k \ell} \hat{\beta}^{2 \times 2,k}_{k \ell} + s^\ell_{k \ell} \hat{\beta}^{2 \times 2,\ell}_{k \ell} \right]
+$$
+
+where:
+
+$\hat{\beta}^{2 \times 2}_{kU}$ is a comparison of timing group $k$ to untreated $U$,
+
+$\hat{\beta}^{2 \times 2,k}_{k \ell}$ is a comparison of an early-treated group $k$ to a late-treated group $\ell$ in the time between the two switches, and
+
+$\hat{\beta}^{2 \times 2,\ell}_{k \ell}$ is a comparison of a late-treated group $\ell$ to an early-treated group $k$ in the time after $\ell$ switched.
+:::
+
+## Goodman-Bacon Decomposition of DID Comparisons
 
 The TWFE model estimates a weighted average of all 2x2 DID comparisons.
 
 ![Goodman-Bacon (2021), Figure 6.](images/Adv_DID/Goodman-Bacon%20Fig6.png){fig-alt="A scatterplot of 2x2 DID estimates, ranging from -30 to 30, by weights, ranging from 0 to 1.2." fig-align="center"}
 
-## Goodman-Bacon Decomposition
+## Goodman-Bacon Decomposition of Treatment Effects
 
-We can also observe the overall weight given to each treatment timing group, which may be negative if it is more often used as a control than a treated group.
+We can observe the overall weight given to each treatment timing group, which may be negative if it is more often used as a control than a treated group.
 
 ![Goodman-Bacon (2021), Figure 7.](images/Adv_DID/Goodman-Bacon%20Fig7.png){fig-alt="Scatter plot of weights for each treatment group, ranging from -0.15 to 0.30, by treatment time, ranging from 1969 to 1985." fig-align="center"}
 
+## Issues with TWFE
+
+::: incremental
+(1) Under unit-varying treatment effects, $VWATT$ may not be a readily interpretable average of effects (and some may get negative weights).
+
+(2) Under any individual deviations from parallel trends (even if average does not deviate), $VWCT$ may not be 0.
+
+(3) Under time-varying treatment effects, $\Delta ATT \neq 0$: can result in negative weights on some effects.
+:::
+
+:::: {.fragment .fade-in}
+::: callout-warning
+Negative weights on some treatment effects *can* lead to averages outside of the range, or even a changed treatment effect sign.
+:::
+::::
+
 # Proposed Solutions
+
+## Possible Solutions
+
+(1) Restricting Observations
+    (a)  Exclude timing-only comparisons
+(2) Restricting Periods
+    (a) First differences only
+    (b) Last pre-treated only
+(3) Dynamic Specifications
+(4) Explicit Weightings
+
+## 1. Restricting Observations
+
+One approach to avoiding forbidden comparisons is restricting the observations used to fit the model.
+
+[Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007) fit this model using only the not-yet-treated observations. They then use that to derive counterfactual outcomes for comparison.
+
+. . .
+
+[Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the approach with a clean "control" $C$ that is either never-treated or last-treated. Their regression approach then implicitly weights by population share in each timing group.
+
+## 1. Restricting Observations
+
+::::: columns
+::: {.column width="50%"}
+Advantages:
+
+-   Simple to implement
+
+-   Straightforward interpretations for each treated unit
+:::
+
+::: {.column width="50%"}
+Disadvantages/Limitations:
+
+-   Still opaque weighting of unit- or time-varying effects
+
+-   Throws out potentially valuable information: inefficient
+:::
+:::::
+
+## 2a. Restricting Periods: First-Difference
+
+Use only the immediate switching effect. For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
+
+$$
+\begin{align*}
+\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} &\sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) \\
+&- \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
+\end{align*}
+$$
+
+## 2a. Restricting Periods: First-Difference
+
+![](images/Adv_DID/FirstDiff.png){fig-alt="Schematic of staggered adoption design. Only the last untreated (white) block and first treated (green) blocks in each row are highlighted for comparison."}
+
+## 2a. Restricting Periods: First-Difference
+
+Average these switcher estimates across all time periods $t$, weighted by number of units or individuals.
+
+See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017), or crossover estimate in [Kennedy-Shaffer et al. (2020)](https://doi.org/10.1002/sim.8451).
+
+## 2a. Restricting Periods: First-Difference
+
+::::: columns
+::: {.column width="50%"}
+Advantages:
+
+-   All switching units (except possibly last) are included equally
+
+-   Can restrict to only clean comparisons
+
+-   Avoids dynamic treatment effects
+:::
+
+::: {.column width="50%"}
+Disadvantages/Limitations:
+
+-   Throws out a lot of information: inefficient
+
+-   Does not capture the full scope of treatment effects
+
+-   Need to be very careful about wash-out periods and interpretations
+:::
+:::::
+
+## 2b. Restricting Periods: Last Pre-Treated
+
+[Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001) propose to estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme compared to the last pre-treatment period: suggested approaches are IPW, OR, and DR.
+
+Then summarize to an overall average effect weighted by $w_{g,t}$:
+
+$$
+\theta = \sum_g \sum_{t=2}^T w_{g,t} ATT_{g,t}.
+$$
+
+## 
 
 ## Group-Time ATT
 
@@ -142,43 +417,6 @@ $$
 
 Various methods use this approach, and differ in which comparisons/observations they allow and how they combine results. This implies different assumptions and bias-variance tradeoffs.
 
-## Restricting Observations
-
-One approach to avoiding forbidden comparisons is restricting the observations used to fit the model.
-
-[Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007) fit this model using only the not-yet-treated observations. They then use that to derive counterfactual outcomes for comparison.
-
-. . .
-
-[Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the approach with a clean "control" $C$ that is either never-treated or last-treated. Their regression approach then implicitly weights by population share in each timing group.
-
-## Restricting Periods: First-Difference
-
-Another approach would only consider one switching effect. For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
-
-$$
-\begin{align*}
-\widehat{DID}_{+,t} = \frac{1}{N_{1,0,t}} &\sum_{i:D_{i,t}=1,D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right) \\
-&- \frac{1}{N_{0,0,t}} \sum_{i:D_{i,t}=D_{i,t-1}=0} \left( Y_{i,t} - Y_{i,t-1} \right)
-\end{align*}
-$$
-
-## Restricting Periods: First-Difference
-
-Average these switcher estimates across all time periods $t$, weighted by number of units or individuals.
-
-See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017).
-
-## Restricting Periods: Last Pre-Treated
-
-[Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001) propose to estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme compared to the last pre-treatment period: suggested approaches are IPW, OR, and DR.
-
-Then summarize to an overall average effect weighted by $w_{g,t}$:
-
-$$
-\theta = \sum_g \sum_{t=2}^T w_{g,t} ATT_{g,t}.
-$$
-
 ## Generalized 2x2 Building Blocks
 
 More generally, can weight across all 2x2 DID comparisons, with weights chosen to target a specific estimand and then minimize variance.
@@ -191,7 +429,7 @@ See [Kennedy-Shaffer (2024)](https://doi.org/10.48550/arXiv.2405.08730).
 
 ## Summary of Options
 
-::: columns
+::::: columns
 ::: {.column width="40%"}
 Review/survey papers:
 
@@ -211,7 +449,7 @@ Review/survey papers:
 ::: {.column width="60%"}
 ![Roth et al. (2023), Table 2.](images/Adv_DID/Roth%20et%20al%202023%20Tbl%202.png){fig-alt="Table showing several R and Stata commands for advanced DID methods." fig-align="center" width="2142"}
 :::
-:::
+:::::
 
 # Other Challenges
 

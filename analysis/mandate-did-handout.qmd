@@ -36,13 +36,13 @@ We now load the required libraries.
 ## If you have not installed these packages before,
 ##  run the following line:
 # install.packages(c("bacondecomp","did2s","DIDmultiplegt"))
-## Either way, require the libraries:
-require(tidyverse)
-require(knitr)
-require(lme4)
-require(bacondecomp)
-require(did2s)
-require(DIDmultiplegt)
+## Either way, load the libraries:
+library(tidyverse)
+library(knitr)
+library(lme4)
+library(bacondecomp)
+library(did2s)
+library(DIDmultiplegt)
 ```
 
 ## Graphical Exploration

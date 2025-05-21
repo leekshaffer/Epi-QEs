@@ -20,7 +20,7 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 -   Abadie A. Using synthetic controls: feasibility, data requirements, and methodological aspect. *J Econom Lit* 2021;**59**:391-425. <https://doi.org/10.1257/jel.20191450>.
 
--   Baker AC, Larcker DF, Wang CCY. How much should we trust staggered difference-in-differences estimates? *J Fin Econ* 2022;**144**:370-395*.* <https://doi.org/10.1016/j.jfineco.2022.01.004>.
+-   Baker AC, Larcker DF, Wang CCY. How much should we trust staggered difference-in-differences estimates? *J Fin Econ* 2022;**144**:370-395. <https://doi.org/10.1016/j.jfineco.2022.01.004>.
 
 -   Butts K, Gardner J. did2s: Two-stage difference-in-differences. *R J* 2022;**14**:162-173. <https://doi.org/10.32614/RJ-2022-048>.
 
@@ -28,7 +28,7 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 -   Roth J, Sant'Anna PHC, Bilinski A, et al. What’s trending in difference-in-differences? A synthesis of the recent econometrics literature. *J Econom* 2023;**235**:2218-2244. <https://doi.org/10.1016/j.jeconom.2023.03.008>.
 
--   Roth J, Sant'Anna PHC. When is parallel trends sensitive to functional form? *Econometrica* 2023;**91**:737-747. [https://doi.org/10.3982/ECTA1940](https://doi.org/10.3982/ECTA19402){.uri}.
+-   Roth J, Sant'Anna PHC. When is parallel trends sensitive to functional form? *Econometrica* 2023;**91**:737-747. <https://doi.org/10.3982/ECTA19402>.
 
 -   Roth J. Interpreting event-studies from recent difference-in-differences methods. *arXiv* [preprint] 2024. <https://doi.org/10.48550/arXiv.2401.12309>.
 
@@ -80,65 +80,71 @@ Compiled by Lee Kennedy-Shaffer, PhD, in May–June 2024. See <https://leekshaff
 
 ## Methods Articles: DID and Staggered Adoption
 
--   Card D, Krueger A. Minimum wages and employment: a case study of the fast food industry in New Jersey and Pennsylvania. *Am Econ Rev* 1994;**84**:772-793.
+-   Card D, Krueger A. Minimum wages and employment: a case study of the fast food industry in New Jersey and Pennsylvania. *Am Econ Rev* 1994;**84**:772--793.
 
 -   Borusyak K, Jaravel X. Revisiting event study designs, with an application to the estimation of the marginal propensity to consume. *Harvard Scholar* [working paper] 2018. <https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf>.
 
+-   Cengiz D, Dube A, Lindner A, Zipperer B. The effect of minimum wages on low-wage jobs. *Q J Econ* 2019;**134**:1405--1454. <https://doi.org/10.1093/qje/qjz014>.
+
 -   Bilinski A, Hatfield LA. Nothing to see here? Non-inferiority approaches to parallel trends and other model assumptions. *arXiv* [preprint] 2020. <https://doi.org/10.48550/arXiv.1805.03273>.
 
--   De Chaisemartin C, D'Haultfoeuille X. Two-way fixed effects estimators with heterogeneous treatment effects. *Am Econ Rev* 2020;**110**:2964-2996. <https://doi.org/10.1257/aer.20181169>.
+-   De Chaisemartin C, D'Haultfoeuille X. Two-way fixed effects estimators with heterogeneous treatment effects. *Am Econ Rev* 2020;**110**:2964--2996. <https://doi.org/10.1257/aer.20181169>.
 
--   Kahn-Lang A, Lang K. The promise and pitfalls of differences-in-differences: reflections on *16 and Pregnant* and other applications. *J Bus Econ Stat* 2020;**38**:613-620. <https://doi.org/10.1080/07350015.2018.1546591>.
+-   Kahn-Lang A, Lang K. The promise and pitfalls of differences-in-differences: reflections on *16 and Pregnant* and other applications. *J Bus Econ Stat* 2020;**38**:613--620. <https://doi.org/10.1080/07350015.2018.1546591>.
 
--   Callaway B, Sant'Anna PHC. Difference-in-differences with multiple time periods. *J Econom* 2021;**225**:200-230. <https://doi.org/10.1016/j.jeconom.2020.12.001>.
+-   Callaway B, Sant'Anna PHC. Difference-in-differences with multiple time periods. *J Econom* 2021;**225**:200--230. <https://doi.org/10.1016/j.jeconom.2020.12.001>.
 
--   Goodman-Bacon A. Difference-in-differences with variation in treatment timing. *J Econom* 2021;**225**:254-277. <https://doi.org/10.1016/j.jeconom.2021.03.014>.
+-   Goodman-Bacon A. Difference-in-differences with variation in treatment timing. *J Econom* 2021;**225**:254--277. <https://doi.org/10.1016/j.jeconom.2021.03.014>.
 
--   Sun L, Abraham S. Estimating dynamic treatment effects in event studies with heterogeneous treatment effects. *J Econom* 2021;**225**:175-199. <https://doi.org/10.1016/j.jeconom.2020.09.006>.
+-   Sun L, Abraham S. Estimating dynamic treatment effects in event studies with heterogeneous treatment effects. *J Econom* 2021;**225**:175--199. <https://doi.org/10.1016/j.jeconom.2020.09.006>.
 
 -   Wooldridge JM. Two-way fixed effects, the two-way Mundlak regression, and difference-in-differences estimators. *SSRN* [working paper] 2021. <https://dx.doi.org/10.2139/ssrn.3906345>.
 
--   Athey S, Imbens GW. Design-based analysis in difference-in-differences settings with staggered adoption. *J Econom* 2022;**226**:62-79. <https://doi.org/10.1016/j.jeconom.2020.10.012>.
+-   Athey S, Imbens GW. Design-based analysis in difference-in-differences settings with staggered adoption. *J Econom* 2022;**226**:62--79. <https://doi.org/10.1016/j.jeconom.2020.10.012>.
 
 -   Gardner J. Two-stage difference in differences. *arXiv* [preprint] 2022. <https://doi.org/10.48550/arXiv.2207.05943>.
 
+-   Roth J, Sant'Anna PHC. Efficient estimation for staggered rollout designs. *J Pol Econ Microecon* 2023;**1*:669--709. <https://doi.org/10.1086/726581>.
+
 -   Caetano C, Callaway B. Difference in differences with time-varying covariates in the parallel trends assumption. *arXiv* [preprint] 2023. <https://doi.org/10.48550/arXiv.2202.02903>.
 
--   Wooldridge JM. Simple approaches to nonlinear difference-in-differences with panel data. *The Econom Journal* 2023;**26**:C31-C66. <https://doi.org/10.1093/ectj/utad016>.
+-   Wooldridge JM. Simple approaches to nonlinear difference-in-differences with panel data. *The Econom Journal* 2023;**26**:C31--C66. <https://doi.org/10.1093/ectj/utad016>.
 
 -   Borusyak K, Jaravel X, Spiess J. Revisiting event study designs: Robust and efficient estimation. *Rev Econ Studies* 2024 [epub ahead of print]. <https://doi.org/10.1093/restud/rdae007>.
 
 -   De Chaisemartin C, D'Haultfoeuille X. Difference-in-differences estimators of intertemporal treatment effects. *Rev Econ Stat* 2024 [epub ahead of print]. <https://doi.org/10.1162/rest_a_01414>.
 
--   Kennedy-Shaffer L. A generalized difference-in-differences estimator for unbiased estimation of desired estimands from staggered adoption and stepped-wedge settings. *arXiv* [preprint] 2024. <https://doi.org/10.48550/arXiv.2405.08730>.
+-   Kennedy-Shaffer L. A generalized difference-in-differences estimator for randomized stepped-wedge and observational staggered adoption settings. *arXiv* [preprint] 2024. <https://doi.org/10.48550/arXiv.2405.08730>.
+
+-   Baker AC, Callaway B, Cunningham S, Goodman-Bacon A, Sant'Anna PHC. Difference-in-differences designs: A practitioner's guide. *arXiv* [preprint] 2025. <https://doi.org/10.48550/arXiv.2503.13323>.
 
 ## Methods Articles: SC and Related Methods
 
--   Abadie A, Gardeazabal J. The economic costs of conflict: A case study of the Basque country. *Am Econ Rev* 2003;**93**:113-132. <https://doi.org/10.1257/000282803321455188>.
+-   Abadie A, Gardeazabal J. The economic costs of conflict: A case study of the Basque country. *Am Econ Rev* 2003;**93**:113--132. <https://doi.org/10.1257/000282803321455188>.
 
--   Abadie A, Diamond A, Hainmueller J. Synthetic control methods for comparative case studies: estimating the effect of California’s tobacco control program. *J Am Stat Assoc* 2010;**105**:493-505. <https://doi.org/10.1198/jasa.2009.ap08746>.
+-   Abadie A, Diamond A, Hainmueller J. Synthetic control methods for comparative case studies: estimating the effect of California’s tobacco control program. *J Am Stat Assoc* 2010;**105**:493--505. <https://doi.org/10.1198/jasa.2009.ap08746>.
 
--   Abadie A, Diamond A, Hainmueller J. Comparative politics and the synthetic control method. *Am J Pol Sci* 2015;**59**:495-510.<https://doi.org/10.1111/ajps.12116>.
+-   Abadie A, Diamond A, Hainmueller J. Comparative politics and the synthetic control method. *Am J Pol Sci* 2015;**59**:495--510.<https://doi.org/10.1111/ajps.12116>.
 
--   Brodersen KH, Gallusser F, Koehler J, et al.Inferring causal impact using Bayesian structural time-series models. *Ann Appl Stat* 2015;**9**:247-274. <https://doi.org/10.1214/14-AOAS788>.
+-   Brodersen KH, Gallusser F, Koehler J, et al.Inferring causal impact using Bayesian structural time-series models. *Ann Appl Stat* 2015;**9**:247--274. <https://doi.org/10.1214/14-AOAS788>.
 
 -   Doudchenko N, Imbens GW. Balancing, regression, difference-in-differences and synthetic control methods: A synthesis. *NBER* [working paper] 2016. <https://doi.org/10.3386/w22791>.
 
--   Xu Y. Generalized synthetic control method: causal inference with interactive fixed effects models. *Polit Anal* 2017;**25**:57-76. <https://doi.org/10.1017/pan.2016.2>.
+-   Xu Y. Generalized synthetic control method: causal inference with interactive fixed effects models. *Polit Anal* 2017;**25**:57--76. <https://doi.org/10.1017/pan.2016.2>.
 
--   Arkhangelsky D, Athey S, Hirshberg DA, et al. Synthetic difference-in-differences. *Am Econ Rev* 2021;**111**:4088-4118. <https://doi.org/10.1257/aer.20190159>.
+-   Arkhangelsky D, Athey S, Hirshberg DA, et al. Synthetic difference-in-differences. *Am Econ Rev* 2021;**111**:4088--4118. <https://doi.org/10.1257/aer.20190159>.
 
--   Abadie A, Cattaneo MD. Introduction to the special section on synthetic controls. *J Am Stat Assoc* 2021;**116**:1713-1715. <https://doi.org/10.1080/01621459.2021.2002600>.
+-   Abadie A, Cattaneo MD. Introduction to the special section on synthetic controls. *J Am Stat Assoc* 2021;**116**:1713--1715. <https://doi.org/10.1080/01621459.2021.2002600>.
 
--   Abadie A, L'Hour J. A penalized synthetic control estimator for disaggregated data. *J Am Stat Assoc* 2021;**116**:1817-1834. <https://doi.org/10.1080/01621459.2021.1971535>.
+-   Abadie A, L'Hour J. A penalized synthetic control estimator for disaggregated data. *J Am Stat Assoc* 2021;**116**:1817--1834. <https://doi.org/10.1080/01621459.2021.1971535>.
 
--   Ben-Michael E, Feller A, Rothstein J. The augmented synthetic control method. *J Am Stat Assoc* 2021;**116**:1789-1803. <https://doi.org/10.1080/01621459.2021.1929245>.
+-   Ben-Michael E, Feller A, Rothstein J. The augmented synthetic control method. *J Am Stat Assoc* 2021;**116**:1789--1803. <https://doi.org/10.1080/01621459.2021.1929245>.
 
--   Ferman B, Pinto C. Synthetic controls with imperfect pretreatment fit. *Quant Econ* 2021;**12**:1197-1221. <https://doi.org/10.3982/QE1596>.
+-   Ferman B, Pinto C. Synthetic controls with imperfect pretreatment fit. *Quant Econ* 2021;**12**:1197--1221. <https://doi.org/10.3982/QE1596>.
 
 -   Robbins MW, Davenport S. microsynth: Synthetic control methods for disaggregated and micro-level data in R. *J Stat Softw* 2021;**97**:2. <https://doi.org/10.18637/jss.v097.i02>.
 
--   Ben-Michael E, Feller A, Rothstein J. Synthetic controls with staggered adoption. *J R Stat Soc Ser B Stat Methodol* 2022;**84**:351-381. <https://doi.org/10.1111/rssb.12448>.
+-   Ben-Michael E, Feller A, Rothstein J. Synthetic controls with staggered adoption. *J R Stat Soc Ser B Stat Methodol* 2022;**84**:351--381. <https://doi.org/10.1111/rssb.12448>.
 
 ## Applications in Epidemiology/Public Health
 

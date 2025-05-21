@@ -37,13 +37,13 @@ We now load the required libraries.
 ##  run the following line:
 # install.packages(c("tidysynth","devtools"))
 ## Either way, require the libraries:
-require(tidyverse)
-require(knitr)
-require(tidysynth)
-require(devtools)
+library(tidyverse)
+library(knitr)
+library(tidysynth)
+library(devtools)
 ## If augsynth has not yet been installed, run the following line:
 # devtools::install_github("ebenmichael/augsynth")
-require(augsynth)
+library(augsynth)
 ```
 
 ## Graphical Exploration

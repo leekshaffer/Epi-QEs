@@ -33,9 +33,9 @@ We now load the required libraries.
 ##  run the following line:
 # install.packages(c("tidyverse","knitr","lme4"))
 ## Either way, the packages must be loaded:
-require(tidyverse)
-require(knitr)
-require(lme4)
+library(tidyverse)
+library(knitr)
+library(lme4)
 ```
 
 ## Graphical Exploration

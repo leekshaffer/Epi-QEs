@@ -1,11 +1,10 @@
 ### data-prep.R ###
 ### Cleaning and preparing data-raw for analyses ###
 ### Lee Kennedy-Shaffer ###
-### May 24, 2024 ###
 
-require(tidyverse)
-require(readxl)
-require(haven)
+library(tidyverse)
+library(readxl)
+library(haven)
 
 proj_wd <- getwd()
 
@@ -69,6 +68,10 @@ Vax_rates <- Vax %>% dplyr::filter(!(Location %in% Exclude_Locs)) %>%
 Vax_wk_summ <- Vax_rates %>% group_by(State,MMWR_year,MMWR_week) %>%
   summarize(Start_Date=min(Date), End_Date=max(Date),
             SCP=max(SCP),D1P=max(D1P)) %>% ungroup()
+Vax_25 <- Vax_wk_summ %>% dplyr::filter(MMWR_year==2021 & MMWR_week==25) %>%
+  dplyr::rename(SCP_25 = SCP,
+                D1P_25 = D1P) %>%
+  dplyr::select(State,SCP_25,D1P_25)
 
 ### Compute weekly vaccination rates and add in mandate date info:
 Vax_weekly <- Vax_wk_summ %>%
@@ -81,6 +84,8 @@ Vax_weekly <- Vax_wk_summ %>%
   dplyr::select(-c(MMWR_year_prior,MMWR_week_prior)) %>%
   dplyr::filter(MMWR_year > 2020) %>%
   mutate(SCP_diff=SCP-SCP_prior,D1P_diff=D1P-D1P_prior) %>%
+  left_join(Vax_25,
+            by=join_by(State)) %>%
   left_join(Dates, by="State") %>%
   mutate(Yr_Wk=paste0(MMWR_year,"_",formatC(MMWR_week, width=2, flag="0")),
          ever_mandate=!is.na(Mandate_Start),

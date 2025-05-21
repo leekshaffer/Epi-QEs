@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.554">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -34,7 +34,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -64,10 +64,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="zika-did-handout_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="zika-did-handout_files/libs/quarto-html/anchor.min.js"></script>
 <link href="zika-did-handout_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="zika-did-handout_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="zika-did-handout_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="zika-did-handout_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="zika-did-handout_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="zika-did-handout_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="zika-did-handout_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -123,9 +123,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  run the following line:</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("tidyverse","knitr","lme4"))</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Either way, the packages must be loaded:</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(tidyverse)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(knitr)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="graphical-exploration" class="level2">
@@ -228,7 +228,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">digits=</span><span class="dv">1</span>,</span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption=</span><span class="st">"Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs. 2014"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <caption>Table 1. Two-by-two DID analysis of birth rates in Pernambuco and Rio Grande do Sul, 2016 vs.&nbsp;2014</caption>
 <thead>
 <tr class="header">
@@ -421,7 +421,7 @@ interaction -0.345  0.404 -0.521</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                             2.5 %       97.5 %
-.sig01                  0.20779243  0.237716262
+.sig01                  0.20779243  0.237716263
 .sigma                  0.14689761  0.163351936
 (Intercept)             2.66012593  2.738260691
 StateRio Grande do Sul -0.43223814 -0.340709224
@@ -496,22 +496,24 @@ interaction             0.8978948  0.9668531</code></pre>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute bootstrap 95% CI for Poisson GLM:</span></span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4008335</span>)</span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>glm_boot <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="at">n=</span><span class="dv">1000</span>,</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">expr=</span><span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)), <span class="at">data=</span><span class="fu">boot_data</span>(),</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>])</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>glm_boot_res <span class="ot">&lt;-</span> <span class="fu">quantile</span>(glm_boot, <span class="at">probs=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">coef</span>(zika_glm)[<span class="st">"interaction"</span>]),</span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>glm_boot_res[<span class="st">"2.5%"</span>],</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>glm_boot_res[<span class="st">"97.5%"</span>]))</span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLMM, clustered by municipality:</span></span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>zika_glmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop))<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), </span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>zika_full,</span>
-<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
-<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>zika_glmer_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(zika_glmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
-<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
-<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">summary</span>(zika_glmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>]),</span>
-<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"2.5 %"</span>],</span>
-<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"97.5 %"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">expr=</span><span class="fu">glm</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop)),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">data=</span><span class="fu">boot_data</span>(),</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>                               <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))<span class="sc">$</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                        coefficients[<span class="st">"interaction"</span>])</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>glm_boot_res <span class="ot">&lt;-</span> <span class="fu">quantile</span>(glm_boot, <span class="at">probs=</span><span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">coef</span>(zika_glm)[<span class="st">"interaction"</span>]),</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>glm_boot_res[<span class="st">"2.5%"</span>],</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>glm_boot_res[<span class="st">"97.5%"</span>]))</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit Poisson GLMM, clustered by municipality:</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>zika_glmer <span class="ot">&lt;-</span> <span class="fu">glmer</span>(Births<span class="sc">~</span>State<span class="sc">+</span>year<span class="sc">+</span>interaction<span class="sc">+</span><span class="fu">offset</span>(<span class="fu">log</span>(Pop))<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>Code), </span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data=</span>zika_full,</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family=</span><span class="fu">poisson</span>(<span class="at">link=</span><span class="st">"log"</span>))</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>zika_glmer_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(zika_glmer, <span class="at">parm=</span><span class="st">"interaction"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiate results:</span></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="at">Estimate=</span><span class="fu">unname</span>(<span class="fu">summary</span>(zika_glmer)<span class="sc">$</span>coefficients[<span class="st">"interaction"</span>,<span class="st">"Estimate"</span>]),</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Lower=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"2.5 %"</span>],</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">CI.Upper=</span>zika_glmer_CI[<span class="st">"interaction"</span>,<span class="st">"97.5 %"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="discussion-question-1" class="level2">
@@ -556,18 +558,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -599,7 +590,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -607,7 +618,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -704,7 +715,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

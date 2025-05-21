@@ -1,8 +1,11 @@
 ---
 title: "Staggered Adoption DID Analysis: COVID-19 Vaccine Mandates"
 author: "Lee Kennedy-Shaffer, PhD"
-format: pdf
+format: html
 editor: visual
+execute:
+  message: false
+  warning: false
 ---
 
 ## Setting and Data
@@ -21,13 +24,15 @@ load(file="../data/mandate.Rda")
 
 ## Libraries
 
-Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clustered TWFE models. [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008) has a summary table with `R` packages that implement advanced DID methods. We will use three of them:
+Again, we will use `tidyverse` and `knitr` for general coding and `lme4` for clustered TWFE models. [Roth et al. (2023)](https://doi.org/10.1016/j.jeconom.2023.03.008) has a summary table with `R` packages that implement advanced DID methods. We will use four of them:
 
 1.  `bacondecomp` implements the decomposition from [Goodman-Bacon (2021)](https://doi.org/10.1016/j.jeconom.2021.03.014);
 
-2.  `did2s`, described in [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf), implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001); and
+2.  `did2s`, described in [Butts and Gardner (2022)](https://journal.r-project.org/articles/RJ-2022-048/RJ-2022-048.pdf), implements the two-stage DID approach of [Gardner (2021)](https://doi.org/10.48550/arXiv.2207.05943), as well as many other proposed methods including the dynamic specification of [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007), the IW estimator of [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006), and the aggregated approach of [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001);
 
-3.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169). Versions of this approach that can handle a wider array of settings, laid out in [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017) and [de Chaisemartin and d'Haultfoeiulle (2024)](https://doi.org/10.1162/rest_a_01414), along with sped-up analytic standard errors are implemented in the `DIDmultiplegtDYN`, which requires Java for installation.
+3.  `did`, described in [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001) gives more options for the CS approaches; and
+
+4.  `DIDmultiplegt` implements the first-difference approach of [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) (if you're on a Mac, you may need to install [Xcode](https://developer.apple.com/xcode/) from the App Store or [XQuartz](https://www.xquartz.org) first and re-start R). Versions of this approach that can handle a wider array of settings, laid out in [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017) and [de Chaisemartin and d'Haultfoeiulle (2024)](https://doi.org/10.1162/rest_a_01414), along with sped-up analytic standard errors are implemented in the `DIDmultiplegtDYN`, which requires Java for installation.
 
 We now load the required libraries.
 
@@ -35,13 +40,14 @@ We now load the required libraries.
 #| output: false
 ## If you have not installed these packages before,
 ##  run the following line:
-# install.packages(c("bacondecomp","did2s","DIDmultiplegt"))
+# install.packages(c("bacondecomp","did2s","did","DIDmultiplegt"))
 ## Either way, load the libraries:
 library(tidyverse)
 library(knitr)
 library(lme4)
 library(bacondecomp)
 library(did2s)
+library(did)
 library(DIDmultiplegt)
 ```
 
@@ -98,7 +104,7 @@ ggplot() +
   theme_bw()
 ```
 
-Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these three states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data errors found at other times.
+Several states appear to have implausible declines or rates at 100. We can identify data errors that explain some of these peculiarities, e.g. [New Hampshire](https://www.nhpr.org/nh-news/2021-11-02/nh-covid-19-data-inaccurate), [Pennsylvania](https://wjactv.com/news/local/data-correction-drops-covid-vaccine-rates-in-pennsylvania), and [Washington](https://www.spokesman.com/stories/2021/sep/21/explaining-the-discrepancy-between-cdc-and-health-/). We will exclude these three states from the analysis, but a full analysis should examine the other states as well. We will also limit the analysis weeks to 2021, MMWR weeks 25–42 to both be more focused on timing around the implementation of mandates and exclude some data inconsistencies found at other times.
 
 ```{r}
 ## Exclude New Hampshire, Pennsylvania, Washington:
@@ -152,7 +158,7 @@ Similar plotting and analyses could be done on the complete series percentage by
 
 ## TWFE Models
 
-First, we fit TWFE models (using `lmer` to get clustered confidence intervals), the so-called "static" specification. We fit it once with just the fixed effects, and once adding `D1P_prior` as a covariate.
+First, we fit TWFE models (using `lmer` to get clustered confidence intervals), the so-called "static" specification. We fit it once with just the fixed effects (no covariates), once adding `D1P_25` as a covariate (not time-varying) and once adding `D1P_prior` as a covariate (time-varying).
 
 ```{r}
 ## Fit TWFE model with no covariates:
@@ -161,28 +167,38 @@ TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
                    dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 ## Get 95% CI:
 TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
-## Fit TWFE model with prior-week as covariate:
-TWFE_D1P_ctrl <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+
+## Fit TWFE model with week 25 as covariate:
+TWFE_D1P_ctrl1 <- lmer(D1P~D1P_25+factor(MMWR_week)+State+
                         mandate+(1|State),
                       data=Vax_weekly %>% 
                         dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
-TWFE_D1P_ctrl_CI <- confint(TWFE_D1P_ctrl, 
+TWFE_D1P_ctrl1_CI <- confint(TWFE_D1P_ctrl1, 
+                            parm="mandateTRUE", level=0.95)
+## Fit TWFE model with prior-week as covariate:
+TWFE_D1P_ctrl2 <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+
+                        mandate+(1|State),
+                      data=Vax_weekly %>% 
+                        dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
+TWFE_D1P_ctrl2_CI <- confint(TWFE_D1P_ctrl2, 
                             parm="mandateTRUE", level=0.95)
 
 ## Summarize results from the two models:
 TWFE_results <- tibble(Model=c("Fixed Effects Only",
+                               "Fixed Effects + Week 25 Value",
                                "Fixed Effects + Prior Week Value"),
                        Estimate=format(c(summary(TWFE_D1P)$coefficients["mandateTRUE","Estimate"],
-                                  summary(TWFE_D1P_ctrl)$coefficients["mandateTRUE","Estimate"]), digits=3, nsmall=3),
+                                         summary(TWFE_D1P_ctrl1)$coefficients["mandateTRUE","Estimate"],
+                                  summary(TWFE_D1P_ctrl2)$coefficients["mandateTRUE","Estimate"]), digits=3, nsmall=3),
                        `95% CI`=c(paste(format(TWFE_D1P_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", "),
-                                  paste(format(TWFE_D1P_ctrl_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", ")))
+                                  paste(format(TWFE_D1P_ctrl1_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", "),
+                                  paste(format(TWFE_D1P_ctrl2_CI["mandateTRUE",], digits=3, nsmall=3), collapse=", ")))
 
 ## Print the formatted table:
 knitr::kable(TWFE_results,
              caption="Table 1. Results from TWFE models on first-dose percentage.")
 ```
 
-The two models give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.
+Note that the static covariate does not affect the results, as there are already fixed effects included for each state. The two different models (no covariates vs. time-varying covariate) give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.
 
 ## Goodman-Bacon Decomposition
 
@@ -276,15 +292,15 @@ ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
                                 arrange(State) %>%
                                 mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
                               by=join_by(State)),
-                  yname="SCP",
+                  yname="D1P",
                   idname="StateID",
                   gname="First_Week",
                   tname="MMWR_week",
                   estimator="all")
 ## List all results:
-ES
+# ES
 ## Pick out a specific method:
-ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")
+# ES %>% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")
 ```
 
 ```{r}
@@ -302,8 +318,11 @@ For easier inspection, particular estimators can be plotted alone, and the lead/
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="TWFE"),
-                 horizon=c(-10,8))
+                 horizon=c(-10,8)) +
+  labs(y="Point Est and 95% CI")
 ```
+
+This is the basic dynamic estimator that arises from including specifying leads/lags in the TWFE model. You can see some evidence for heterogeneous treatment effects: the effect seems to grow with time since treatment. There is also evidence for non-parallel trends: the lead times consistently have positive point estimates, indicating the treated states were growing faster than untreated states prior to treatment. These are decreasing, indicating that this effect was disappearing, or possibly changing.
 
 ```{r}
 ## Plot the results for just the dynamic estimator:
@@ -311,8 +330,11 @@ plot_event_study(ES %>%
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)"),
-                 horizon=c(-10,8))
+                 horizon=c(-10,8)) +
+  labs(y="Point Est and 95% CI")
 ```
+
+In this case, the results are quite similar to the TWFE event study specification. Since there are so many untreated states, limiting comparisons to not-yet-treated does not remove many comparisons.
 
 ```{r}
 ## Plot the results for just the Sun and Abraham estimator:
@@ -320,8 +342,11 @@ plot_event_study(ES %>%
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Sun and Abraham (2020)"),
-                 horizon=c(-10,8))
+                 horizon=c(-10,8)) +
+  labs(y="Point Est and 95% CI")
 ```
+
+Similarly, the Sun and Abraham estimator that only uses never-treated for comparison has similar results as well.
 
 ```{r}
 ## Plot the results for just the Callaway abnd Sant'Anna estimator:
@@ -329,8 +354,85 @@ plot_event_study(ES %>%
 #| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
 plot_event_study(ES %>% 
                    dplyr::filter(estimator=="Callaway and Sant'Anna (2020)"),
-                 horizon=c(-10,8))
+                 horizon=c(-10,8)) +
+  labs(y="Point Est and 95% CI")
 ```
+
+This approach gives noticeably different results from the others, especially in the lead periods. This may be because the CS specification allows not-yet-treated controls to be used and later-treated units may have better parallel trends than never-treated units. CS also does not require comparison only to the last-pretreated period, allowing more information to be used in the adjustment for fixed effects of time.
+
+In all cases, note how the standard errors tend to increase further from 0, as there are fewer treated (and in some cases, control) units available to make those estimates. Aggregating to a single parameter depends on the desired interpretation and variance properties.
+
+We can get more detail on the CS approach using the functions in the `did` package:
+
+```{r}
+## It requires a 0 value for the start period for untreated units
+Vax_CS <- Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
+                    left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
+                                dplyr::select(State,MMWR_week) %>%
+                                rename(First_Week=MMWR_week),
+                              by=join_by(State)) %>%
+                    left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
+                                arrange(State) %>%
+                                mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
+                              by=join_by(State)) %>%
+  dplyr::mutate(First_Week=if_else(is.na(First_Week),0,First_Week))
+```
+
+The `att_gt` function estimates all group-time ATTs:
+
+```{r}
+attgt <- att_gt(yname="D1P", tname="MMWR_week", 
+                 gname="First_Week", idname="StateID",
+                 data=Vax_CS,
+                 control_group="nevertreated")
+# attgt
+```
+
+Then, these group-time ATTs can be aggregated in different ways using the `aggte` function:
+
+```{r}
+agg.simple <- aggte(attgt, type="simple")
+summary(agg.simple)
+
+agg.es <- aggte(attgt, type="dynamic")
+summary(agg.es)
+
+agg.gs <- aggte(attgt, type="group")
+summary(agg.gs)
+```
+
+We can plot the event-study plot again from these results using the `ggdid` function:
+
+```{r}
+## Plot the event-study results for the CS estimator:
+#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2021) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+
+ggdid(agg.es) +
+  coord_cartesian(xlim=c(-10,8))
+```
+
+This package also allows us to add covariates with the `xformla` option:
+
+```{r}
+attgt1 <- att_gt(yname="D1P", tname="MMWR_week",
+                gname="First_Week", idname="StateID",
+                xformla = ~D1P_prior,
+                data=Vax_CS,
+                control_group="nevertreated")
+# attgt1
+
+agg.es.1 <- aggte(attgt1, type="dynamic", na.rm=TRUE)
+summary(agg.es.1)
+
+#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2021) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."
+#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."
+
+ggdid(agg.es.1) +
+  coord_cartesian(xlim=c(-10,8))
+```
+
+Now, the point estimates after treatment are generally positive, although still small and highly uncertain.
 
 ## First-Difference Switching Effect
 
@@ -351,7 +453,8 @@ Vax_firstWeek <- Vax_adj %>%
               mutate(StateID=1:length(unique(Vax_adj %>% pull(State)))),
             by=join_by(State))
 ## Run analysis method:
-dCdH <- did_multiplegt(df=Vax_firstWeek,
+dCdH <- did_multiplegt(mode="old",
+                       df=Vax_firstWeek,
                        Y="D1P",
                        G="StateID",
                        T="MMWR_week",
@@ -361,7 +464,7 @@ dCdH <- did_multiplegt(df=Vax_firstWeek,
                        brep=0,
                        cluster="StateID")
 ## See full results:
-dCdH
+# dCdH
 ```
 
 The treatment effect estimate is `r format(dCdH$effect["treatment"], digits=3, nsmall=3)`. We can also pull the dynamic and placebo effect estimates from the output.
@@ -426,8 +529,10 @@ dCdH_dyn
 
 ## Additional Options
 
-Other methods and specifications are possible, along with incorporating covariates into some of these methods. The review papers listed in the slides are a good place to start to investigate these.
+Other methods, specifications, and aggregations are possible. The review papers listed in the slides are a good place to start to investigate these.
 
-## Discussion Question
+## Discussion Questions
 
-Is this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?
+- Are this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?
+
+- What would you conclude from these results?

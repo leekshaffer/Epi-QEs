@@ -91,8 +91,8 @@ Vax_weekly <- Vax_wk_summ %>%
          ever_mandate=!is.na(Mandate_Start),
          mandate=if_else(!ever_mandate,FALSE,
                          if_else(Mandate_Start<=End_Date,TRUE,FALSE)),
-         Wks_mandate=ifelse(mandate==0,0,ceiling((End_Date-Mandate_Start+1)/7)),
-         LeadLag=ifelse(is.na(Mandate_Start),NA,ceiling((End_Date-Mandate_Start+1)/7)))
+         Wks_mandate=ifelse(mandate==0,0,ceiling((End_Date-Mandate_Start+1)/7)-1),
+         LeadLag=ifelse(is.na(Mandate_Start),NA,ceiling((End_Date-Mandate_Start+1)/7)-1))
 ### Save output in clean data folder:
 save(Vax_weekly, file="data/mandate.Rda")
 

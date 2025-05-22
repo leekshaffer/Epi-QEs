@@ -163,21 +163,21 @@ First, we fit TWFE models (using `lmer` to get clustered confidence intervals), 
 ```{r}
 ## Fit TWFE model with no covariates:
 TWFE_D1P <- lmer(D1P~factor(MMWR_week)+State+mandate+(1|State),
-                 data=Vax_weekly %>% 
+                 data=Vax_adj %>% 
                    dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 ## Get 95% CI:
 TWFE_D1P_CI <- confint(TWFE_D1P, parm="mandateTRUE", level=0.95)
 ## Fit TWFE model with week 25 as covariate:
 TWFE_D1P_ctrl1 <- lmer(D1P~D1P_25+factor(MMWR_week)+State+
                         mandate+(1|State),
-                      data=Vax_weekly %>% 
+                      data=Vax_adj %>% 
                         dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 TWFE_D1P_ctrl1_CI <- confint(TWFE_D1P_ctrl1, 
                             parm="mandateTRUE", level=0.95)
 ## Fit TWFE model with prior-week as covariate:
 TWFE_D1P_ctrl2 <- lmer(D1P~D1P_prior+factor(MMWR_week)+State+
                         mandate+(1|State),
-                      data=Vax_weekly %>% 
+                      data=Vax_adj %>% 
                         dplyr::filter(Yr_Wk %in% Yr_Wk_Sel))
 TWFE_D1P_ctrl2_CI <- confint(TWFE_D1P_ctrl2, 
                             parm="mandateTRUE", level=0.95)
@@ -198,7 +198,7 @@ knitr::kable(TWFE_results,
              caption="Table 1. Results from TWFE models on first-dose percentage.")
 ```
 
-Note that the static covariate does not affect the results, as there are already fixed effects included for each state. The two different models (no covariates vs. time-varying covariate) give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.
+Note that the static covariate does not affect the results, as there are already fixed effects included for each state. The two different models (no covariates vs. time-varying covariate) give fairly different results, with large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.
 
 ## Goodman-Bacon Decomposition
 
@@ -279,19 +279,30 @@ The final switching group receives a negative overall weight, as it is used as a
 
 ## Dynamic Specification and Alternative Estimators
 
+### Data Prep
+
+Many of the following functions require two additional variables: a first-treated period variable that is constant for each unit (determines the group/cohort and treatment indicator), and, in some cases a unique numeric or factor ID for the unit. We create those as `First_Week` and `StateID`, respectively. For never-treated units, `event_study` allows either a 0 or `NA` for the first-treated period, while the `did` package requires a 0.
+
+```{r}
+Vax_prep <- Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>% 
+  left_join(Vax_adj %>% dplyr::filter(LeadLag==0) %>% 
+              dplyr::select(State,MMWR_week) %>%
+              rename(First_Week=MMWR_week),
+            by=join_by(State)) %>%
+  dplyr::mutate(First_Week=replace_na(First_Week, 0)) %>%
+  left_join(tibble(State=unique(Vax_adj %>% pull(State))) %>%
+              arrange(State) %>%
+              mutate(StateID=1:length(unique(Vax_adj %>% pull(State)))),
+            by=join_by(State))
+```
+
+### Multi-Method Quick Fits
+
 The `event_study` function in the `did2s` package implements many proposed DID/staggered adoption methods. These can be chosen using the `estimator` option, or all can be fit by setting `estimator="all"`.
 
 ```{r}
 ## Run event_study function with estimator="all":
-ES <- event_study(data=Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
-                    left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
-                                dplyr::select(State,MMWR_week) %>%
-                                rename(First_Week=MMWR_week),
-                              by=join_by(State)) %>%
-                    left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
-                                arrange(State) %>%
-                                mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
-                              by=join_by(State)),
+ES <- event_study(data=Vax_prep,
                   yname="D1P",
                   idname="StateID",
                   gname="First_Week",
@@ -322,7 +333,7 @@ plot_event_study(ES %>%
   labs(y="Point Est and 95% CI")
 ```
 
-This is the basic dynamic estimator that arises from including specifying leads/lags in the TWFE model. You can see some evidence for heterogeneous treatment effects: the effect seems to grow with time since treatment. There is also evidence for non-parallel trends: the lead times consistently have positive point estimates, indicating the treated states were growing faster than untreated states prior to treatment. These are decreasing, indicating that this effect was disappearing, or possibly changing.
+This is the basic dynamic estimator that arises from including leads/lags (except -1, the last pre-treatment period) in the TWFE model. You can see some evidence for heterogeneous treatment effects: the effect seems to grow with time since treatment. There is also evidence for non-parallel trends: the lead times consistently have positive point estimates, indicating the treated states were growing faster than untreated states prior to treatment. These are decreasing, indicating that this effect was disappearing, or possibly changing. Under heterogeneous treatment effects (either calendar time-varying treatment effects or different dynamic effects by adoption cohorts), there can still be cross-lag contamination and negative weights. This even means that apparent pre-trends may not be reliable (i.e., non-zero lead estimates can result from heterogeneous dynamic effects rather than a violation of parallel trends).
 
 ```{r}
 ## Plot the results for just the dynamic estimator:
@@ -334,7 +345,9 @@ plot_event_study(ES %>%
   labs(y="Point Est and 95% CI")
 ```
 
-In this case, the results are quite similar to the TWFE event study specification. Since there are so many untreated states, limiting comparisons to not-yet-treated does not remove many comparisons.
+The BJS estimator is a two-stage estimator that first fits a model for the unit and time fixed effects on the untreated unit-periods only. Then it removes these effects from the treated unit-periods and regresses the residuals on the leads/lags. It thus requires a strict parallel trends assumption (by using all prior periods to fit the counterfactual) and weights the group-time ATTs implicitly through the final OLS regression.
+
+In this case, the results are fairly similar to the TWFE event study specification.
 
 ```{r}
 ## Plot the results for just the Sun and Abraham estimator:
@@ -346,7 +359,7 @@ plot_event_study(ES %>%
   labs(y="Point Est and 95% CI")
 ```
 
-Similarly, the Sun and Abraham estimator that only uses never-treated for comparison has similar results as well.
+The Sun and Abraham estimator fits a dynamic regression with leads/lags interacted with each timing group, leaving out the never- or last-treated group. All comparisons are made to the final pre-treatment week. These are then weighted for each lead/lag by the share of units/observations at each lead/lag that falls into that timing group. This works well for unit-level homogeneity and ensures no negative weights even under different dynamic trends. It is also a strong restriction, not using any information from not-yet-treated groups (limiting efficiency in the bias-variance tradeoff); and does not permit covariates.
 
 ```{r}
 ## Plot the results for just the Callaway abnd Sant'Anna estimator:
@@ -358,32 +371,22 @@ plot_event_study(ES %>%
   labs(y="Point Est and 95% CI")
 ```
 
-This approach gives noticeably different results from the others, especially in the lead periods. This may be because the CS specification allows not-yet-treated controls to be used and later-treated units may have better parallel trends than never-treated units. CS also does not require comparison only to the last-pretreated period, allowing more information to be used in the adjustment for fixed effects of time.
+This approach gives noticeably different results from the others for the lead periods, although the post-treatment effect estimates are pretty similar. There are two main differences in the fitting compared to the Sun and Abraham approach: (1) not-yet-treated units are also used as controls here; and (2) pre-treatment lag estimates are estimated compared to the prior period, rather than to the last pre-treatment period. Thus, the lags are testing a different parallel trends (one period-forward trends) than Sun and Abraham (vs. last pre-treatment period trends). If there is anticipation, or a noticeable change in pre-trends immediately prior to treatment, Sun and Abraham lags will be more affected; in addition, if the not-yet-treated are a better control group than the never-treated, that can show up in worse pre-trends for Sun and Abraham than for Callaway and Sant'Anna.
+
+In addition, CS can more easily accomodate covariates.
 
 In all cases, note how the standard errors tend to increase further from 0, as there are fewer treated (and in some cases, control) units available to make those estimates. Aggregating to a single parameter depends on the desired interpretation and variance properties.
 
-We can get more detail on the CS approach using the functions in the `did` package:
+### Explicitly Weighted CS Approach
 
-```{r}
-## It requires a 0 value for the start period for untreated units
-Vax_CS <- Vax_adj %>% dplyr::filter(Yr_Wk %in% Yr_Wk_Sel) %>%
-                    left_join(Vax_weekly %>% dplyr::filter(LeadLag==0) %>% 
-                                dplyr::select(State,MMWR_week) %>%
-                                rename(First_Week=MMWR_week),
-                              by=join_by(State)) %>%
-                    left_join(tibble(State=unique(Vax_weekly %>% pull(State))) %>%
-                                arrange(State) %>%
-                                mutate(StateID=1:length(unique(Vax_weekly %>% pull(State)))),
-                              by=join_by(State)) %>%
-  dplyr::mutate(First_Week=if_else(is.na(First_Week),0,First_Week))
-```
+We can get more detail on the CS approach using the functions in the `did` package:
 
 The `att_gt` function estimates all group-time ATTs:
 
 ```{r}
 attgt <- att_gt(yname="D1P", tname="MMWR_week", 
                  gname="First_Week", idname="StateID",
-                 data=Vax_CS,
+                 data=Vax_prep,
                  control_group="nevertreated")
 # attgt
 ```
@@ -418,7 +421,7 @@ This package also allows us to add covariates with the `xformla` option:
 attgt1 <- att_gt(yname="D1P", tname="MMWR_week",
                 gname="First_Week", idname="StateID",
                 xformla = ~D1P_prior,
-                data=Vax_CS,
+                data=Vax_prep,
                 control_group="nevertreated")
 # attgt1
 
@@ -434,7 +437,7 @@ ggdid(agg.es.1) +
 
 Now, the point estimates after treatment are generally positive, although still small and highly uncertain.
 
-## First-Difference Switching Effect
+### DCDH: First-Difference Switching Effect
 
 Using the `did_multiplegt` function from the `DIDmultiplegt` package, we can fit the de Chaisemartin and d'Haultfoeuille (2020) method to estimate the average treatment effect of the first period after adoption. Standard errors can be derived using the `brep` and `cluster` options, but we set it to 0 here to speed up the analysis.
 
@@ -526,10 +529,6 @@ dCdH_dyn <- did_multiplegt_dyn(df=Vax_firstWeek,
                                graph_off=FALSE)
 dCdH_dyn
 ```
-
-## Additional Options
-
-Other methods, specifications, and aggregations are possible. The review papers listed in the slides are a good place to start to investigate these.
 
 ## Discussion Questions
 

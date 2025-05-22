@@ -259,21 +259,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with no covariates:</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>TWFE_D1P <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span>mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Get 95% CI:</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P, <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with week 25 as covariate:</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span>D1P_25<span class="sc">+</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                        mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl1_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P_ctrl1, </span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Fit TWFE model with prior-week as covariate:</span></span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(D1P<span class="sc">~</span>D1P_prior<span class="sc">+</span><span class="fu">factor</span>(MMWR_week)<span class="sc">+</span>State<span class="sc">+</span></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                        mandate<span class="sc">+</span>(<span class="dv">1</span><span class="sc">|</span>State),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_weekly <span class="sc">%&gt;%</span> </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> </span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                        dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel))</span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>TWFE_D1P_ctrl2_CI <span class="ot">&lt;-</span> <span class="fu">confint</span>(TWFE_D1P_ctrl2, </span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                            <span class="at">parm=</span><span class="st">"mandateTRUE"</span>, <span class="at">level=</span><span class="fl">0.95</span>)</span>
@@ -305,24 +305,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Fixed Effects Only</td>
-<td style="text-align: left;">-0.3803</td>
-<td style="text-align: left;">-0.6869, -0.0738</td>
+<td style="text-align: left;">-0.4832</td>
+<td style="text-align: left;">-0.798, -0.168</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Fixed Effects + Week 25 Value</td>
-<td style="text-align: left;">-0.3803</td>
-<td style="text-align: left;">-0.6869, -0.0738</td>
+<td style="text-align: left;">-0.4832</td>
+<td style="text-align: left;">-0.798, -0.168</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Fixed Effects + Prior Week Value</td>
-<td style="text-align: left;">0.0208</td>
-<td style="text-align: left;">-0.0659, 0.1074</td>
+<td style="text-align: left;">-0.0121</td>
+<td style="text-align: left;">-0.0899, 0.0657</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Note that the static covariate does not affect the results, as there are already fixed effects included for each state. The two different models (no covariates vs.&nbsp;time-varying covariate) give diverging results, with fairly large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.</p>
+<p>Note that the static covariate does not affect the results, as there are already fixed effects included for each state. The two different models (no covariates vs.&nbsp;time-varying covariate) give fairly different results, with large confidence intervals, leading to no clear conclusion. The estimates are hard to interpret as well given the changing circumstances of the states involved.</p>
 </section>
 <section id="goodman-bacon-decomposition" class="level2">
 <h2 class="anchored" data-anchor-id="goodman-bacon-decomposition">Goodman-Bacon Decomposition</h2>
@@ -483,50 +483,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="dynamic-specification-and-alternative-estimators" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-specification-and-alternative-estimators">Dynamic Specification and Alternative Estimators</h2>
+<section id="data-prep" class="level3">
+<h3 class="anchored" data-anchor-id="data-prep">Data Prep</h3>
+<p>Many of the following functions require two additional variables: a first-treated period variable that is constant for each unit (determines the group/cohort and treatment indicator), and, in some cases a unique numeric or factor ID for the unit. We create those as <code>First_Week</code> and <code>StateID</code>, respectively. For never-treated units, <code>event_study</code> allows either a 0 or <code>NA</code> for the first-treated period, while the <code>did</code> package requires a 0.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>Vax_prep <span class="ot">&lt;-</span> Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>              dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">First_Week=</span><span class="fu">replace_na</span>(First_Week, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>              <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_adj <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">by=</span><span class="fu">join_by</span>(State))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="multi-method-quick-fits" class="level3">
+<h3 class="anchored" data-anchor-id="multi-method-quick-fits">Multi-Method Quick Fits</h3>
 <p>The <code>event_study</code> function in the <code>did2s</code> package implements many proposed DID/staggered adoption methods. These can be chosen using the <code>estimator</code> option, or all can be fit by setting <code>estimator="all"</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run event_study function with estimator="all":</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>ES <span class="ot">&lt;-</span> <span class="fu">event_study</span>(<span class="at">data=</span>Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)),</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">yname=</span><span class="st">"D1P"</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gname=</span><span class="st">"First_Week"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tname=</span><span class="st">"MMWR_week"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimator=</span><span class="st">"all"</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="do">## List all results:</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co"># ES</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Pick out a specific method:</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ES %&gt;% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run event_study function with estimator="all":</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ES <span class="ot">&lt;-</span> <span class="fu">event_study</span>(<span class="at">data=</span>Vax_prep,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">yname=</span><span class="st">"D1P"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">gname=</span><span class="st">"First_Week"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tname=</span><span class="st">"MMWR_week"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimator=</span><span class="st">"all"</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="do">## List all results:</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ES</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Pick out a specific method:</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ES %&gt;% dplyr::filter(estimator=="Borusyak, Jaravel, Spiess (2021)")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of the various estimators:</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the dynamic estimator:</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification of the TWFE model on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"TWFE"</span>),</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Point Est and 95% CI"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results of the various estimators:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results from various staggered adoption methods on the effect of state employee COVID-19 vaccine mandates, event times from -16 to 12."</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Six event-study plots showing effect estimates and 95% confidence intervals at each lead/lag time from -16 to 12. The plots are labelled: TWFE, Borusyak, Jaravel, Spiess (2021), Callway and Sant'Anna (2020), Gardner (2021), Roth and Sant'Anna (2021), and Sun and Abraham (2020)."</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -535,13 +528,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>This is the basic dynamic estimator that arises from including specifying leads/lags in the TWFE model. You can see some evidence for heterogeneous treatment effects: the effect seems to grow with time since treatment. There is also evidence for non-parallel trends: the lead times consistently have positive point estimates, indicating the treated states were growing faster than untreated states prior to treatment. These are decreasing, indicating that this effect was disappearing, or possibly changing.</p>
+<p>For easier inspection, particular estimators can be plotted alone, and the lead/lag times to show can be specified.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the dynamic estimator:</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification of the TWFE model on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"TWFE"</span>),</span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Point Est and 95% CI"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -552,13 +545,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>In this case, the results are quite similar to the TWFE event study specification. Since there are so many untreated states, limiting comparisons to not-yet-treated does not remove many comparisons.</p>
+<p>This is the basic dynamic estimator that arises from including leads/lags (except -1, the last pre-treatment period) in the TWFE model. You can see some evidence for heterogeneous treatment effects: the effect seems to grow with time since treatment. There is also evidence for non-parallel trends: the lead times consistently have positive point estimates, indicating the treated states were growing faster than untreated states prior to treatment. These are decreasing, indicating that this effect was disappearing, or possibly changing. Under heterogeneous treatment effects (either calendar time-varying treatment effects or different dynamic effects by adoption cohorts), there can still be cross-lag contamination and negative weights. This even means that apparent pre-trends may not be reliable (i.e., non-zero lead estimates can result from heterogeneous dynamic effects rather than a violation of parallel trends).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Sun and Abraham estimator:</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the dynamic estimator:</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the dynamic specification described in Borusyak et al. (2024) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Sun and Abraham (2020)"</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Borusyak, Jaravel, Spiess (2021)"</span>),</span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Point Est and 95% CI"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -569,13 +562,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Similarly, the Sun and Abraham estimator that only uses never-treated for comparison has similar results as well.</p>
+<p>The BJS estimator is a two-stage estimator that first fits a model for the unit and time fixed effects on the untreated unit-periods only. Then it removes these effects from the treated unit-periods and regresses the residuals on the leads/lags. It thus requires a strict parallel trends assumption (by using all prior periods to fit the counterfactual) and weights the group-time ATTs implicitly through the final OLS regression.</p>
+<p>In this case, the results are fairly similar to the TWFE event study specification.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Callaway abnd Sant'Anna estimator:</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Sun and Abraham estimator:</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Sun and Abraham (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have positive estimates with CIs crossing or nearly crossing 0, and those greater than 0 tend to have negative estimates with CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Callaway and Sant'Anna (2020)"</span>),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Sun and Abraham (2020)"</span>),</span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Point Est and 95% CI"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -586,27 +580,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>This approach gives noticeably different results from the others, especially in the lead periods. This may be because the CS specification allows not-yet-treated controls to be used and later-treated units may have better parallel trends than never-treated units. CS also does not require comparison only to the last-pretreated period, allowing more information to be used in the adjustment for fixed effects of time.</p>
-<p>In all cases, note how the standard errors tend to increase further from 0, as there are fewer treated (and in some cases, control) units available to make those estimates. Aggregating to a single parameter depends on the desired interpretation and variance properties.</p>
-<p>We can get more detail on the CS approach using the functions in the <code>did</code> package:</p>
+<p>The Sun and Abraham estimator fits a dynamic regression with leads/lags interacted with each timing group, leaving out the never- or last-treated group. All comparisons are made to the final pre-treatment week. These are then weighted for each lead/lag by the share of units/observations at each lead/lag that falls into that timing group. This works well for unit-level homogeneity and ensures no negative weights even under different dynamic trends. It is also a strong restriction, not using any information from not-yet-treated groups (limiting efficiency in the bias-variance tradeoff); and does not permit covariates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## It requires a 0 value for the start period for untreated units</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>Vax_CS <span class="ot">&lt;-</span> Vax_adj <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(Yr_Wk <span class="sc">%in%</span> Yr_Wk_Sel) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(Vax_weekly <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(LeadLag<span class="sc">==</span><span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                                dplyr<span class="sc">::</span><span class="fu">select</span>(State,MMWR_week) <span class="sc">%&gt;%</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">rename</span>(<span class="at">First_Week=</span>MMWR_week),</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">left_join</span>(<span class="fu">tibble</span>(<span class="at">State=</span><span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State))) <span class="sc">%&gt;%</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">arrange</span>(State) <span class="sc">%&gt;%</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">mutate</span>(<span class="at">StateID=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(Vax_weekly <span class="sc">%&gt;%</span> <span class="fu">pull</span>(State)))),</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">by=</span><span class="fu">join_by</span>(State)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">First_Week=</span><span class="fu">if_else</span>(<span class="fu">is.na</span>(First_Week),<span class="dv">0</span>,First_Week))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the results for just the Callaway abnd Sant'Anna estimator:</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Event-study results using the estimator from Callaway and Sant'Anna (2020) on the effect of state employee COVID-19 vaccine mandates, event times from -10 to 8."</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A single event-study plot showing effect estimates and 95% confidence intervals at each lead/lag time from -10 to 8. The event times less than 0 tend to have estimates near 0 with (mostly) fairly narrow CIs, and those greater than 0 tend to have negative estimates with wide CIs crossing or nearly crossing 0. The CIs are narrowest near event time 0, and the estimates are closest to 0 there."</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_event_study</span>(ES <span class="sc">%&gt;%</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                   dplyr<span class="sc">::</span><span class="fu">filter</span>(estimator<span class="sc">==</span><span class="st">"Callaway and Sant'Anna (2020)"</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">horizon=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Point Est and 95% CI"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mandate-did-handout_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
+</div>
+</div>
+<p>This approach gives noticeably different results from the others for the lead periods, although the post-treatment effect estimates are pretty similar. There are two main differences in the fitting compared to the Sun and Abraham approach: (1) not-yet-treated units are also used as controls here; and (2) pre-treatment lag estimates are estimated compared to the prior period, rather than to the last pre-treatment period. Thus, the lags are testing a different parallel trends (one period-forward trends) than Sun and Abraham (vs.&nbsp;last pre-treatment period trends). If there is anticipation, or a noticeable change in pre-trends immediately prior to treatment, Sun and Abraham lags will be more affected; in addition, if the not-yet-treated are a better control group than the never-treated, that can show up in worse pre-trends for Sun and Abraham than for Callaway and Sant’Anna.</p>
+<p>In addition, CS can more easily accomodate covariates.</p>
+<p>In all cases, note how the standard errors tend to increase further from 0, as there are fewer treated (and in some cases, control) units available to make those estimates. Aggregating to a single parameter depends on the desired interpretation and variance properties.</p>
+</section>
+<section id="explicitly-weighted-cs-approach" class="level3">
+<h3 class="anchored" data-anchor-id="explicitly-weighted-cs-approach">Explicitly Weighted CS Approach</h3>
+<p>We can get more detail on the CS approach using the functions in the <code>did</code> package:</p>
 <p>The <code>att_gt</code> function estimates all group-time ATTs:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>attgt <span class="ot">&lt;-</span> <span class="fu">att_gt</span>(<span class="at">yname=</span><span class="st">"D1P"</span>, <span class="at">tname=</span><span class="st">"MMWR_week"</span>, </span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gname=</span><span class="st">"First_Week"</span>, <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>Vax_CS,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>Vax_prep,</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">control_group=</span><span class="st">"nevertreated"</span>)</span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># attgt</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -622,7 +624,7 @@ aggte(MP = attgt, type = "simple")
 Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. &lt;https://doi.org/10.1016/j.jeconom.2020.12.001&gt;, &lt;https://arxiv.org/abs/1803.09015&gt; 
 
      ATT    Std. Error     [ 95%  Conf. Int.] 
- -0.4194        0.5404    -1.4787      0.6398 
+ -0.3631        0.5022    -1.3475      0.6213 
 
 
 ---
@@ -643,39 +645,39 @@ Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differenc
 
 Overall summary of ATT's based on event-study/dynamic aggregation:  
      ATT    Std. Error     [ 95%  Conf. Int.] 
- -0.5191        0.6418     -1.777      0.7388 
+ -0.4219        0.5932    -1.5844      0.7407 
 
 
 Dynamic Effects:
  Event time Estimate Std. Error [95% Simult.  Conf. Band] 
-        -15  -0.8690     0.7906       -2.9328      1.1948 
-        -14  -0.0092     0.0684       -0.1876      0.1693 
-        -13  -0.0621     0.0689       -0.2420      0.1179 
-        -12  -0.0595     0.0785       -0.2643      0.1454 
-        -11  -0.0632     0.0627       -0.2269      0.1005 
-        -10  -0.0824     0.0802       -0.2916      0.1269 
-         -9  -0.1272     0.0669       -0.3018      0.0474 
-         -8   0.2029     0.4219       -0.8985      1.3043 
-         -7  -0.0980     0.0804       -0.3079      0.1120 
-         -6  -0.0623     0.0701       -0.2453      0.1207 
-         -5  -0.1039     0.0727       -0.2937      0.0859 
-         -4  -0.0266     0.0941       -0.2723      0.2191 
-         -3  -0.0628     0.0582       -0.2148      0.0891 
-         -2  -0.0705     0.0570       -0.2194      0.0784 
-         -1  -0.0891     0.0672       -0.2645      0.0864 
-          0  -0.0431     0.0719       -0.2308      0.1446 
-          1  -0.0762     0.1466       -0.4590      0.3065 
-          2  -0.2499     0.3315       -1.1151      0.6154 
-          3  -0.2805     0.3809       -1.2747      0.7138 
-          4  -0.3025     0.4267       -1.4164      0.8114 
-          5  -0.7169     0.6294       -2.3599      0.9261 
-          6  -0.7701     0.7750       -2.7932      1.2530 
-          7  -0.7429     0.7837       -2.7886      1.3028 
-          8  -0.5095     0.9097       -2.8842      1.8652 
-          9  -1.2172     1.0703       -4.0112      1.5767 
-         10  -1.0966     1.0782       -3.9111      1.7180 
-         11  -1.4259     1.5491       -5.4696      2.6178 
-         12   0.6828     0.5402       -0.7274      2.0929 
+        -16  -0.8690     0.7816       -2.8953      1.1574 
+        -15  -0.0092     0.0661       -0.1805      0.1622 
+        -14  -0.0621     0.0709       -0.2458      0.1217 
+        -13  -0.0595     0.0783       -0.2624      0.1434 
+        -12  -0.0632     0.0625       -0.2252      0.0988 
+        -11  -0.0824     0.0809       -0.2921      0.1274 
+        -10  -0.1272     0.0694       -0.3072      0.0528 
+         -9   0.2029     0.4320       -0.9172      1.3230 
+         -8  -0.0980     0.0778       -0.2996      0.1037 
+         -7  -0.0623     0.0700       -0.2438      0.1192 
+         -6  -0.1039     0.0763       -0.3018      0.0940 
+         -5  -0.0266     0.0926       -0.2667      0.2135 
+         -4  -0.0628     0.0613       -0.2217      0.0960 
+         -3  -0.0705     0.0591       -0.2236      0.0826 
+         -2  -0.0891     0.0630       -0.2524      0.0743 
+         -1  -0.0431     0.0744       -0.2360      0.1498 
+          0  -0.0331     0.0731       -0.2226      0.1563 
+          1  -0.1818     0.2644       -0.8673      0.5036 
+          2  -0.2124     0.3092       -1.0142      0.5894 
+          3  -0.2345     0.3592       -1.1658      0.6969 
+          4  -0.5414     0.5788       -2.0421      0.9593 
+          5  -0.5977     0.6330       -2.2390      1.0436 
+          6  -0.5705     0.8063       -2.6609      1.5200 
+          7  -0.3724     0.8333       -2.5331      1.7882 
+          8  -1.0230     0.9890       -3.5871      1.5412 
+          9  -0.9023     1.0143       -3.5322      1.7276 
+         10  -1.1828     1.4982       -5.0673      2.7018 
+         11   0.7897     0.5601       -0.6626      2.2419 
 ---
 Signif. codes: `*' confidence band does not cover 0
 
@@ -694,19 +696,19 @@ Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differenc
 
 Overall summary of ATT's based on group/cohort aggregation:  
      ATT    Std. Error     [ 95%  Conf. Int.] 
- -0.1874        0.4314    -1.0329      0.6581 
+ -0.1406        0.3423    -0.8115      0.5304 
 
 
 Group Effects:
  Group Estimate Std. Error [95% Simult.  Conf. Band]  
-    30  -0.2030     0.3654       -1.3407      0.9347  
-    31  -4.3819     0.3050       -5.3315     -3.4323 *
-    32  -0.4647     0.5757       -2.2571      1.3276  
-    34   0.7266     0.4823       -0.7749      2.2282  
-    35  -1.2026     0.1221       -1.5826     -0.8226 *
-    37  -0.3086     0.0707       -0.5286     -0.0886 *
-    38   0.4578     0.1693       -0.0692      0.9847  
-    41   0.1052     0.1006       -0.2080      0.4184  
+    31  -0.1041     0.3023       -0.7823      0.5741  
+    32  -4.0693     0.2372       -4.6014     -3.5372 *
+    33  -0.4050     0.4167       -1.3397      0.5297  
+    35   0.7787     1.2373       -1.9969      3.5542  
+    36  -0.8542     0.0966       -1.0708     -0.6376 *
+    38  -0.1262     0.0625       -0.2665      0.0141  
+    39   0.3886     0.1442        0.0653      0.7120 *
+    42   0.0471     0.0847       -0.1428      0.2370  
 ---
 Signif. codes: `*' confidence band does not cover 0
 
@@ -735,7 +737,7 @@ Estimation Method:  Doubly Robust</code></pre>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>attgt1 <span class="ot">&lt;-</span> <span class="fu">att_gt</span>(<span class="at">yname=</span><span class="st">"D1P"</span>, <span class="at">tname=</span><span class="st">"MMWR_week"</span>,</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">gname=</span><span class="st">"First_Week"</span>, <span class="at">idname=</span><span class="st">"StateID"</span>,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">xformla =</span> <span class="sc">~</span>D1P_prior,</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data=</span>Vax_CS,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data=</span>Vax_prep,</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">control_group=</span><span class="st">"nevertreated"</span>)</span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co"># attgt1</span></span>
 <span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
@@ -751,39 +753,39 @@ Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differenc
 
 Overall summary of ATT's based on event-study/dynamic aggregation:  
     ATT    Std. Error     [ 95%  Conf. Int.] 
- 0.2223        0.5022    -0.7621      1.2066 
+ 0.2151         0.444    -0.6551      1.0853 
 
 
 Dynamic Effects:
  Event time Estimate Std. Error [95% Simult.  Conf. Band] 
-        -15  -0.6902     0.7865       -2.6222      1.2417 
-        -14   0.0380     0.0675       -0.1278      0.2038 
-        -13   0.0506     0.0755       -0.1349      0.2360 
-        -12   0.1045     0.0838       -0.1012      0.3103 
-        -11   0.0122     0.0642       -0.1454      0.1698 
-        -10   0.0651     0.0674       -0.1006      0.2307 
-         -9   0.0154     0.0709       -0.1587      0.1896 
-         -8   0.3213     0.4135       -0.6944      1.3370 
-         -7   0.0154     0.0784       -0.1772      0.2080 
-         -6   0.0266     0.0704       -0.1465      0.1996 
-         -5  -0.0204     0.0892       -0.2395      0.1987 
-         -4   0.0378     0.1018       -0.2122      0.2879 
-         -3  -0.0294     0.0756       -0.2151      0.1562 
-         -2  -0.0135     0.0613       -0.1640      0.1370 
-         -1  -0.0390     0.0929       -0.2671      0.1892 
-          0  -0.0115     0.0875       -0.2264      0.2033 
-          1   0.0470     0.1418       -0.3012      0.3953 
-          2   0.0696     0.2305       -0.4967      0.6359 
-          3   0.0711     0.3211       -0.7178      0.8599 
-          4   0.0650     0.3475       -0.7885      0.9186 
-          5   0.0514     0.5265       -1.2421      1.3448 
-          6   0.1317     0.6610       -1.4920      1.7554 
-          7   0.1536     0.7923       -1.7928      2.0999 
-          8   0.5526     0.8990       -1.6558      2.7609 
-          9   0.0987     0.7839       -1.8270      2.0244 
-         10   0.1711     0.8816       -1.9945      2.3368 
-         11   0.4588     0.9323       -1.8314      2.7489 
-         12   1.0305     0.9518       -1.3077      3.3687 
+        -16  -0.6902     0.7955       -2.6802      1.2998 
+        -15   0.0380     0.0713       -0.1403      0.2162 
+        -14   0.0506     0.0795       -0.1484      0.2496 
+        -13   0.1045     0.0789       -0.0928      0.3019 
+        -12   0.0122     0.0683       -0.1586      0.1831 
+        -11   0.0651     0.0706       -0.1117      0.2418 
+        -10   0.0154     0.0674       -0.1533      0.1841 
+         -9   0.3213     0.4019       -0.6842      1.3268 
+         -8   0.0154     0.0736       -0.1686      0.1995 
+         -7   0.0266     0.0719       -0.1532      0.2063 
+         -6  -0.0204     0.0868       -0.2376      0.1968 
+         -5   0.0378     0.1036       -0.2214      0.2971 
+         -4  -0.0294     0.0764       -0.2205      0.1616 
+         -3  -0.0135     0.0624       -0.1697      0.1426 
+         -2  -0.0390     0.0931       -0.2719      0.1940 
+         -1  -0.0115     0.0822       -0.2173      0.1942 
+          0   0.0552     0.0594       -0.0933      0.2037 
+          1   0.0647     0.1444       -0.2965      0.4259 
+          2   0.0636     0.2131       -0.4694      0.5966 
+          3   0.0560     0.2524       -0.5754      0.6875 
+          4   0.0796     0.4181       -0.9663      1.1254 
+          5   0.1322     0.6062       -1.3843      1.6486 
+          6   0.1525     0.6635       -1.5073      1.8124 
+          7   0.4809     0.8071       -1.5382      2.5001 
+          8   0.0301     0.6697       -1.6452      1.7054 
+          9   0.0965     0.7621       -1.8100      2.0031 
+         10   0.4001     0.8013       -1.6046      2.4049 
+         11   0.9697     0.9033       -1.2900      3.2295 
 ---
 Signif. codes: `*' confidence band does not cover 0
 
@@ -805,8 +807,8 @@ Estimation Method:  Doubly Robust</code></pre>
 </div>
 <p>Now, the point estimates after treatment are generally positive, although still small and highly uncertain.</p>
 </section>
-<section id="first-difference-switching-effect" class="level2">
-<h2 class="anchored" data-anchor-id="first-difference-switching-effect">First-Difference Switching Effect</h2>
+<section id="dcdh-first-difference-switching-effect" class="level3">
+<h3 class="anchored" data-anchor-id="dcdh-first-difference-switching-effect">DCDH: First-Difference Switching Effect</h3>
 <p>Using the <code>did_multiplegt</code> function from the <code>DIDmultiplegt</code> package, we can fit the de Chaisemartin and d’Haultfoeuille (2020) method to estimate the average treatment effect of the first period after adoption. Standard errors can be derived using the <code>brep</code> and <code>cluster</code> options, but we set it to 0 here to speed up the analysis.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="do">## First, we prepare a data set with a variable with the First_Week of</span></span>
@@ -971,9 +973,6 @@ ERC REALLYCREDIBLE - GA N. 101043899</code></pre>
 </div>
 </div>
 </section>
-<section id="additional-options" class="level2">
-<h2 class="anchored" data-anchor-id="additional-options">Additional Options</h2>
-<p>Other methods, specifications, and aggregations are possible. The review papers listed in the slides are a good place to start to investigate these.</p>
 </section>
 <section id="discussion-questions-1" class="level2">
 <h2 class="anchored" data-anchor-id="discussion-questions-1">Discussion Questions</h2>

@@ -282,12 +282,34 @@ Negative weights on some treatment effects *can* lead to averages outside of the
 
 ## Possible Solutions
 
-(1) Restricting Observations: Exclude timing-only comparisons
-(2) Restricting Periods: First Difference
-(3) Dynamic Specifications
-(4) Explicit Weightings
+(1) Dynamic Specifications
+(2) Restricting Observations: Exclude timing-only comparisons
+(3) Interacted Specification
+(4) Restricting Periods: First Differences
+(5) Explicit Weightings
 
-## 1. Restricting Observations
+## 1. Dynamic Regression Specification
+
+$$
+Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq -1} \delta_{k} I(K_{it} = k) + \epsilon_{it},
+$$
+
+where $K_{it}$ is the lead/lag for unit $i$ in period $t$ (e.g., $K_{it} = 0$ in the first exposed period).
+
+See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007). Captures time-on-treatment heterogeneity.
+
+Also useful to test for "pre-trends" in single intervention time setting.
+
+## Issues
+
+If there are any heterogeneities beyond time-on-treatment, then this dynamic specification can still give bias or uninterpretable estimands.
+
+- Negative weights on some units
+- "Contaminated" period effects
+
+See [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006).
+
+## 2. Restricting Observations
 
 One approach to avoiding forbidden comparisons is restricting the observations used to fit the model.
 
@@ -297,7 +319,13 @@ One approach to avoiding forbidden comparisons is restricting the observations u
 
 [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) use the approach with a clean "control" $C$ that is either never-treated or last-treated. Their regression approach then implicitly weights by population share in each timing group.
 
-## 1. Restricting Observations
+## 2. Stacked DID Regression
+
+[Cengiz et al. (2019)](https://doi.org/10.1093/qje/qjz014) and others weight through "stacked" regression. Get data for a clean comparison for each treated group and put these data sets together, with an indicator for each one. Then conduct TWFE, accounting for these data indicators.
+
+This essentially estimates each $ATT_{g,t}$ and then inverse-variance weights them through OLS. May have good efficiency, but limits interpretability of estimand if there are other heterogeneities.
+
+## 2. Restricting Observations
 
 ::::: columns
 ::: {.column width="50%"}
@@ -317,7 +345,7 @@ Disadvantages/Limitations:
 :::
 :::::
 
-## 2. Restricting Periods: First-Difference
+## 3. Restricting Periods: First-Difference
 
 Use only the immediate switching effect. For each time period $t$ with at least one unit untreated at $t-1$ and treated at $t$ and at least one unit untreated at both $t-1$ and $t$, compute:
 
@@ -328,17 +356,17 @@ $$
 \end{align*}
 $$
 
-## 2. Restricting Periods: First-Difference
+## 3. Restricting Periods: First-Difference
 
 ![](images/Adv_DID/FirstDiff.png){fig-alt="Schematic of staggered adoption design. Only the last untreated (white) block and first treated (green) blocks in each row are highlighted for comparison."}
 
-## 2. Restricting Periods: First-Difference
+## 3. Restricting Periods: First-Difference
 
 Average these switcher estimates across all time periods $t$, weighted by number of units or individuals.
 
 See [de Chaisemartin and d'Haultfoeuille (2020)](https://doi.org/10.1257/aer.20181169) and [de Chaisemartin and d'Haultfoeuille (2023)](https://doi.org/10.1093/ectj/utac017), or the crossover (CO) estimator in [Kennedy-Shaffer et al. (2020)](https://doi.org/10.1002/sim.8451).
 
-## 2. Restricting Periods: First-Difference
+## 3. Restricting Periods: First-Difference
 
 ::::: columns
 ::: {.column width="50%"}
@@ -362,31 +390,19 @@ Disadvantages/Limitations:
 :::
 :::::
 
-## 3. Dynamic Regression Specification
-
-$$
-Y_{it} = \alpha_i + \gamma_t + \sum_{k \neq 0} \delta_{k} I(K_{it} = k)+\epsilon_{it},
-$$
-
-where $K_{it}$ is the lead/lag for unit $i$ in period $t$ (e.g., $K_{it} = 1$ in the first exposed period).
-
-See [Borusyak and Jaravel (2018)](https://scholar.harvard.edu/files/borusyak/files/borusyak_jaravel_event_studies.pdf) and [Borusyak et al. (2024)](https://doi.org/10.1093/restud/rdae007). Captures time-on-treatment heterogeneity.
-
-Also useful to test for "pre-trends" in single intervention time setting.
-
-## 3. Interaction-Weighting Dynamics
+## 4. Interaction-Weighting Dynamics
 
 We can account for timing cohort heterogeneity as well by further allowing the effect to vary by adoption timing group ($G_i$):
 
 $$
-Y_{it} = \alpha_i + \gamma_t + \sum_g \sum_{k \neq 0} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
+Y_{it} = \alpha_i + \gamma_t + \sum_{g \not\in C} \sum_{k \neq -1} \delta_{g,k} I(G_i = g) I(K_{it} = k) + \epsilon_{it}
 $$
 
 . . .
 
-Various methods use this approach (e.g., [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006)), and differ in which comparisons/observations they allow and how they combine results (SA focuses on time-on-treatment averaging). This implies different assumptions and bias-variance tradeoffs.
+Various methods use this approach (e.g., [Sun and Abraham (2021)](https://doi.org/10.1016/j.jeconom.2020.09.006) can be put in this form), and differ in which comparisons/observations they allow and how they combine results (SA focuses on time-on-treatment averaging). This implies different assumptions and bias-variance tradeoffs.
 
-## 4. Weighting: Group-Time ATT
+## 5. Weighting: Group-Time ATT
 
 Let
 
@@ -402,7 +418,7 @@ Many solutions boil down to considering which group-time ATTs should be included
 
 TWFE assumes $ATT(g,t) = \theta$ for all $g \le t$.
 
-## 4. Weighting: Callaway and Sant'Anna
+## 5. Weighting: Callaway and Sant'Anna
 
 [Callaway and Sant'Anna (2021)](https://doi.org/10.1016/j.jeconom.2020.12.001) propose to estimate $\widehat{ATT}_{g,t}$ for each timing group $g$ and period $t$ using a non-parametric scheme compared to the **last** pre-treatment period, comparing group $g$ to a never-, last-, or not yet-treated control. Simple DID can be used, or regression-based estimators (IPW, OR, DR) to accomodate covariates. CS favor aggregation by cohort. Also has highly developed inference.
 
@@ -412,13 +428,7 @@ $$
 \theta = \sum_g \sum_{t=2}^T w_{g,t} ATT_{g,t}.
 $$
 
-## 4. Weighting: Stacked DID Regression
-
-[Cengiz et al. (2019)](https://doi.org/10.1093/qje/qjz014) and others weight through "stacked" regression. Get data for a clean comparison for each treated group and put these data sets together, with an indicator for each one. Then conduct TWFE, accounting for these data indicators.
-
-This essentially estimates each $ATT_{g,t}$ and then inverse-variance weights them through OLS. May have good efficiency, but limits interpretability of estimand.
-
-## 4. Weighting: 2x2 Building Blocks
+## 5. Weighting: 2x2 Building Blocks
 
 Another framework allows weights across all 2x2 DID comparisons, with weights chosen to target a specific estimand or minimize variance.
 

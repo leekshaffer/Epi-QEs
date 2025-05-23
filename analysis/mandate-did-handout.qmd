@@ -212,7 +212,7 @@ bacon <- bacon(D1P~mandate,
                id_var="State",
                time_var="MMWR_week")
 ## Full decomposition:
-bacon
+# bacon
 ```
 
 ```{r}
@@ -371,9 +371,7 @@ plot_event_study(ES %>%
   labs(y="Point Est and 95% CI")
 ```
 
-This approach gives noticeably different results from the others for the lead periods, although the post-treatment effect estimates are pretty similar. There are two main differences in the fitting compared to the Sun and Abraham approach: (1) not-yet-treated units are also used as controls here; and (2) pre-treatment lag estimates are estimated compared to the prior period, rather than to the last pre-treatment period. Thus, the lags are testing a different parallel trends (one period-forward trends) than Sun and Abraham (vs. last pre-treatment period trends). If there is anticipation, or a noticeable change in pre-trends immediately prior to treatment, Sun and Abraham lags will be more affected; in addition, if the not-yet-treated are a better control group than the never-treated, that can show up in worse pre-trends for Sun and Abraham than for Callaway and Sant'Anna.
-
-In addition, CS can more easily accomodate covariates.
+This approach gives noticeably different results from the others for the lead periods, although the post-treatment effect estimates are pretty similar. There are two main differences in the fitting compared to the Sun and Abraham approach: (1) not-yet-treated units are also used as controls here; and (2) pre-treatment lead estimates are estimated compared to the prior period, rather than to the last pre-treatment period. In fact, the leads estimated by SA are similar to the accumulated leads estimated by CS (they will be more different if there are fewer never-treated units). This makes any divergence from parallel pre-trends, including anticipation, appear starker in the SA results.
 
 In all cases, note how the standard errors tend to increase further from 0, as there are fewer treated (and in some cases, control) units available to make those estimates. Aggregating to a single parameter depends on the desired interpretation and variance properties.
 
@@ -532,6 +530,6 @@ dCdH_dyn
 
 ## Discussion Questions
 
-- Are this question and its associated data set a good fit for a DID/staggered adoption analysis? Why or why not?
+- Are this question and this data set a good fit for a DID/staggered adoption analysis? Why or why not?
 
 - What would you conclude from these results?
